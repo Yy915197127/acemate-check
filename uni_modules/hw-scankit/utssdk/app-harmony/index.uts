@@ -1,0 +1,86 @@
+import {
+	HWScanOption,
+	HWScanResult,
+	HWScanResultCallBack,
+} from '../interface.uts'
+
+import { scanCore, scanBarcode } from '@kit.ScanKit';
+import { BusinessError } from '@kit.BasicServicesKit';
+import type { common } from '@kit.AbilityKit'
+
+export function scan(options : HWScanOption | null, complete : HWScanResultCallBack) {
+	try {
+		let scanOption : scanBarcode.ScanOptions = {
+			scanTypes: [scanCore.ScanType.ALL],
+			enableMultiMode: true,
+			enableAlbum: true
+		};
+		scanBarcode.startScanForResult(getContext() as common.UIAbilityContext, scanOption,
+			(error : BusinessError, result : scanBarcode.ScanResult) => {
+				if (error) {
+					complete({
+						code: error.code,
+						msg: error.message,
+						data: null,
+					})
+					return
+				}
+				// 解析码值结果跳转应用服务页
+				complete({
+					code: 0,
+					msg: 'success',
+					data: {
+						scanType: getScanTypeName(result.scanType),
+						originalValue: result.originalValue,
+					}
+				})
+			})
+	} catch (error) {
+		complete({
+			code: error.code,
+			msg: error.message,
+			data: null,
+		})
+	}
+}
+
+function getScanTypeName(type : number) {
+	switch (type) {
+		case 0:
+			return "FORMAT_UNKNOWN";
+		case 1:
+			return "AZTEC_CODE";
+		case 2:
+			return "CODABAR_CODE";
+		case 3:
+			return "CODE39_CODE";
+		case 4:
+			return "CODE93_CODE";
+		case 5:
+			return "CODE128_CODE";
+		case 6:
+			return "DATAMATRIX_CODE";
+		case 7:
+			return "EAN8_CODE";
+		case 8:
+			return "EAN13_CODE";
+		case 9:
+			return "ITF14_CODE";
+		case 10:
+			return "PDF417_CODE";
+		case 11:
+			return "QR_CODE";
+		case 12:
+			return "UPC_A_CODE";
+		case 13:
+			return "UPC_E_CODE";
+		case 14:
+			return "MULTIFUNCTIONAL_CODE";
+		case 100:
+			return "ONE_D_CODE";
+		case 101:
+			return "TWO_D_CODE";
+		default:
+			return "FORMAT_UNKNOWN";
+	}
+}

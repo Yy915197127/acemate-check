@@ -1,0 +1,91 @@
+{
+  "id": "hw-scankit",
+  "displayName": "Android iOS HarmonyOS 统一扫码",
+  "version": "1.1.2",
+  "description": "华为 ScanKit 统一扫码",
+  "keywords": [
+    "huawei",
+    "hw-scankit",
+    "hw",
+    "scan",
+    "harmony"
+],
+  "repository": "",
+  "engines": {
+    "HBuilderX": "^4.44"
+  },
+  "dcloudext": {
+    "type": "uts",
+    "sale": {
+      "regular": {
+        "price": "0.00"
+      },
+      "sourcecode": {
+        "price": "0.00"
+      }
+    },
+    "contact": {
+      "qq": "1014457309"
+    },
+    "declaration": {
+      "ads": "无",
+      "data": "插件不采集任何数据",
+      "permissions": "<uses-permission android:name=\"android.permission.CAMERA\" />\n\n<uses-permission android:name=\"android.permission.FLASHLIGHT\" />\n\n<uses-permission android:name=\"android.permission.READ_MEDIA_IMAGES\" />\n\n<uses-permission android:name=\"android.permission.READ_MEDIA_VIDEO\" />\n\n<uses-permission android:name=\"android.permission.READ_MEDIA_AUDIO\" />\n\n<uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\" android:maxSdkVersion=\"32\" />\n\n<uses-permission android:name=\"android.permission.READ_MEDIA_VISUAL_USER_SELECTED\" />\n\n"
+    },
+    "npmurl": ""
+  },
+  "uni_modules": {
+    "dependencies": [],
+    "encrypt": [],
+    "platforms": {
+      "cloud": {
+        "tcb": "y",
+        "aliyun": "y",
+        "alipay": "y"
+      },
+      "client": {
+        "Vue": {
+          "vue2": "y",
+          "vue3": "y"
+        },
+        "App": {
+            "app-android": {
+                "minVersion": "28"
+            },
+            "app-ios": {
+                "minVersion": "11"
+            },
+            "app-harmony": "y"
+        },
+        "H5-mobile": {
+          "Safari": "n",
+          "Android Browser": "n",
+          "微信浏览器(Android)": "n",
+          "QQ浏览器(Android)": "n"
+        },
+        "H5-pc": {
+          "Chrome": "n",
+          "IE": "n",
+          "Edge": "n",
+          "Firefox": "n",
+          "Safari": "n"
+        },
+        "小程序": {
+          "微信": "n",
+          "阿里": "n",
+          "百度": "n",
+          "字节跳动": "n",
+          "QQ": "n",
+          "钉钉": "n",
+          "快手": "n",
+          "飞书": "n",
+          "京东": "n"
+        },
+        "快应用": {
+          "华为": "n",
+          "联盟": "n"
+        }
+      }
+    }
+  }
+}

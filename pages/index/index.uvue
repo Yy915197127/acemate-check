@@ -1,0 +1,61 @@
+<template>
+	<view>
+		<image class="logo" src="/static/logo.png" @click="ceshisaoma()"></image>
+		<image class="logo" src="/static/logo.png" @click="ceshisaoma1()"></image>
+		<image class="logo" src="/static/logo.png" @click="ceshisaoma2()"></image>
+		<view class="text-area">
+			<text class="title">{{title}}</text>
+		</view>
+
+	</view>
+</template>
+
+<script lang="uts">
+	import { onBluetoothManager, BluetoothCallback, onStartScanning, onConnectDevice, onDisconnectPeripheral } from '@/uni_modules/ace-bluetooth';
+
+	export default {
+		data() {
+			return {
+				title: 'Hello',
+				peripherals: [] as Array<string>
+			}
+		},
+
+		onLoad() {
+			/* 蓝牙列表回调 */
+			onBluetoothManager((res) => {
+				console.log(res)
+				this.peripherals = res
+			});
+		},
+
+		methods: {
+			ceshisaoma() {
+				console.log('扫描蓝牙')
+				onStartScanning()
+			},
+			ceshisaoma1() {
+				console.log('连接蓝牙')
+				onConnectDevice(this.peripherals[0])
+			},
+			ceshisaoma2() {
+				console.log('断开蓝牙')
+				onDisconnectPeripheral()
+			},
+		}
+	}
+</script>
+
+<style>
+	.logo {
+		height: 100px;
+		width: 100px;
+		margin: 100px auto 25px auto;
+	}
+
+	.title {
+		font-size: 18px;
+		color: #8f8f94;
+		text-align: center;
+	}
+</style>

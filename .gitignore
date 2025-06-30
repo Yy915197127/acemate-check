@@ -1,22 +1,88 @@
-### AL ###
-#Template for AL projects for Dynamics 365 Business Central
-#launch.json folder
-.vscode/
-#Cache folder
-.alcache/
-#Symbols folder
-.alpackages/
-#Snapshots folder
-.snapshots/
-#Testing Output folder
-.output/
-#Extension App-file
-*.app
-#Rapid Application Development File
-rad.json
-#Translation Base-file
-*.g.xlf
-#License-file
-*.flf
-#Test results file
-TestResults.xml
+# macOS 系统文件
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Xcode 自动生成的文件
+build/
+DerivedData/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+*.moved-aside
+*.swp
+*.xcscmblueprint
+
+# Xcode 工作区
+*.xcworkspace/
+!default.xcworkspace
+
+# Swift Package Manager
+.swiftpm/
+Package.resolved
+Package.pins
+.build/
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Carthage
+Carthage/
+Carthage/Checkouts
+Carthage/Build
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# Flutter (如果使用 Flutter)
+flutter/bin/cache/
+flutter/bin/internal/
+.flutter-plugins
+.flutter-plugins-dependencies
+.dart_tool/
+.pub-cache/
+.idea/
+.metadata
+android/.gradle/
+android/.idea/
+android/local.properties
+android/app/google-services.json
+ios/.symlinks/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.podspec
+
+# Google Firebase & Service Files
+GoogleService-Info.plist
+
+# HBuilderX 编译输出目录
+unpackage/
+dist/
+build/
+
+# Vite 缓存
+.vite/
+
+# HBuilderX 缓存
+.hbuilderx/
+
+# 临时文件
+*.log
+*.tmp
+
+# 其他
+*.lock
+*.xcworkspace
+*.xcuserstate
