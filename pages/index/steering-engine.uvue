@@ -1,0 +1,198 @@
+<template>
+	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
+		<template v-slot:right>
+			<button size="mini" style="width: 70px; padding: 0;" @click="quit">退出测试</button>
+		</template>
+	</uni-navbar-lite>
+	<scroll-view class="page">
+		<view style="background-color: #ffffff; padding: 20px;">
+			<text class="title">{{turntableTitle}}</text>
+			<view class="space-view">
+				<button class="btn" size="mini" @click="turntableBut(turntable[0])">0°</button>
+				<button class="btn" size="mini" @click="turntableBut(turntable[1])">90°</button>
+				<button class="btn" size="mini" @click="turntableBut(turntable[2])">180°</button>
+				<button class="btn" size="mini" @click="turntableBut(turntable[3])">270°</button>
+			</view>
+			<view class="long-btn-view">
+				<text class="remark-text">当前角度偏移量：{{turntableOffset}}°</text>
+				<button class="long-btn" @click="turntableRevise">{{turntableOffset}}°校正</button>
+			</view>
+		</view>
+
+		<view style="background-color: #ffffff; padding: 20px; margin-top: 30px;">
+			<text class="title">{{cabinDoorTitle}}</text>
+			<view class="space-view">
+				<button class="cabinDoor-btn" size="mini" @click="cabinDoorClose">关舱门</button>
+				<button class="cabinDoor-btn" size="mini" @click="cabinDoorOpen">开舱门</button>
+			</view>
+			<view class="long-btn-view">
+				<text class="remark-text">当前角度偏移量：{{cabinDoorOffset}}°</text>
+				<button class="long-btn" @click="cabinDoorRevise">关舱门角度校正</button>
+			</view>
+		</view>
+
+		<view style="background-color: #ffffff; padding: 20px; margin-top: 30px;">
+			<text class="title">{{pitchingTitle}}</text>
+			<view class="space-view">
+				<text class="remark-text">发球仰角(0：最高，180：最低)</text>
+				<text class="">{{angle}}°</text>
+			</view>
+			<slider :min="0" :max="180" :step="10" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
+				:value="angle" @changing="angleSliderChangeing" @change="angleSliderChange" />
+			<view class="long-btn-view">
+				<text class="remark-text">当前角度偏移量：{{pitchingOffset}}°</text>
+				<button class="long-btn" @click="pitchingRevise">{{pitchingOffset}}°校正</button>
+			</view>
+		</view>
+		<view style="padding: 30px 20px;">
+			<button style="color: #ffffff; background-color: #000000;" @click="next">下一步</button>
+		</view>
+	</scroll-view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				title: "蓝牙" as string | null,
+				turntableTitle: "转盘舵机测试",
+				cabinDoorTitle: "舱门舵机测试",
+				pitchingTitle: "俯仰舵机测试",
+				turntable: [0, 90, 180, 270],
+				turntableOffset: 0,
+				cabinDoorOffset: 0,
+				pitchingOffset: 0,
+				angle: 90
+			}
+		},
+
+		onLoad(query) {
+			this.title = query.title
+			uni.$on("steering-engine", (res) => {
+				switch (res.type) {
+					case "turntable":
+						this.turntableOffset = res.offset
+						break;
+					case "cabinDoor":
+						this.cabinDoorOffset = res.offset
+						break;
+					case "pitching":
+						this.pitchingOffset = res.offset
+						break;
+					default:
+						break;
+				}
+			})
+		},
+
+		onUnload() {
+			console.log("+++++++++++++++++++++++++++steering-engine停止监听+++++++++++++++++++++++++++")
+			uni.$off("steering-engine")
+		},
+
+		methods: {
+			turntableBut(res : number) {
+				console.log(res)
+			},
+			turntableRevise() {
+				const obj = { "type": "turntable", "title": "转盘舵机校正", "offset": this.turntableOffset };
+				this.openDialogPage(obj)
+			},
+			cabinDoorClose() {
+
+			},
+			cabinDoorOpen() {
+
+			},
+			cabinDoorRevise() {
+				const obj = { "type": "cabinDoor", "title": "舱门舵机校正", "offset": this.cabinDoorOffset };
+				this.openDialogPage(obj)
+			},
+			pitchingRevise() {
+				const obj = { "type": "pitching", "title": "俯仰舵机校正", "offset": this.pitchingOffset };
+				this.openDialogPage(obj)
+			},
+			openDialogPage(obj : UTSJSONObject) {
+				uni.openDialogPage({
+					url: '/pages/dialog-page/revise-dialog?data=' + encodeURIComponent(JSON.stringify(obj)),
+					animationType: "fade-in",
+					animationDuration: 600
+				})
+			},
+
+			angleSliderChange(e : UniSliderChangeEvent) {
+				console.log("俯仰角度发生变化：" + e.detail.value);
+			},
+			angleSliderChangeing(e : UniSliderChangeEvent) {
+				console.log("俯仰角度持续发生变化：" + e.detail.value);
+				this.angle = e.detail.value
+			},
+			next() {
+				uni.navigateTo({
+					url: `/pages/index/imu?title=${this.title}`
+				})
+			},
+			quit() {
+				uni.navigateBack({
+					delta: 100,
+					animationType: "slide-out-bottom"
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.page {
+		flex: 1;
+		background-color: $uni-bg-color-hover;
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.title {
+		color: black;
+		font-size: 18;
+		font-weight: bold;
+	}
+
+	.space-view {
+		/* 水平居中 */
+		align-items: center;
+		/* 横向排列 */
+		flex-direction: row;
+		/* 两端布局 */
+		justify-content: space-between;
+		margin-top: 15px;
+	}
+
+	.btn {
+		width: 70px;
+		border-color: black;
+		border-width: 1px;
+	}
+
+	.long-btn-view {
+		align-items: center;
+		justify-content: center;
+		margin-top: 15px;
+	}
+
+	.remark-text {
+		font-size: 13;
+		line-height: 1.4;
+		color: gray;
+	}
+
+	.long-btn {
+		margin-top: 15px;
+		width: 220px;
+		border-color: black;
+		border-width: 1px;
+	}
+
+	.cabinDoor-btn {
+		width: 90px;
+		border-color: black;
+		border-width: 1px;
+	}
+</style>

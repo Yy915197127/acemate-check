@@ -1,4 +1,5 @@
 import CoreBluetooth
+import DCloudUTSFoundation
 import Foundation
 import NetworkExtension
 //import SVProgressHUD
@@ -67,10 +68,17 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
 
     /// 连接状态变化时的回调
     var onConnectionChange: ((ConnectionState) -> Void)?
+
+    /// 连接状态变化时的回调
+    var onConnectionChangeBack: (() -> Void)?
+
     /// 开始连接时的回调
     var startConnectBlock: ((CBManagerState) -> Void)?
 
     var versionBlock: ((String) -> Void)?
+
+    //信号强度回调
+    var connectDeviceReadRSSIBlock: ((NSNumber) -> Void)?
 
     /// 读取特征值完成的回调
     private var readCompletion: ((Data?, Error?) -> Void)?
@@ -138,7 +146,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         guard let savedUUIDString = UserDefaults.standard.string(forKey: "savedPeripheralUUID"),
             let savedUUID = UUID(uuidString: savedUUIDString)
         else {
-            print("没有已保存的设备UUID")
+            console.log("没有已保存的设备UUID")
             return
         }
         let knownPeripherals = centralManager.retrievePeripherals(withIdentifiers: [savedUUID])
@@ -146,7 +154,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             targetPeripheral = peripheral
             centralManager.connect(peripheral, options: nil)
         } else {
-            print("无法找到已保存的设备，开始扫描新设备")
+            console.log("无法找到已保存的设备，开始扫描新设备")
             startScanning()
         }
     }
@@ -154,7 +162,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     /// 开始扫描附近的蓝牙设备
     /// 设置扫描超时计时器，达到超时时间后停止扫描
     func startScanning() {
-        print("开始扫描新设备")
+        console.log("开始扫描新设备")
         self.peripheralDic.removeAll()
         centralManager.scanForPeripherals(withServices: nil, options: nil)
         scanTimeoutTimer?.invalidate()
@@ -182,7 +190,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     /// 停止扫描并通知外部超时
     private func handleScanTimeout() {
         centralManager.stopScan()
-        print("扫描超时")
+        console.log("扫描超时")
         onConnectionChange?(.timeout)
     }
 
@@ -202,7 +210,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         if let localName = advertisementData[CBAdvertisementDataLocalNameKey] as? String,
             localName.contains(deviceName)
         {
-            print("设备广播名称：\(localName)")
+            console.log("设备广播名称：\(localName)")
             //            onPeripheralDiscovered?(peripheral, RSSI, localName)
 
             // 检查设备名称是否已存在于列表中
@@ -215,7 +223,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 self.peripheralDic.updateValue(peripheral, forKey: localName)
                 onPeripheralDiscovered?(localName)
             } else {
-                print("设备 \(localName) 已存在于列表中，跳过添加")
+                console.log("设备 \(localName) 已存在于列表中，跳过添加")
             }
 
         }
@@ -229,19 +237,30 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         centralManager.connect(peripheral, options: nil)
     }
 
-    func connectDeviceName(_ name: String) {
+    //获取信号强度
+    func connectDeviceReadRSSI(_ readRSSIBlock: @escaping ((NSNumber) -> Void)) {
+        targetPeripheral?.readRSSI()
+        connectDeviceReadRSSIBlock = readRSSIBlock
+    }
+
+    //连接制定名称的设备
+    func connectDeviceName(_ name: String, _ connectionChangeBlock: @escaping (() -> Void)) {
         guard !peripheralDic.isEmpty else { return }
+        onConnectionChangeBack = connectionChangeBlock
         targetPeripheral = peripheralDic[name]
         centralManager.connect(targetPeripheral!, options: nil)
+        scanTimeoutTimer?.invalidate()  //开始心跳
+        centralManager.stopScan()  //停止扫描
     }
 
     /// 连接成功的回调
     /// 保存设备UUID，开始发现服务，更新连接状态
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        print("已连接到设备：\(peripheral.name ?? "unknown")")
+        console.log("已连接到设备：\(peripheral.name ?? "unknown")")
         peripheral.delegate = self
         peripheral.discoverServices([serviceUUID])
         onConnectionChange?(.connected)
+        onConnectionChangeBack?()
         bluetoothState = .connected
         UserDefaults.standard.set(peripheral.identifier.uuidString, forKey: "savedPeripheralUUID")
         reconnectAttempts = 0
@@ -253,7 +272,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     func centralManager(
         _ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?
     ) {
-        print("已断开连接: \(peripheral.name ?? "未知设备")")
+        console.log("已断开连接: \(peripheral.name ?? "未知设备")")
         onConnectionChange?(.disconnected)
         bluetoothState = .disconnected
         isConnect = false
@@ -266,7 +285,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             // 检查重试次数是否小于最大重试次数
             if reconnectAttempts < maxRetries {
                 reconnectAttempts += 1
-                print("非用户主动断开，尝试重新连接，当前尝试次数: \(reconnectAttempts)/\(maxRetries)")
+                console.log("非用户主动断开，尝试重新连接，当前尝试次数: \(reconnectAttempts)/\(maxRetries)")
 
                 // 延迟一段时间后尝试重新连接
                 DispatchQueue.main.asyncAfter(deadline: .now() + retryIntervalSeconds) {
@@ -274,7 +293,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                     guard let self = self else { return }
 
                     if let peripheral = self.targetPeripheral {
-                        print("正在尝试重新连接到: \(peripheral.name ?? "未知设备")")
+                        console.log("正在尝试重新连接到: \(peripheral.name ?? "未知设备")")
                         self.centralManager.connect(peripheral, options: nil)
                     } else if let savedUUIDString = UserDefaults.standard.string(
                         forKey: "savedPeripheralUUID"),
@@ -284,26 +303,38 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                         let knownPeripherals = self.centralManager.retrievePeripherals(
                             withIdentifiers: [savedUUID])
                         if let peripheral = knownPeripherals.first {
-                            print("正在尝试重新连接到之前保存的设备: \(peripheral.name ?? "未知设备")")
+                            console.log("正在尝试重新连接到之前保存的设备: \(peripheral.name ?? "未知设备")")
                             self.targetPeripheral = peripheral
                             self.centralManager.connect(peripheral, options: nil)
                         }
                     }
                 }
             } else {
-                print("已达到最大重试次数 (\(maxRetries))，不再尝试重新连接")
+                console.log("已达到最大重试次数 (\(maxRetries))，不再尝试重新连接")
                 targetPeripheral = nil
             }
         } else {
             // 用户主动断开连接，重置标志位
             isDisconnectInitiatedByUser = false
             targetPeripheral = nil
-            print("用户主动断开连接，不尝试重新连接")
+            console.log("用户主动断开连接，不尝试重新连接")
         }
 
     }
 
     // MARK: - CBPeripheralDelegate
+
+    //获取信号强度 targetPeripheral?.readRSSI()
+    func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: (any Error)?) {
+        if let error = error {
+            console.log("读取RSSI出错: \(error.localizedDescription)")
+            return
+        }
+        console.log("当前RSSI: \(RSSI)")
+
+        connectDeviceReadRSSIBlock?(RSSI)
+    }
+
     /// 发现服务的回调
     /// 找到目标服务后，开始发现特征
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
@@ -320,19 +351,13 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         _ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?
     ) {
         guard error == nil, let characteristics = service.characteristics else { return }
-        print("已发现特征: \(characteristics.map { $0.uuid.uuidString })")
+        console.log("已发现特征: \(characteristics.map { $0.uuid.uuidString })")
 
-        //发送时间戳
-        //        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-        //            self.setTimestampData()
-        //        }
-
-        DispatchQueue.main.asyncAfter(
-            deadline: .now() + 3.0,
-            execute: {
-                print("================获取版本信息===============")
-                self.getMachineVersion()
-            })
+        //测试版隐藏
+        //        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
+        //            console.log("================获取版本信息===============")
+        //            self.getMachineVersion()
+        //        })
 
         if let statusCharacteristic = characteristics.first(where: { $0.uuid == statusCharUUID }) {
             peripheral.setNotifyValue(true, for: statusCharacteristic)
@@ -350,9 +375,9 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     ) {
         if characteristic.uuid == statusCharUUID {
             if let error = error {
-                print("订阅状态特征通知失败：\(error.localizedDescription)")
+                console.log("订阅状态特征通知失败：\(error.localizedDescription)")
             } else {
-                print(characteristic.isNotifying ? "已订阅状态特征通知" : "已停止状态特征通知订阅")
+                console.log(characteristic.isNotifying ? "已订阅状态特征通知" : "已停止状态特征通知订阅")
             }
         }
     }
@@ -374,7 +399,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     ) {
         if characteristic.uuid == statusCharUUID {
             guard error == nil else {
-                print("读取状态特征通知值时出错：\(error!.localizedDescription)")
+                console.log("读取状态特征通知值时出错：\(error!.localizedDescription)")
                 return
             }
             if let data = characteristic.value {
@@ -401,7 +426,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
 
     private func processReceivedData(_ data: Data) {
         guard let chunk = String(data: data, encoding: .utf8) else { return }
-        print("收到原始数据: \(chunk)")
+        console.log("收到原始数据: \(chunk)")
 
         jsonDataBuffer += chunk
         resetPacketTimer()  // 每收到数据就重置超时
@@ -418,8 +443,8 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
 
             // 去掉可能的换行、空格
             let trimmed = jsonText.trimmingCharacters(in: .whitespacesAndNewlines)
-            print("trimmed: \(trimmed)")
-            print("==================完整数据====================")
+            console.log("trimmed: \(trimmed)")
+            console.log("==================完整数据====================")
             // 交给原来的解析
             parseJsonData(jsonString: trimmed)
             // 继续 while，看看后面是否还粘着下一条
@@ -433,7 +458,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         packetTimer?.setEventHandler { [weak self] in
             guard let self = self else { return }
             if self.jsonDataBuffer.isEmpty == false {
-                print("❌ 收包超时，丢弃残包")
+                console.log("❌ 收包超时，丢弃残包")
                 self.jsonDataBuffer.removeAll()
             }
             self.packetTimer?.cancel()
@@ -447,7 +472,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     //            let jsonData = jsonString.data(using: .utf8),
     //            let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any]
     //        else {
-    //            print("JSON 解析失败: \(jsonString)")
+    //            console.log("JSON 解析失败: \(jsonString)")
     //            return
     //        }
     ////        handle(json: json)   // 这里就是你原来的 switch type 逻辑
@@ -457,26 +482,26 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     //    private func processReceivedData(_ data: Data) {
     //        // 将收到的数据转换为字符串
     //        guard let receivedString = String(data: data, encoding: .utf8) else {
-    //            print("无法将数据转换为字符串")
+    //            console.log("无法将数据转换为字符串")
     //            return
     //        }
     //
-    //        print("收到原始数据：\(receivedString)")
+    //        console.log("收到原始数据：\(receivedString)")
     //
     //        // 添加到缓冲区
     //        jsonDataBuffer += receivedString
     //
-    //        print("缓冲区数据: \(jsonDataBuffer)")
+    //        console.log("缓冲区数据: \(jsonDataBuffer)")
     //        // 检查是否包含完整的JSON对象
     //        if isCompleteJsonObject(jsonDataBuffer) {
     //            // 尝试解析完整的JSON数据
     //            parseJsonData()
     //            // 清空缓冲区，准备接收下一个JSON数据
     //            jsonDataBuffer = ""
-    //            print("数据完整，解析数据。。。")
+    //            console.log("数据完整，解析数据。。。")
     //        } else {
     //            // 数据不完整，继续等待更多数据
-    //            print("数据不完整，等待更多数据...")
+    //            console.log("数据不完整，等待更多数据...")
     //        }
     //    }
 
@@ -508,7 +533,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])
                     as? [String: Any]
             else {
-                print("无效的JSON数据")
+                console.log("无效的JSON数据")
                 return
             }
 
@@ -516,7 +541,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             guard let type = jsonObject["type"] as? String else {
                 // 尝试检查是否有rsp_train_detail格式的数据
                 if jsonObject["train_detail"] as? [String: Any] != nil {
-                    print("接收到不带type的训练详情")
+                    console.log("接收到不带type的训练详情")
 
                     // 不修改字段名，模型期望的是miniutes而不是minutes
                     // 构建完整的JSON对象
@@ -534,7 +559,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                     return
                 }
 
-                print("JSON数据缺少type字段")
+                console.log("JSON数据缺少type字段")
                 return
             }
 
@@ -545,7 +570,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                     let carState = data["car_state"] as? [String: Any]
                 {
                     CarStatus.shared.updateStatus(from: carState)
-                    print("接收到心跳状态: \(carState)")
+                    console.log("接收到心跳状态: \(carState)")
 
                     if CarStatus.shared.isTimeset == 0 {
                         self.setTimestampData()
@@ -561,13 +586,13 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             case "rsp_set_mode":
                 if let data = jsonObject["data"] as? [String: Any] {
                     // 处理设置模式的响应
-                    print("模式设置响应: \(data)")
+                    console.log("模式设置响应: \(data)")
                 }
 
             case "rsp_train_data":
                 if jsonObject["data"] as? [String: Any] != nil {
                     // 处理训练数据概览
-                    print("接收到训练数据概览")
+                    console.log("接收到训练数据概览")
 
                     // 委托给TrainingRecordManager处理训练数据概览
                     let jsonData = try JSONSerialization.data(
@@ -578,7 +603,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             case "rsp_train_detail":
                 if jsonObject["data"] as? [String: Any] != nil {
                     // 处理训练详情数据
-                    print("接收到训练详情")
+                    console.log("接收到训练详情")
 
                     // 委托给TrainingRecordManager处理训练详情
                     let jsonData = try JSONSerialization.data(
@@ -589,7 +614,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             case "versionInfo":
                 if let data = jsonObject["data"] as? [String: Any] {
                     if let version = data["version"] as? String {
-                        print("接收到版本信息, \(version)")
+                        console.log("接收到版本信息, \(version)")
                         versionBlock?(version)
                         let machineVersion = versionNumber(from: version)
                         let newVersion = versionNumber(from: currentVersion)
@@ -597,12 +622,12 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                             //临时测试
                             //                        if machineVersion <= newVersion {
 
-                            //                            print("app 附带新版本，进行升级, \(OtaManager.shared.fileName)")
+                            //                            console.log("app 附带新版本，进行升级, \(OtaManager.shared.fileName)")
                             //                            sendOpenAp()
 
                             //                            OtaManager.shared.upload { result in
                             //                                OtaManager.shared.triggerUpdate { result in
-                            //                                    print("升级成功")
+                            //                                    console.log("升级成功")
                             //                                }
                             //                            }
 
@@ -654,7 +679,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
 
                 }
             case "wifiHotspot":
-                print("wifiInfo: \(jsonObject)")
+                console.log("wifiInfo: \(jsonObject)")
                 if let ssid = jsonObject["data"] as? String {
 
                     //                    DispatchQueue.main.async {
@@ -667,11 +692,11 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 }
 
             default:
-                print("未知的响应类型: \(type)")
+                console.log("未知的响应类型: \(type)")
             }
         } catch {
             TrainingRecordManager.shared.isSyncing = false
-            print("JSON解析出错：\(error.localizedDescription)")
+            console.log("JSON解析出错：\(error.localizedDescription)")
         }
     }
 
@@ -696,7 +721,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
 
     func connectToHotspot(ssid: String, in parentView: UIView) {
 
-        print("==============开始连接WiFi热点===================)")
+        console.log("==============开始连接WiFi热点===================)")
         //
         //        SVProgressHUD.show(withStatus: "Connecting to \(ssid)")
         //
@@ -705,15 +730,15 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         //        NEHotspotConfigurationManager.shared.removeConfiguration(forSSID: ssid)
         //        NEHotspotConfigurationManager.shared.apply(config) { error in
         //            SVProgressHUD.dismiss()
-        //            print("==============error===================)")
+        //            console.log("==============error===================)")
         //            if let error = error as? NSError {
-        //                print("❌ 连接失败：\(error.localizedDescription)")
+        //                console.log("❌ 连接失败：\(error.localizedDescription)")
         //            }else {
-        //                print("==================✅ 已连接到 \(ssid)=========================")
+        //                console.log("==================✅ 已连接到 \(ssid)=========================")
         //
         //                //先监测本地网络是否有授权
         //                LocalNetworkPermissionTrigger.shared.checkLocalNetworkAccess { Bool in
-        //                    print("获取本地网络权限：\(Bool)")
+        //                    console.log("获取本地网络权限：\(Bool)")
         //
         //                    guard Bool else  {
         //                        //引导用户去设置中开启本地网络权限
@@ -732,22 +757,22 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         //                    }, completion: { result in
         //                        switch result {
         //                        case .success:
-        //                            print("上传完成，开始升级")
+        //                            console.log("上传完成，开始升级")
         //                            // 3. 切换到“正在升级”阶段，90 秒模拟进度
         //
         //                            // 真正触发升级指令
         //                            OtaManager.shared.triggerUpdate { result in
         //                                switch result {
         //                                case .success:
-        //                                    print("升级成功，响应UI")
+        //                                    console.log("升级成功，响应UI")
         //                                    progressView.startUpgrade(duration: 20)
         //                                case .failure(_):
-        //                                    print("升级失败")
+        //                                    console.log("升级失败")
         //                                }
         //                            }
         //
         //                        case .failure(let err):
-        //                            print("上传失败：\(err)")
+        //                            console.log("上传失败：\(err)")
         //                            DispatchQueue.main.async {
         //                                progressView.updateProgress(0, status: "上传失败")
         //                                // 1 秒后消失
@@ -771,7 +796,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             if let nsError = error as NSError?, nsError.domain == NEHotspotConfigurationErrorDomain
             {
                 if nsError.code == NEHotspotConfigurationError.alreadyAssociated.rawValue {
-                    print("✅ 已连接到 \(ssid)")
+                    console.log("✅ 已连接到 \(ssid)")
 
                     //                    OtaManager.shared.upload { result in
                     //                        OtaManager.shared.triggerUpdate { result2 in
@@ -780,7 +805,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                     //                    }
 
                 } else {
-                    print("❌ 连接失败：\(nsError.localizedDescription)")
+                    console.log("❌ 连接失败：\(nsError.localizedDescription)")
                 }
             }
         }
@@ -839,14 +864,14 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         // 立即发送一次心跳
         setMachineHeartBeat()
 
-        print("心跳定时器已启动，间隔: \(heartbeatInterval)秒")
+        console.log("心跳定时器已启动，间隔: \(heartbeatInterval)秒")
     }
 
     /// 停止心跳定时器
     private func stopHeartbeatTimer() {
         heartbeatTimer?.invalidate()
         heartbeatTimer = nil
-        print("心跳定时器已停止")
+        console.log("心跳定时器已停止")
     }
 
     /// 请求机器心跳
@@ -860,7 +885,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         sendCommand(data: [
             "type": "ask_heartbeat"
         ])
-        print("发送心跳请求")
+        console.log("发送心跳请求")
     }
 
     /// 设置机器时间戳
@@ -898,7 +923,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         //        formatter.locale = Locale(identifier: "zh_CN") // 确保本地化
         let todayString = formatter.string(from: Date())
         //        let yesterdayString = formatter.string(from: yesterday)
-        print("todayString: \(todayString)")
+        console.log("todayString: \(todayString)")
         sendCommand(data: [
             "type": "ask_train_data",
             "data": ["date_str": todayString],
@@ -1093,7 +1118,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 TrainingDataOverviewResponse.self, from: jsonData)
             return response.data.recordDateList
         } catch {
-            print("解析训练日期列表失败：\(error)")
+            console.log("解析训练日期列表失败：\(error)")
             return nil
         }
     }
@@ -1133,13 +1158,13 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 self.lastCommandSentTime = now
 
                 do {
-                    //                    print("send_data: \(dataToSend)")
+                    //                    console.log("send_data: \(dataToSend)")
                     let jsonData = try JSONSerialization.data(
                         withJSONObject: dataToSend, options: [])
                     if let jsonString = String(data: jsonData, encoding: .utf8),
                         let finalData = (jsonString + "\r\n").data(using: .utf8)
                     {
-                        //                        print("finalData: \(jsonString + "\r\n")")
+                        //                        console.log("finalData: \(jsonString + "\r\n")")
                         self.writeValue(data: finalData, to: self.dataCommandCharUUID) { error in
                             self.commandSerialQueue.asyncAfter(
                                 deadline: .now() + self.minIntervalBetweenCommands
@@ -1147,21 +1172,21 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                                 self.isSending = false
 
                                 if let error = error {
-                                    print("写入命令失败: \(error.localizedDescription)")
+                                    console.log("写入命令失败: \(error.localizedDescription)")
                                 } else {
-                                    print("命令发送成功， \(jsonString)")
+                                    console.log("命令发送成功， \(jsonString)")
                                 }
                                 self.processCommandQueue()
                             }
                         }
                     } else {
                         self.isSending = false
-                        print("⚠️ JSON 编码失败")
+                        console.log("⚠️ JSON 编码失败")
                         self.processCommandQueue()
                     }
                 } catch {
                     self.isSending = false
-                    print("JSON 序列化失败: \(error.localizedDescription)")
+                    console.log("JSON 序列化失败: \(error.localizedDescription)")
                 }
             } else {
                 let delay = self.minIntervalBetweenCommands - timeSinceLastSend
@@ -1177,21 +1202,21 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     /// 将字典序列化为JSON，添加换行符后发送到设备
     //    func sendCommand(data: [String: Any]) {
     //        do {
-    //            print("send_data: \(data)")
+    //            console.log("send_data: \(data)")
     //            let jsonData = try JSONSerialization.data(withJSONObject: data, options: [])
     //            if let jsonString = String(data: jsonData, encoding: .utf8),
     //               let finalData = (jsonString + "\r\n").data(using: .utf8) {
-    //                print("finalData: \(jsonString + "\r\n")")
+    //                console.log("finalData: \(jsonString + "\r\n")")
     //                writeValue(data: finalData, to: dataCommandCharUUID) { error in
     //                    if let error = error {
-    //                        print("写入命令失败: \(error.localizedDescription)")
+    //                        console.log("写入命令失败: \(error.localizedDescription)")
     //                    } else {
-    //                        print("命令发送成功")
+    //                        console.log("命令发送成功")
     //                    }
     //                }
     //            }
     //        } catch {
-    //            print("JSON 序列化失败: \(error.localizedDescription)")
+    //            console.log("JSON 序列化失败: \(error.localizedDescription)")
     //        }
     //    }
 }
@@ -1202,7 +1227,7 @@ protocol BluetoothManagerUIHandler: AnyObject {
 
 // MARK: - 通知扩展
 extension Notification.Name {
-    /// 蓝牙状态变化通知
+    /// 蓝牙状态变化���知
     static let bluetoothStateChanged = Notification.Name("bluetoothStateChanged")
     /// 设备状态变化通知
     static let carStateChanged = Notification.Name("carStateChanged")

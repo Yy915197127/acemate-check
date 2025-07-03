@@ -45,5 +45,10 @@ export type MyApi = (options : MyApiOptions) => void
 /* 同步函数定义 */
 export type MyApiSync = (paramA : boolean) => MyApiResult
 
-/* 扫描蓝牙列表 */
+
+
+/* 扫描蓝牙列表回调 */
 export type BluetoothCallback = (res : Array<string>) => void;
+
+/* 设备连接成功回调 */
+export type ConnectionStateBack = () => void;

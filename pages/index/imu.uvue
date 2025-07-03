@@ -1,0 +1,194 @@
+<template>
+	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
+		<template v-slot:right>
+			<button size="mini" style="width: 70px; padding: 0;" @click="quit">退出测试</button>
+		</template>
+	</uni-navbar-lite>
+	<scroll-view class="page">
+		<view style="background-color: #ffffff; padding: 20px;">
+			<text class="title">{{HighGTitle}}</text>
+			<text class="remark-text">{{HighGRemark}}</text>
+			<view class="space-view">
+				<text>ax: {{ax}}</text>
+				<text>ay: {{ay}}</text>
+				<text>az: {{az}}</text>
+			</view>
+			<text class="remark-text">{{HighGButtonRemark}}</text>
+			<view class="long-btn-view">
+				<button class="long-btn" @click="highGButtonAction">{{HighGButton}}</button>
+				<text class="remark-text"
+					:class="HighGTestResultText?.includes('自动检测中') ? '' : (highGTestResult ? 'high-G-test-succeed' : 'high-G-test-fall')"
+					v-show="HighGTestResultText?.length != 0">{{HighGTestResultText}}</text>
+			</view>
+		</view>
+
+		<view style="background-color: #ffffff; padding: 20px; margin-top: 30px;">
+			<text class="title">{{gyroscopeTitle}}</text>
+			<text class="remark-text">{{gyroscopeRemark}}</text>
+			<view class="space-view">
+				<text>yzw: {{yaw}}</text>
+				<text>旋转角度: {{rotationAngle}}°</text>
+			</view>
+			<text class="remark-text">{{gyroscopeButtonRemark}}</text>
+			<view class="long-btn-view">
+				<view class="space-view" v-show="!isShowGyroscopeButton">
+					<button class="gyroscope-test-fall-btn" @click="gyroscopeTestResultAction(false)">角度异常</button>
+					<button class="gyroscope-test-succeed-btn" @click="gyroscopeTestResultAction(true)">角度正常</button>
+				</view>
+				<button class="long-btn" v-show="isShowGyroscopeButton"
+					@click="gyroscopeButtonAction">{{gyroscopeButton}}</button>
+				<text class="remark-text"
+					:class="gyroscopeTestResultText?.includes('请选择观察结果') ? '' : (gyroscopeTestResult ? 'high-G-test-succeed' : 'high-G-test-fall')"
+					v-show="gyroscopeTestResultText?.length != 0">{{gyroscopeTestResultText}}</text>
+			</view>
+		</view>
+		<view style="padding: 30px 20px;">
+			<button style="color: #ffffff; background-color: #000000;" @click="next">下一步</button>
+		</view>
+	</scroll-view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				title: "蓝牙" as string | null,
+				ax: 0.02 as number,
+				ay: 0 as number,
+				az: 9.8 as number,
+				isCounting: false,
+				countdown: 10,
+				highGTestResult: true as boolean,
+				HighGTestResultText: "" as string | null,
+				HighGButton: "开始检测",
+				HighGButtonRemark: "测试时长为10秒，在此期间内ax和ay平均值为0(±0.2)，az平均值为9.8(±0.2)，则为正常，否则为异常",
+				HighGTitle: "重力加速度计测试",
+				HighGRemark: "检测重力加速度计前请把机器平放在地面，为保数据准确性，测试期间不要触碰机器",
+
+
+				yaw: 0.01 as number,
+				rotationAngle: 0 as number,
+				gyroscopeTestResult: true as boolean,
+				isShowGyroscopeButton: true as boolean,
+				gyroscopeTitle: "陀螺仪测试",
+				gyroscopeRemark: "检测陀螺仪前请把机器平放在地面，为保数据准确性，测试期间不要触碰机器",
+				gyroscopeButton: "开始检测",
+				gyroscopeButtonRemark: "检测开始后，机器会缓慢旋转约90°，待旋转完毕后，请观察机身旋转角度是否和上述显示数值基本一致",
+				gyroscopeTestResultText: "",
+			}
+		},
+
+		onLoad(query) {
+			this.title = query.title
+		},
+
+		methods: {
+			highGButtonAction() {
+				if (this.isCounting) return
+				this.HighGTestResultText = "自动检测中，请等候..."
+				this.isCounting = true
+				this.HighGButton = "10"
+				const timer = setInterval(() => {
+					this.countdown--
+					this.HighGButton = `${this.countdown}`
+					if (this.countdown <= 0) {
+						clearInterval(timer)
+						this.isCounting = false
+						this.countdown = 10
+						this.HighGButton = '开始检测'
+						this.HighGTestResultText = this.highGTestResult ? '检测结果正常' : '检测结果异常'
+					}
+				}, 1000)
+			},
+			gyroscopeButtonAction() {
+				this.gyroscopeTestResultText = "请选择观察结果"
+				this.isShowGyroscopeButton = false
+			},
+			gyroscopeTestResultAction(res : boolean) {
+				this.isShowGyroscopeButton = true
+				this.gyroscopeTestResult = res
+				this.gyroscopeTestResultText = res ? '检测结果正常' : '检测结果异常'
+			},
+			next() {
+
+			},
+			quit() {
+				uni.navigateBack({
+					delta: 100,
+					animationType: "slide-out-bottom"
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.page {
+		flex: 1;
+		background-color: $uni-bg-color-hover;
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.title {
+		color: black;
+		font-size: 18;
+		font-weight: bold;
+	}
+
+	.space-view {
+		/* 水平居中 */
+		align-items: center;
+		/* 横向排列 */
+		flex-direction: row;
+		/* 两端布局 */
+		justify-content: space-between;
+		margin-top: 15px;
+	}
+
+	.btn {
+		width: 70px;
+		border-color: black;
+		border-width: 1px;
+	}
+
+	.long-btn-view {
+		align-items: center;
+		justify-content: center;
+		margin-top: 15px;
+	}
+
+	.remark-text {
+		font-size: 13;
+		line-height: 1.4;
+		color: gray;
+		margin-top: 15px;
+	}
+
+	.long-btn {
+		width: 220px;
+		border-color: black;
+		border-width: 1px;
+	}
+
+	.high-G-test-succeed {
+		color: green;
+	}
+
+	.high-G-test-fall {
+		color: darkred;
+	}
+
+	.gyroscope-test-succeed-btn {
+		border-color: black;
+		border-width: 1px;
+		margin: 0 30px;
+	}
+
+	.gyroscope-test-fall-btn {
+		color: #fff;
+		border-color: black;
+		background-color: darkred;
+		border-width: 1px;
+		margin: 0 30px;
+	}
+</style>

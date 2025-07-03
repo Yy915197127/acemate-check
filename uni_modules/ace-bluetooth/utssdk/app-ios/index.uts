@@ -6,13 +6,11 @@
 
 
 /* 引入 interface.uts 文件中定义的变量 */
-import { MyApiOptions, MyApiResult, MyApi, MyApiSync, BluetoothCallback } from '../interface.uts';
+import { MyApiOptions, MyApiResult, MyApi, MyApiSync, BluetoothCallback, ConnectionStateBack } from '../interface.uts';
 
 /* 引入 unierror.uts 文件中定义的变量 */
 import { MyApiFailImpl } from '../unierror';
 
-/* 引入原生蓝牙 */
-import { CBPeripheral } from "CoreBluetooth";
 
 /**
  * 引入三方库
@@ -49,9 +47,14 @@ export function onStartScanning() {
 	BluetoothManager.shared.startScanning()
 }
 
+/* 停止扫描 */
+export function onStopScanning() {
+	BluetoothManager.shared.stopScanning()
+}
+
 /* 连接蓝牙 */
-export function onConnectDevice(peripheral : string) {
-	BluetoothManager.shared.connectDeviceName(peripheral)
+export function onConnectDevice(peripheral : string, callback : ConnectionStateBack) {
+	BluetoothManager.shared.connectDeviceName(peripheral, callback)
 }
 
 /* 断开蓝牙 */
@@ -59,7 +62,10 @@ export function onDisconnectPeripheral() {
 	BluetoothManager.shared.disconnectPeripheral()
 }
 
-
+/* 获取设备信号强度 */
+export function onConnectReadRSSIBut(callback : (rssi : number) => void) {
+	BluetoothManager.shared.connectDeviceReadRSSI(callback)
+}
 
 /**
  * 异步方法

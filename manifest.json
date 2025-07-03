@@ -1,5 +1,5 @@
 {
-	"name": "Acemate",
+	"name": "Acemate Check",
 	"appid": "__UNI__A4F1569",
 	"description": "",
 	"versionName": "1.0.0",
@@ -43,6 +43,29 @@
 	"web": {
 		"router": {
 			"mode": ""
+		}
+	},
+	"app-android": {
+		"distribute": {
+			"modules": {},
+			"icons": {
+				"hdpi": "",
+				"xhdpi": "",
+				"xxhdpi": "",
+				"xxxhdpi": ""
+			},
+			"splashScreens": {
+				"default": {}
+			}
+		}
+	},
+	"app-ios": {
+		"distribute": {
+			"modules": {},
+			"icons": {
+				"appstore": "static/icon.png"
+			},
+			"splashScreens": {}
 		}
 	}
 }

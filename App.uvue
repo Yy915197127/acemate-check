@@ -36,11 +36,13 @@
 
 <style>
 	/*每个页面公共css */
-	.uni-row {
+	@import "./common/uni.css";
+	/*每个页面公共css */
+	/* 	.uni-row {
 		flex-direction: row;
 	}
 
 	.uni-column {
 		flex-direction: column;
-	}
+	} */
 </style>

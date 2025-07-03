@@ -1,43 +1,96 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
-			"path": "pages/index/index",
+			//IMU
+			"path": "pages/index/imu",
 			"style": {
-				"navigationBarTitleText": "uni-app x"
+				"navigationStyle": "custom"
 			}
 		},
 		{
-			"path": "pages/index/camera",
+			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "uni-app x"
+				"navigationBarTitleText": "全局测试"
+			}
+		},
+		{
+			//蓝牙列表
+			"path": "pages/index/bluetooth-list",
+			"style": {
+				"navigationBarTitleText": "蓝牙测试"
+			}
+		},
+		{
+			//蓝牙详情
+			"path": "pages/index/bluetooth-details",
+			"style": {
+				"disableSwipeBack": true,
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			//行走电机
+			"path": "pages/index/wheel-motor",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			//发球电机
+			"path": "pages/index/serve-machine-motor",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			//舵机
+			"path": "pages/index/steering-engine",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			//舵机校正
+			"path": "pages/dialog-page/revise-dialog",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		// {
+		// 	//IMU
+		// 	"path": "pages/index/imu",
+		// 	"style": {
+		// 		"navigationStyle": "custom"
+		// 	}
+		// },
+		{
+			"path": "pages/unit/unit",
+			"style": {
+				"navigationBarTitleText": "单元测试"
 			}
 		}
 
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app x",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
-	},
-	"tabBar": {
-		"color": "#7A7E83",
-		"selectedColor": "#3cc51f",
-		"borderStyle": "black",
-		"backgroundColor": "#ffffff",
-		"list": [{
-				"pagePath": "pages/index/index",
-				"iconPath": "@tabBarComponentIconPath",
-				"selectedIconPath": "@tabBarComponentSelectedIconPath",
-				"text": "组件"
-			},
-			{
-				"pagePath": "pages/index/camera",
-				"iconPath": "@tabBarAPIIconPath",
-				"selectedIconPath": "@tabBarAPISelectedIconPath",
-				"text": "接口"
-			}
-		]
-	},
-	"uniIdRouter": {}
+		"navigationBarTitleText": "",
+		"navigationBarBackgroundColor": "#f1f1f1",
+		"backgroundColor": "#f1f1f1"
+	}
+	// "tabBar": {
+	// 	"color": "#a3a7ad",
+	// 	"fontSize": "16px",
+	// 	"selectedColor": "#000000",
+	// 	"borderStyle": "black",
+	// 	"backgroundColor": "#ffffff",
+	// 	"list": [{
+	// 			"pagePath": "pages/index/index",
+	// 			"text": "全局测试"
+	// 		},
+	// 		{
+	// 			"pagePath": "pages/unit/unit",
+	// 			"text": "单元测试"
+	// 		}
+	// 	]
+	// }
 }

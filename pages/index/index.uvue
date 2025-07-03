@@ -1,61 +1,52 @@
 <template>
-	<view>
-		<image class="logo" src="/static/logo.png" @click="ceshisaoma()"></image>
-		<image class="logo" src="/static/logo.png" @click="ceshisaoma1()"></image>
-		<image class="logo" src="/static/logo.png" @click="ceshisaoma2()"></image>
-		<view class="text-area">
-			<text class="title">{{title}}</text>
-		</view>
-
+	<view class="content">
+		<button id="testButton" class="testButton" @click="button_click">开始测试</button>
 	</view>
 </template>
 
 <script lang="uts">
-	import { onBluetoothManager, BluetoothCallback, onStartScanning, onConnectDevice, onDisconnectPeripheral } from '@/uni_modules/ace-bluetooth';
+	import { onDisconnectPeripheral } from '@/uni_modules/ace-bluetooth';
 
 	export default {
 		data() {
 			return {
-				title: 'Hello',
-				peripherals: [] as Array<string>
+
 			}
 		},
 
+		onShow() {
+			console.log("+++++++++++++++++++++++++++首页启动前断开蓝牙+++++++++++++++++++++++++++")
+			onDisconnectPeripheral()
+		},
+
 		onLoad() {
-			/* 蓝牙列表回调 */
-			onBluetoothManager((res) => {
-				console.log(res)
-				this.peripherals = res
-			});
+
 		},
 
 		methods: {
-			ceshisaoma() {
-				console.log('扫描蓝牙')
-				onStartScanning()
-			},
-			ceshisaoma1() {
-				console.log('连接蓝牙')
-				onConnectDevice(this.peripherals[0])
-			},
-			ceshisaoma2() {
-				console.log('断开蓝牙')
-				onDisconnectPeripheral()
-			},
+			button_click() {
+				uni.navigateTo({
+					url: '/pages/index/bluetooth-list'
+				})
+			}
 		}
 	}
 </script>
 
 <style>
-	.logo {
-		height: 100px;
-		width: 100px;
-		margin: 100px auto 25px auto;
+	.content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
 	}
 
-	.title {
-		font-size: 18px;
-		color: #8f8f94;
-		text-align: center;
+	.testButton {
+		color: #ffffff;
+		background-color: #000000;
+		width: 50%;
+		margin-top: 50%;
+		margin-left: auto;
+		margin-right: auto;
 	}
 </style>

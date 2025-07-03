@@ -1,0 +1,175 @@
+<template>
+	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
+		<template v-slot:right>
+			<button size="mini" style="width: 70px; padding: 0;" @click="quit">退出测试</button>
+		</template>
+	</uni-navbar-lite>
+	<view class="page">
+		<view style="background-color: #ffffff; padding: 20px;">
+			<text class="title">{{wheelMotorTitle}}</text>
+
+			<view class="space-view">
+				<text class="remark-text">速度(车子的最高移动速度)</text>
+				<text class="">{{speed}}</text>
+			</view>
+			<slider :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
+				:value="speed" @changing="speedSliderChangeing" @change="speedSliderChange" />
+
+			<view class="space-view">
+				<text class="remark-text">加速度(车子达到最高移动速度时的加速度)</text>
+				<text class="">{{acceleration}}</text>
+			</view>
+			<slider :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
+				:value="acceleration" @changing="accelerationSliderChangeing" @change="accelerationSliderChange" />
+
+			<view class="container-view">
+				<view class="container">
+					<button class="btn top-btn" @longtap="long" @click="handleTopClick">前进</button>
+					<button class="btn right-btn" @click="handleRightClick">右移</button>
+					<button class="btn bottom-btn" @click="handleBottomClick">后退</button>
+					<button class="btn left-btn" @click="handleLeftClick">左移</button>
+				</view>
+			</view>
+		</view>
+
+		<view style="padding: 30px 20px;">
+			<button style="color: #ffffff; background-color: #000000;" @click="next()">下一步</button>
+		</view>
+
+
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				title: "蓝牙" as string | null,
+				wheelMotorTitle: "行走电机测试",
+				speed: 1,
+				acceleration: 1
+			}
+		},
+
+		onLoad(query) {
+			this.title = query.title
+		},
+
+		methods: {
+			speedSliderChange(e : UniSliderChangeEvent) {
+				console.log("速度 发生变化：" + e.detail.value);
+
+			},
+			speedSliderChangeing(e : UniSliderChangeEvent) {
+				console.log("速度 发生变化：" + e.detail.value);
+				this.speed = e.detail.value
+			},
+			accelerationSliderChange(e : UniSliderChangeEvent) {
+				console.log("加速度 发生变化：" + e.detail.value);
+			},
+			accelerationSliderChangeing(e : UniSliderChangeEvent) {
+				console.log("加速度 发生变化：" + e.detail.value);
+				this.acceleration = e.detail.value
+			},
+			handleTopClick() {
+				console.log('上按钮点击');
+			},
+			handleRightClick() {
+				console.log('右按钮点击');
+			},
+			handleBottomClick() {
+				console.log('下按钮点击');
+			},
+			handleLeftClick() {
+				console.log('左按钮点击');
+			},
+			long() {
+				console.log('长按');
+			},
+			next() {
+				uni.navigateTo({
+					url: `/pages/index/serve-machine-motor?title=${this.title}`
+				})
+			},
+			quit() {
+				uni.navigateBack({
+					delta: 100,
+					animationType: "slide-out-bottom"
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.page {
+		flex: 1;
+		background-color: $uni-bg-color-hover;
+	}
+
+	.title {
+		color: black;
+		font-size: 18;
+		font-weight: bold;
+	}
+
+	.space-view {
+		/* 水平居中 */
+		align-items: center;
+		/* 横向排列 */
+		flex-direction: row;
+		/* 两端布局 */
+		justify-content: space-between;
+		height: 40px;
+		margin-top: 15px;
+	}
+
+	.remark-text {
+		font-size: 13;
+		line-height: 1.4;
+		color: gray;
+	}
+
+	.container-view {
+		align-items: center;
+		justify-content: center;
+		margin-top: 15px;
+	}
+
+	.container {
+		position: relative;
+		width: 300px;
+		height: 200px;
+	}
+
+	.btn {
+		position: absolute;
+		width: 80px;
+		border-color: black;
+		border-width: 1px;
+	}
+
+	.top-btn {
+		top: 0px;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	.right-btn {
+		right: 0px;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
+	.bottom-btn {
+		bottom: 0px;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	.left-btn {
+		left: 0px;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+</style>

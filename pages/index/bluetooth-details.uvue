@@ -1,0 +1,138 @@
+<template>
+	<uni-navbar-lite :title="title" :is-back="false" :nc-color="'#f1f1f1'">
+		<template v-slot:right>
+			<button size="mini" style="width: 70px; padding: 0;" @click="quit">退出测试</button>
+		</template>
+	</uni-navbar-lite>
+
+	<view class="page">
+		<view style="background-color: #ffffff; padding: 20px;">
+			<view class="space-view">
+				<text class="title">{{rssiTitle}}</text>
+				<text>{{rssi}}db</text>
+			</view>
+			<text style="font-size: 13; color: gray; margin-top: 15px;">{{rssiRemark}}</text>
+		</view>
+
+		<view style="background-color: #ffffff; padding: 20px; margin-top: 30px;">
+			<text class="title">{{receiveSendDataTitle}}</text>
+			<view class="space-view send-data-view">
+				<text>{{sendDataTitle}}</text>
+				<button style="border-color: black; border-width: 1px;" size="mini" @click="send()">发送</button>
+			</view>
+			<view class="space-view send-data-view">
+				<text>{{receiveDataTitle}}</text>
+				<view :class="status ? 'on-status-view' : 'status-view'"></view>
+			</view>
+			<text
+				style="font-size: 13; color: gray; margin-top: 15px;">{{status ? receiveSucceedRemark : receiveDataRemark}}</text>
+		</view>
+
+		<view style="padding: 30px 20px;">
+			<button style="color: #ffffff; background-color: #000000;" v-show="status" @click="next()">下一步</button>
+		</view>
+
+	</view>
+</template>
+
+<script>
+	import { onConnectReadRSSIBut } from '@/uni_modules/ace-bluetooth';
+
+	export default {
+		data() {
+			return {
+				title: "" as string | null,
+				rssiTitle: "信号强度",
+				rssiRemark: "需确保在5米内的信号强度在70db以内，否则天线可能有问题",
+				receiveSendDataTitle: "收发功能测试",
+				sendDataTitle: "发送测试数据",
+				receiveDataTitle: "检测接收数据",
+				receiveDataRemark: "请点击发送按钮进行收发功能测试设备收到信息后会自动进行接收功能测试",
+				receiveSucceedRemark: "已收到返回数据，蓝牙功能测试成功",
+				interval: 0,
+				rssi: 0,
+				status: false
+			}
+		},
+		onLoad(query) {
+			this.title = query.title
+			// this.interval = setInterval(() => {
+			// 	console.log('这段代码将每隔1秒执行一次');
+			// 	onConnectReadRSSIBut((rssi) => {
+			// 		this.rssi = rssi
+			// 		console.log("设备信号强度:" + rssi)
+			// 	})
+			// }, 1000);
+
+			setTimeout(() => {
+				this.status = true
+			}, 2000)
+
+			console.log("开启获取信号强度定时器")
+
+		},
+
+		methods: {
+			send() {
+
+			},
+			next() {
+				console.log("销毁获取信号强度定时器")
+				clearInterval(this.interval);
+				uni.navigateTo({
+					url: `/pages/index/wheel-motor?title=${this.title}`
+				})
+			},
+			quit() {
+				console.log("销毁获取信号强度定时器")
+				clearInterval(this.interval);
+				uni.navigateBack({
+					delta: 100,
+					animationType: "slide-out-bottom"
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.page {
+		flex: 1;
+		background-color: $uni-bg-color-hover;
+	}
+
+	.title {
+		color: black;
+		font-size: 18;
+		font-weight: bold;
+	}
+
+	.space-view {
+		/* 水平居中 */
+		align-items: center;
+		/* 横向排列 */
+		flex-direction: row;
+		/* 两端布局 */
+		justify-content: space-between;
+	}
+
+	.send-data-view {
+		margin-top: 15px;
+	}
+
+	.status-view {
+		margin-right: 15px;
+		width: 30px;
+		height: 30px;
+		background-color: #dedede;
+		border-radius: 15px;
+	}
+
+	.on-status-view {
+		margin-right: 15px;
+		width: 30px;
+		height: 30px;
+		background-color: $uni-color-primary;
+		border-radius: 15px;
+	}
+</style>

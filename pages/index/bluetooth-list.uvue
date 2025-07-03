@@ -1,0 +1,97 @@
+<template>
+	<scroll-view class="page" @click="tap">
+		<view class="list-view" v-for="(name, index) in peripherals" :key="index">
+			<text>{{name}}</text>
+			<button class="connectDevice-button" size="mini" @click="connectDeviceButton(name)">连接</button>
+		</view>
+	</scroll-view>
+</template>
+
+<script lang="uts">
+	import { onBluetoothManager, onConnectDevice, onStartScanning, onStopScanning } from '@/uni_modules/ace-bluetooth'
+
+	export default {
+		data() {
+			return {
+				title: 'createCanvasContextAsync',
+				canvas: null as UniCanvasElement | null,
+				canvasContext: null as CanvasContext | null,
+				renderingContext: null as CanvasRenderingContext2D | null,
+				canvasWidth: 0,
+				canvasHeight: 0,
+				fontLoaded: false,
+				peripherals: [] as string[]
+			}
+		},
+		onLoad() {
+			console.log("+++++++++++++++++++++++++++开始扫描+++++++++++++++++++++++++++")
+			/* 蓝牙列表回调 */
+			onBluetoothManager((res) => {
+				this.peripherals = res
+				// this.peripherals.push(...res)
+				// this.peripherals.push(...res)
+				// this.peripherals.push(...res)
+				uni.hideLoading();
+			});
+			/* 开始扫描 */
+			onStartScanning()
+			uni.showLoading({
+				title: ''
+			})
+		},
+
+		methods: {
+			/* 连接设备 */
+			connectDeviceButton(name : string) {
+				uni.showLoading({
+					title: '正在连接' + name,
+					mask: true
+				})
+				onConnectDevice(name, () => {
+					onStopScanning()//停止扫描
+					uni.hideLoading();
+					uni.navigateTo({
+						url: `/pages/index/bluetooth-details?title=${name}`,
+						animationType: "slide-in-bottom"
+					})
+				})
+			},
+
+			tap() {
+				// const name1 = "蓝牙名称"
+				// uni.navigateTo({
+				// 	url: `/pages/index/bluetooth-details?title=${name1}`,
+				// 	animationType: "slide-in-bottom"
+				// })
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.page {
+		flex: 1;
+		background-color: $uni-bg-color-hover;
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.list-view {
+		padding: 20px;
+		height: 60px;
+		/* 水平居中 */
+		align-items: center;
+		/* 横向排列 */
+		flex-direction: row;
+		/* 两端布局 */
+		justify-content: space-between;
+		background-color: white;
+	}
+
+	.connectDevice-button {
+		width: 80px;
+		color: #000;
+		border-color: #90E174;
+		border-width: 1px;
+		align-items: center;
+	}
+</style>
