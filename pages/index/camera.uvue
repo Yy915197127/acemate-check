@@ -1,0 +1,113 @@
+<template>
+	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
+		<template v-slot:right>
+			<button size="mini" style="width: 70px; padding: 0;" @click="quit">退出测试</button>
+		</template>
+	</uni-navbar-lite>
+	<scroll-view class="page">
+		<view style="background-color: #ffffff; padding: 20px;">
+			<text class="title">{{cameraTitle}}</text>
+			<text class="remark-text">{{tennisRemark}}</text>
+			<view class="space-view">
+				<text>高度: {{height}}m</text>
+				<text>深度: {{depth}}</text>
+				<text>左右: {{lr}}</text>
+			</view>
+			<text class="remark-text">{{cameraRemark}}</text>
+			<view class="long-btn-view">
+				<button class="long-btn" @click="cameraButtonAction">{{cameraButton}}</button>
+			</view>
+		</view>
+		<view style="padding: 30px 20px;">
+			<button style="color: #ffffff; background-color: #000000;" @click="next">下一步</button>
+		</view>
+	</scroll-view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				title: "蓝牙" as string | null,
+				height: 1.5 as number,
+				depth: 1.5 as number,
+				lr: 1.5 as number,
+				cameraTitle: "摄像头测试",
+				tennisRemark: "网球实时坐标:",
+				cameraRemark: "点击开始检测后，请将网球放在机器正前方5m，高度1m以上的位置，实时判断网球位置是否准确",
+				cameraButton: "开始检测"
+			}
+		},
+
+		onLoad(query) {
+			this.title = query.title
+		},
+
+		methods: {
+			cameraButtonAction() {
+
+
+			},
+			next() {
+				uni.navigateTo({
+					url: `/pages/index/wifi?title=${this.title}`
+				})
+			},
+			quit() {
+				uni.navigateBack({
+					delta: 100,
+					animationType: "slide-out-bottom"
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.page {
+		flex: 1;
+		background-color: $uni-bg-color-hover;
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.title {
+		color: black;
+		font-size: 18;
+		font-weight: bold;
+	}
+
+	.space-view {
+		/* 水平居中 */
+		align-items: center;
+		/* 横向排列 */
+		flex-direction: row;
+		/* 两端布局 */
+		justify-content: space-between;
+		margin-top: 15px;
+	}
+
+	.btn {
+		width: 70px;
+		border-color: black;
+		border-width: 1px;
+	}
+
+	.long-btn-view {
+		align-items: center;
+		justify-content: center;
+		margin-top: 15px;
+	}
+
+	.remark-text {
+		font-size: 13;
+		line-height: 1.4;
+		color: gray;
+		margin-top: 15px;
+	}
+
+	.long-btn {
+		width: 220px;
+		border-color: black;
+		border-width: 1px;
+	}
+</style>

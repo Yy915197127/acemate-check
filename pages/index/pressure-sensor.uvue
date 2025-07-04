@@ -1,0 +1,128 @@
+<template>
+	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
+		<template v-slot:right>
+			<button size="mini" style="width: 70px; padding: 0;" @click="quit">退出测试</button>
+		</template>
+	</uni-navbar-lite>
+	<scroll-view class="page">
+		<view style="background-color: #ffffff; padding: 20px;">
+			<text class="title">{{psTitle}}</text>
+			<view class="space-view">
+				<text>压力值: {{ps}}</text>
+				<view class="status-view">
+					<view class="status" :style="{ backgroundColor: status ? 'green' : 'darkred'}"></view>
+					<text>{{status?'有球':'无球'}}</text>
+				</view>
+			</view>
+			<text class="remark-text">{{psRemark}}</text>
+			<view class="long-btn-view">
+				<button class="long-btn" @click="psButtonAction">{{isTesting ? psButton2 : psButton1}}</button>
+			</view>
+		</view>
+		<view style="padding: 30px 20px;">
+			<button style="color: #ffffff; background-color: #000000;" @click="next">下一步</button>
+		</view>
+	</scroll-view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				title: "蓝牙" as string | null,
+				ps: 788 as number,
+				status: true,
+				isTesting: false,
+				psTitle: "压力传感器测试",
+				psRemark: "点击开始测试后，转盘会每2秒自动旋转90度，请将部分球洞放入网球，查看数值和状态是否正确",
+				psButton1: "开始检测",
+				psButton2: "停止检测",
+			}
+		},
+
+		onLoad(query) {
+			this.title = query.title
+		},
+
+		methods: {
+			psButtonAction() {
+				this.isTesting = !this.isTesting
+
+			},
+			next() {
+				uni.navigateTo({
+					url: `/pages/index/camera?title=${this.title}`
+				})
+			},
+			quit() {
+				uni.navigateBack({
+					delta: 100,
+					animationType: "slide-out-bottom"
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.page {
+		flex: 1;
+		background-color: $uni-bg-color-hover;
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.title {
+		color: black;
+		font-size: 18;
+		font-weight: bold;
+	}
+
+	.space-view {
+		/* 水平居中 */
+		align-items: center;
+		/* 横向排列 */
+		flex-direction: row;
+		/* 两端布局 */
+		justify-content: space-between;
+		margin-top: 15px;
+	}
+
+	.btn {
+		width: 70px;
+		border-color: black;
+		border-width: 1px;
+	}
+
+	.long-btn-view {
+		align-items: center;
+		justify-content: center;
+		margin-top: 15px;
+	}
+
+	.remark-text {
+		font-size: 13;
+		line-height: 1.4;
+		color: gray;
+		margin-top: 15px;
+	}
+
+	.long-btn {
+		width: 220px;
+		border-color: black;
+		border-width: 1px;
+	}
+
+	.status-view {
+		/* 水平居中 */
+		align-items: center;
+		/* 横向排列 */
+		flex-direction: row;
+	}
+
+	.status {
+		width: 20px;
+		height: 20px;
+		border-radius: 10px;
+		margin-right: 8px;
+	}
+</style>

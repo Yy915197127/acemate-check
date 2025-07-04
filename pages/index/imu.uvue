@@ -110,7 +110,9 @@
 				this.gyroscopeTestResultText = res ? '检测结果正常' : '检测结果异常'
 			},
 			next() {
-
+				uni.navigateTo({
+					url: `/pages/index/pressure-sensor?title=${this.title}`
+				})
 			},
 			quit() {
 				uni.navigateBack({
