@@ -3,7 +3,7 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "全局测试"
+				// "navigationBarTitleText": "全局测试"
 			}
 		},
 		{

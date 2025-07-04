@@ -13,8 +13,8 @@
 			</picker-view>
 
 			<view class="space-view">
-				<button class="cancel-btn" @click="cancel">取消</button>
-				<button class="save-btn" @click="save">保存</button>
+				<button class="cancel-btn" @click="cancel">{{$t('steeringEngine.Cancel')}}</button>
+				<button class="save-btn" @click="save">{{$t('steeringEngine.Save')}}</button>
 			</view>
 		</view>
 	</view>
@@ -28,7 +28,7 @@
 				type: '' as string | null,
 				title: '' as string | null,
 				value: [0] as number[],
-				ramarkTitle: '观察舵机当前位置，如若未居中请调整偏移角度，使舵机位置居中',
+				ramarkTitle: this.$t('steeringEngine.Observe'),
 				offsets: _offsets as number[],
 				pickerIndex: 0,
 			};
@@ -123,13 +123,13 @@
 	}
 
 	.cancel-btn {
-		width: 80px;
+		//width: 80px;
 		border-color: black;
 		border-width: 1px;
 	}
 
 	.save-btn {
-		width: 80px;
+		//width: 80px;
 		background-color: black;
 		color: white;
 	}

@@ -1,17 +1,17 @@
 <template>
 	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
 		<template v-slot:right>
-			<button size="mini" style="width: 70px; padding: 0;" @click="quit">退出测试</button>
+			<button size="mini" style="width: 70px; padding: 0;" @click="quit">{{$t('global.ExitTest')}}</button>
 		</template>
 	</uni-navbar-lite>
 	<scroll-view class="page">
 		<view style="background-color: #ffffff; padding: 20px;">
 			<text class="title">{{psTitle}}</text>
 			<view class="space-view">
-				<text>压力值: {{ps}}</text>
+				<text>{{$t('pressureSensor.PressureValue') + ps}}</text>
 				<view class="status-view">
 					<view class="status" :style="{ backgroundColor: status ? 'green' : 'darkred'}"></view>
-					<text>{{status?'有球':'无球'}}</text>
+					<text>{{status?$t('pressureSensor.BallPresent'):$t('pressureSensor.NoBall')}}</text>
 				</view>
 			</view>
 			<text class="remark-text">{{psRemark}}</text>
@@ -20,7 +20,7 @@
 			</view>
 		</view>
 		<view style="padding: 30px 20px;">
-			<button style="color: #ffffff; background-color: #000000;" @click="next">下一步</button>
+			<button style="color: #ffffff; background-color: #000000;" @click="next">{{$t('global.NextStep')}}</button>
 		</view>
 	</scroll-view>
 </template>
@@ -33,10 +33,10 @@
 				ps: 788 as number,
 				status: true,
 				isTesting: false,
-				psTitle: "压力传感器测试",
-				psRemark: "点击开始测试后，转盘会每2秒自动旋转90度，请将部分球洞放入网球，查看数值和状态是否正确",
-				psButton1: "开始检测",
-				psButton2: "停止检测",
+				psTitle: this.$t('pressureSensor.PressureSensor'),
+				psRemark: this.$t('pressureSensor.StartTest'),
+				psButton1: this.$t('global.StartDetection'),
+				psButton2: this.$t('pressureSensor.StopDetection'),
 			}
 		},
 

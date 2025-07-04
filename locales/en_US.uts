@@ -1,0 +1,183 @@
+export default {
+
+	global: {
+		globalTest: 'Global Test',
+		beginTesting: 'Start Test',
+		ExitTest: 'Exit Test',
+		NextStep: 'Next Step',
+		Test: 'Test',
+		StartDetection: 'Start Detection',
+	},
+
+	//bluetooth-list
+	bluetoothList: {
+		BluetoothList: 'Bluetooth List',
+		Connect: 'Connect',
+		Connecting: 'Connecting ',
+	},
+
+	//bluetooth-details
+	bluetoothDetails: {
+		SignalStrength: 'Signal Strength',
+		TransceivingFunction: 'Transceiving Function @:global.Test',
+		Send: 'Send',
+		SendRemark: 'Send Test Data',
+		Receive: 'Receive Test Data',
+		remark1: 'Make sure the signal strength within 5 meters is below 70 dB; otherwise, there may be an antenna issue',
+		remark2: 'Please tap the Send button to test the transceiving function. Once the device receives the information, it will automatically test the receiving function',
+		remark3: 'Return data received. Bluetooth functionality test successful'
+	},
+
+	//wheel-motor
+	wheelMotor: {
+		DriveMotor: 'Drive Motor @:global.Test',
+		Speed: 'Speed (the maximum moving speed of the car)',
+		Acceleration: 'Acceleration (the acceleration when the car reaches maximum speed)',
+		Forward: 'Forward',
+		MoveRight: 'Move Right',
+		Backward: 'Backward',
+		MoveLeft: 'Move Left'
+	},
+
+	//serve-machine-motor
+	serveMachineMotor: {
+		ServingMotor: 'Serving Motor @:global.Test',
+		Speed: 'Speed (1–10 represents 1,000–10,000 rpm; please use a tachometer for testing)',
+		Confirm: 'Confirm'
+	},
+
+	//steering-engine
+	steeringEngine: {
+		TurntableServo: 'Turntable Servo @:global.Test',
+		HatchServo: 'Hatch Servo @:global.Test',
+		PitchServo: 'Pitch Servo @:global.Test',
+		Offset: 'Current Angle Offset:',
+		Calibrate: 'Calibrate',
+		TurntableServoCalibrate: 'Turntable Servo @:steeringEngine.Calibrate',
+		HatchServoCalibrate: 'Hatch Servo @:steeringEngine.Calibrate',
+		PitchServoCalibrate: 'Pitch Servo @:steeringEngine.Calibrate',
+		CloseHatch: 'Close Hatch',
+		OpenHatch: 'Open Hatch',
+		HatchAngleCalibration: 'Hatch Angle Calibration',
+		ServeElevationAngle: 'Serve Elevation Angle (0 = highest, 180 = lowest)',
+		Observe: 'Observe the current servo position. If it is not centered, adjust the offset angle to center it',
+		Cancel: 'Cancel',
+		Save: 'Save'
+	},
+
+	//imu
+	imu: {
+		Accelerometer: 'Accelerometer @:global.Test',
+		AccelerometerRemark1: 'Before testing the accelerometer, please place the machine flat on the ground. To ensure data accuracy, do not touch the machine during testing',
+		AccelerometerRemark2: 'The test lasts 10 seconds. During this period, ax and ay average values should be 0 (±0.2), and az should be 9.8 (±0.2). Otherwise, it is abnormal',
+		Gyroscope: 'Gyroscope @:global.Test',
+		GyroscopeRemark1: 'Before testing the gyroscope, please place the machine flat on the ground. To ensure data accuracy, do not touch the machine during testing',
+		GyroscopeRemark2: 'After the test begins, the machine will slowly rotate about 90°. Once rotation is complete, check whether the body rotation angle matches the displayed value',
+		AutoDetecting: 'Auto-detecting, please wait...',
+		Normal: 'Test Result: Normal',
+		Abnormal: 'Test Result: Abnormal',
+		observationresult: 'Please select the observation result',
+		RotationAngle: 'Rotation Angle: ',
+		AngleAbnormal: 'Angle Abnormal',
+		AngleNormal: 'Angle Normal'
+	},
+
+	//pressure-sensor
+	pressureSensor: {
+		PressureSensor: 'Pressure Sensor @:global.Test',
+		PressureValue: 'Pressure Value: ',
+		BallPresent: 'Ball Present',
+		NoBall: 'No Ball',
+		StartTest: 'After tapping Start Test, the turntable will automatically rotate 90° every 2 seconds. Please place tennis balls in some of the holes and check whether the values and status are correct',
+		StopDetection: 'Stop Detection'
+	},
+
+	//camera
+	camera: {
+		Camera: 'Camera @:global.Test',
+		Coordinates: 'Real-time Tennis Coordinates:',
+		Height: 'Height: ',
+		Depth: 'Depth: ',
+		LeftRight: 'LeftRight: ',
+		StartTest: 'After tapping Start Detection, place the tennis ball 5 meters directly in front of the machine, at a height above 1 meter, to check whether the position is detected accurately in real time'
+	},
+
+	//WiFi
+	WiFi: {
+		WiFiHotspot: 'WiFi Hotspot @:global.Test',
+		WiFiName: 'WiFi Name: ',
+		Connected: 'Connected',
+		NotConnected: 'Not Connected',
+		StartTest: 'After tapping Start Test, the app will automatically attempt to connect to the machine’s WiFi hotspot and update the status',
+		TestComplete: 'Test Complete'
+	},
+
+
+	globalTest: 'global test'
+	beginTesting: 'begin testing',
+	common: {
+		more: "Look More",
+		hello: '{msg} world'
+	},
+	leftMenus: {
+		// "/": "Home",
+		// Home: "Home",
+		home: "Home",
+	},
+	headMenus: {
+		"subTitle": "Organization service platform",
+		"userName": "ZhangSan"
+	},
+	login: {
+		"personal_center": "personal center",
+		"sign_out": "sign out"
+	},
+	plurals: {
+		car: 'car | cars',
+		apple: 'no apples | one apple | {count} apples',
+		format: {
+			named: 'Hello {name}, how are you? | Hi {name}, you look fine',
+			list: 'Hello {0}, how are you? | Hi {0}, you look fine'
+		},
+		fallback: 'this is fallback | this is a plural fallback'
+	},
+	message: {
+		hello: 'the world',
+		helloName: 'Hello {name}',
+		hoge: 'hoge',
+		link: '@:message.hello',
+		linkHelloName: '@:message.helloName',
+		linkLinkHelloName: '@:message.linkHelloName',
+		linkEnd: 'This is a linked translation to @:message.hello',
+		linkWithin: 'Isn\'t @:message.hello we live in great?',
+		linkMultiple: 'Hello @:message.hoge!, isn\'t @:message.hello great?',
+		linkBrackets: 'Hello @:(message.hoge). Isn\'t @:(message.hello) great?',
+		linkHyphen: '@:hyphen-hello',
+		linkUnderscore: '@:underscore_hello',
+		linkPipe: '@:pipe|hello',
+		linkColon: '@:(colon:hello)',
+		linkList: '@:message.hello: {0} {1}',
+		linkCaseLower: 'Please provide @.lower:message.homeAddress',
+		linkCaseUpper: '@.upper:message.homeAddress',
+		linkCaseCapitalize: '@.capitalize:message.homeAddress',
+		linkCaseUnknown: '@.unknown:message.homeAddress',
+		linkCaseCustom: '@.custom:message.homeAddress',
+		homeAddress: 'home Address',
+		circular1: 'Foo @:message.circular2',
+		circular2: 'Bar @:message.circular3',
+		circular3: 'Buz @:message.circular1',
+		linkTwice: '@:message.hello: @:message.hello',
+		the_world: 'the world',
+		dio: 'DIO:',
+		linked: '@:message.dio @:message.the_world !!!!',
+		missingHomeAddress: 'Please provide @.lower:message.homeAddress',
+		snake: 'snake case',
+		custom_modifier: "custom modifiers example: @.snakeCase:{'message.snake'}"
+	},
+	address: "{account}{'@'}{domain}",
+	'hyphen-hello': 'hyphen the wolrd',
+	underscore_hello: 'underscore the wolrd',
+	// 'colon:hello': 'hello colon',
+	// 'pipe|hello': 'hello pipe',
+
+};

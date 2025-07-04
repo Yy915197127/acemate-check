@@ -1,17 +1,17 @@
 <template>
 	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
 		<template v-slot:right>
-			<button size="mini" style="width: 70px; padding: 0;" @click="quit">退出测试</button>
+			<button size="mini" style="width: 70px; padding: 0;" @click="quit">{{$t('global.ExitTest')}}</button>
 		</template>
 	</uni-navbar-lite>
 	<scroll-view class="page">
 		<view style="background-color: #ffffff; padding: 20px;">
 			<text class="title">{{wifiTitle}}</text>
 			<view class="space-view">
-				<text>WiFi名称: {{wifiname}}</text>
+				<text>{{$t('WiFi.WiFiName')+wifiname}}</text>
 				<view class="status-view">
 					<view class="status" :style="{ backgroundColor: status ? 'green' : 'darkred'}"></view>
-					<text>{{status?'已连接':'未连接'}}</text>
+					<text>{{status?$t('WiFi.Connected'):$t('WiFi.NotConnected')}}</text>
 				</view>
 			</view>
 			<text class="remark-text">{{wifiRemark}}</text>
@@ -30,12 +30,12 @@
 		data() {
 			return {
 				title: "蓝牙" as string | null,
-				wifiname: 'xiaomi YU7' as string,
+				wifiname: 'acemate' as string,
 				status: true,
-				wifiTitle: "WiFi热点测试",
-				wifiRemark: "点击开始测试后，app会自动尝试连入机器WIFI热点，并更新状态",
-				wifiButton: "开始检测",
-				completeTest: "完成测试"
+				wifiTitle: this.$t('WiFi.WiFiHotspot'),
+				wifiRemark: this.$t('WiFi.StartTest'),
+				wifiButton: this.$t('global.StartDetection'),
+				completeTest: this.$t('WiFi.TestComplete')
 
 			}
 		},

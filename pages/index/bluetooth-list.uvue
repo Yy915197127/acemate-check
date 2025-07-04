@@ -1,8 +1,15 @@
 <template>
-	<scroll-view class="page" @click="tap">
+	<scroll-view class="page">
+		<view class="scanning-view">
+			<image :style="`width: 180px; height: 180px; transform: rotate(${angle}deg);`"
+				src="/static/scan_img_scaning.png" mode=""></image>
+			<image style="width: 40px; height: 40px; position: absolute;" src="/static/scan_ic_scan.png" mode="">
+			</image>
+		</view>
 		<view class="list-view" v-for="(name, index) in peripherals" :key="index">
 			<text>{{name}}</text>
-			<button class="connectDevice-button" size="mini" @click="connectDeviceButton(name)">连接</button>
+			<button class="connectDevice-button" size="mini"
+				@click="connectDeviceButton(name)">{{$t('bluetoothList.Connect')}}</button>
 		</view>
 	</scroll-view>
 </template>
@@ -20,10 +27,15 @@
 				canvasWidth: 0,
 				canvasHeight: 0,
 				fontLoaded: false,
-				peripherals: [] as string[]
+				peripherals: [] as string[],
+				angle: 0,
+				timer: 0 as number,
 			}
 		},
 		onLoad() {
+			uni.setNavigationBarTitle({
+				title: this.$t('bluetoothList.BluetoothList')
+			})
 			console.log("+++++++++++++++++++++++++++开始扫描+++++++++++++++++++++++++++")
 			/* 蓝牙列表回调 */
 			onBluetoothManager((res) => {
@@ -31,38 +43,52 @@
 				// this.peripherals.push(...res)
 				// this.peripherals.push(...res)
 				// this.peripherals.push(...res)
-				uni.hideLoading();
 			});
 			/* 开始扫描 */
 			onStartScanning()
-			uni.showLoading({
-				title: ''
-			})
+			this.startRotate()
+		},
+
+		onUnload() {
+			onStopScanning()//停止扫描
+			this.stopRotate()
+			console.log("+++++++++++++++++++++++++++停止扫描+++++++++++++++++++++++++++")
 		},
 
 		methods: {
+			startRotate() {
+				if (this.timer) return
+				this.timer = setInterval(() => {
+					this.angle += 2
+					if (this.angle >= 360) {
+						this.angle -= 360
+					}
+				}, 13)
+			},
+
+			stopRotate() {
+				if (this.timer) {
+					clearInterval(this.timer)
+					this.timer = 0
+				}
+			},
+
 			/* 连接设备 */
 			connectDeviceButton(name : string) {
+				onStopScanning()//停止扫描
+				this.stopRotate()
+				console.log("+++++++++++++++++++++++++++停止扫描+++++++++++++++++++++++++++")
 				uni.showLoading({
-					title: '正在连接' + name,
+					title: this.$t('bluetoothList.Connecting') + name,
 					mask: true
 				})
 				onConnectDevice(name, () => {
-					onStopScanning()//停止扫描
 					uni.hideLoading();
 					uni.navigateTo({
 						url: `/pages/index/bluetooth-details?title=${name}`,
 						animationType: "slide-in-bottom"
 					})
 				})
-			},
-
-			tap() {
-				// const name1 = "蓝牙名称"
-				// uni.navigateTo({
-				// 	url: `/pages/index/bluetooth-details?title=${name1}`,
-				// 	animationType: "slide-in-bottom"
-				// })
 			}
 		}
 	}
@@ -75,6 +101,14 @@
 		padding-bottom: env(safe-area-inset-bottom);
 	}
 
+	.scanning-view {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: 30px auto;
+	}
+
 	.list-view {
 		padding: 20px;
 		height: 60px;
@@ -85,10 +119,11 @@
 		/* 两端布局 */
 		justify-content: space-between;
 		background-color: white;
+		border-bottom: 0.5px solid $uni-text-color-disable;
 	}
 
 	.connectDevice-button {
-		width: 80px;
+		//width: 80px;
 		color: #000;
 		border-color: #90E174;
 		border-width: 1px;

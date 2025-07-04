@@ -1,7 +1,7 @@
 <template>
 	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
 		<template v-slot:right>
-			<button size="mini" style="width: 70px; padding: 0;" @click="quit">退出测试</button>
+			<button size="mini" style="width: 70px; padding: 0;" @click="quit">{{$t('global.ExitTest')}}</button>
 		</template>
 	</uni-navbar-lite>
 	<scroll-view class="page">
@@ -9,9 +9,9 @@
 			<text class="title">{{cameraTitle}}</text>
 			<text class="remark-text">{{tennisRemark}}</text>
 			<view class="space-view">
-				<text>高度: {{height}}m</text>
-				<text>深度: {{depth}}</text>
-				<text>左右: {{lr}}</text>
+				<text>{{$t('camera.Height')+height}}m</text>
+				<text>{{$t('camera.Depth')+depth}}m</text>
+				<text>{{$t('camera.LeftRight')+lr}}m</text>
 			</view>
 			<text class="remark-text">{{cameraRemark}}</text>
 			<view class="long-btn-view">
@@ -19,7 +19,7 @@
 			</view>
 		</view>
 		<view style="padding: 30px 20px;">
-			<button style="color: #ffffff; background-color: #000000;" @click="next">下一步</button>
+			<button style="color: #ffffff; background-color: #000000;" @click="next">{{$t('global.NextStep')}}</button>
 		</view>
 	</scroll-view>
 </template>
@@ -32,10 +32,10 @@
 				height: 1.5 as number,
 				depth: 1.5 as number,
 				lr: 1.5 as number,
-				cameraTitle: "摄像头测试",
-				tennisRemark: "网球实时坐标:",
-				cameraRemark: "点击开始检测后，请将网球放在机器正前方5m，高度1m以上的位置，实时判断网球位置是否准确",
-				cameraButton: "开始检测"
+				cameraTitle: this.$t('camera.Camera'),
+				tennisRemark: this.$t('camera.Coordinates'),
+				cameraRemark: this.$t('camera.StartTest'),
+				cameraButton: this.$t('global.StartDetection')
 			}
 		},
 

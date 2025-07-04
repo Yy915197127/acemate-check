@@ -1,7 +1,7 @@
 <template>
 	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
 		<template v-slot:right>
-			<button size="mini" style="width: 70px; padding: 0;" @click="quit">退出测试</button>
+			<button size="mini" style="width: 70px; padding: 0;" @click="quit">{{$t('global.ExitTest')}}</button>
 		</template>
 	</uni-navbar-lite>
 	<scroll-view class="page">
@@ -14,38 +14,43 @@
 				<button class="btn" size="mini" @click="turntableBut(turntable[3])">270°</button>
 			</view>
 			<view class="long-btn-view">
-				<text class="remark-text">当前角度偏移量：{{turntableOffset}}°</text>
-				<button class="long-btn" @click="turntableRevise">{{turntableOffset}}°校正</button>
+				<text class="remark-text">{{$t('steeringEngine.Offset')+turntableOffset}}°</text>
+				<button class="long-btn"
+					@click="turntableRevise">{{turntableOffset}}°{{$t('steeringEngine.Calibrate')}}</button>
 			</view>
 		</view>
 
 		<view style="background-color: #ffffff; padding: 20px; margin-top: 30px;">
 			<text class="title">{{cabinDoorTitle}}</text>
 			<view class="space-view">
-				<button class="cabinDoor-btn" size="mini" @click="cabinDoorClose">关舱门</button>
-				<button class="cabinDoor-btn" size="mini" @click="cabinDoorOpen">开舱门</button>
+				<button class="cabinDoor-btn" size="mini"
+					@click="cabinDoorClose">{{$t('steeringEngine.CloseHatch')}}</button>
+				<button class="cabinDoor-btn" size="mini"
+					@click="cabinDoorOpen">{{$t('steeringEngine.OpenHatch')}}</button>
 			</view>
 			<view class="long-btn-view">
-				<text class="remark-text">当前角度偏移量：{{cabinDoorOffset}}°</text>
-				<button class="long-btn" @click="cabinDoorRevise">关舱门角度校正</button>
+				<text class="remark-text">{{$t('steeringEngine.Offset')+cabinDoorOffset}}°</text>
+				<button class="long-btn"
+					@click="cabinDoorRevise">{{$t('steeringEngine.HatchAngleCalibration')}}</button>
 			</view>
 		</view>
 
 		<view style="background-color: #ffffff; padding: 20px; margin-top: 30px;">
 			<text class="title">{{pitchingTitle}}</text>
 			<view class="space-view">
-				<text class="remark-text">发球仰角(0：最高，180：最低)</text>
+				<text class="remark-text">{{$t('steeringEngine.ServeElevationAngle')}}</text>
 				<text class="">{{angle}}°</text>
 			</view>
 			<slider :min="0" :max="180" :step="10" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
 				:value="angle" @changing="angleSliderChangeing" @change="angleSliderChange" />
 			<view class="long-btn-view">
-				<text class="remark-text">当前角度偏移量：{{pitchingOffset}}°</text>
-				<button class="long-btn" @click="pitchingRevise">{{pitchingOffset}}°校正</button>
+				<text class="remark-text">{{$t('steeringEngine.Offset')+pitchingOffset}}°</text>
+				<button class="long-btn"
+					@click="pitchingRevise">{{pitchingOffset}}°{{$t('steeringEngine.Calibrate')}}</button>
 			</view>
 		</view>
 		<view style="padding: 30px 20px;">
-			<button style="color: #ffffff; background-color: #000000;" @click="next">下一步</button>
+			<button style="color: #ffffff; background-color: #000000;" @click="next">{{$t('global.NextStep')}}</button>
 		</view>
 	</scroll-view>
 </template>
@@ -55,9 +60,9 @@
 		data() {
 			return {
 				title: "蓝牙" as string | null,
-				turntableTitle: "转盘舵机测试",
-				cabinDoorTitle: "舱门舵机测试",
-				pitchingTitle: "俯仰舵机测试",
+				turntableTitle: this.$t('steeringEngine.TurntableServo'),
+				cabinDoorTitle: this.$t('steeringEngine.HatchServo'),
+				pitchingTitle: this.$t('steeringEngine.PitchServo'),
 				turntable: [0, 90, 180, 270],
 				turntableOffset: 0,
 				cabinDoorOffset: 0,
@@ -95,7 +100,7 @@
 				console.log(res)
 			},
 			turntableRevise() {
-				const obj = { "type": "turntable", "title": "转盘舵机校正", "offset": this.turntableOffset };
+				const obj = { "type": "turntable", "title": this.$t('steeringEngine.TurntableServoCalibrate'), "offset": this.turntableOffset };
 				this.openDialogPage(obj)
 			},
 			cabinDoorClose() {
@@ -105,11 +110,11 @@
 
 			},
 			cabinDoorRevise() {
-				const obj = { "type": "cabinDoor", "title": "舱门舵机校正", "offset": this.cabinDoorOffset };
+				const obj = { "type": "cabinDoor", "title": this.$t('steeringEngine.HatchServoCalibrate'), "offset": this.cabinDoorOffset };
 				this.openDialogPage(obj)
 			},
 			pitchingRevise() {
-				const obj = { "type": "pitching", "title": "俯仰舵机校正", "offset": this.pitchingOffset };
+				const obj = { "type": "pitching", "title": this.$t('steeringEngine.PitchServoCalibrate'), "offset": this.pitchingOffset };
 				this.openDialogPage(obj)
 			},
 			openDialogPage(obj : UTSJSONObject) {

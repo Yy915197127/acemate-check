@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<button id="testButton" class="testButton" @click="button_click">开始测试</button>
+		<button id="testButton" class="testButton" @click="button_click">{{$t('global.beginTesting')}}</button>
 	</view>
 </template>
 
@@ -20,7 +20,10 @@
 		},
 
 		onLoad() {
-
+			uni.setNavigationBarTitle({
+				// title: instance!.proxy!.$t('globalTest')
+				title: this.$t('global.globalTest')
+			})
 		},
 
 		methods: {

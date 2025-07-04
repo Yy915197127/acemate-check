@@ -1,7 +1,7 @@
 <template>
 	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
 		<template v-slot:right>
-			<button size="mini" style="width: 70px; padding: 0;" @click="quit">退出测试</button>
+			<button size="mini" style="width: 70px; padding: 0;" @click="quit">{{$t('global.ExitTest')}}</button>
 		</template>
 	</uni-navbar-lite>
 	<view class="page">
@@ -9,14 +9,14 @@
 			<text class="title">{{wheelMotorTitle}}</text>
 
 			<view class="space-view">
-				<text class="remark-text">速度(车子的最高移动速度)</text>
+				<text class="remark-text">{{$t('wheelMotor.Speed')}}</text>
 				<text class="">{{speed}}</text>
 			</view>
 			<slider :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
 				:value="speed" @changing="speedSliderChangeing" @change="speedSliderChange" />
 
 			<view class="space-view">
-				<text class="remark-text">加速度(车子达到最高移动速度时的加速度)</text>
+				<text class="remark-text">{{$t('wheelMotor.Acceleration')}}</text>
 				<text class="">{{acceleration}}</text>
 			</view>
 			<slider :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
@@ -24,16 +24,18 @@
 
 			<view class="container-view">
 				<view class="container">
-					<button class="btn top-btn" @longtap="long" @click="handleTopClick">前进</button>
-					<button class="btn right-btn" @click="handleRightClick">右移</button>
-					<button class="btn bottom-btn" @click="handleBottomClick">后退</button>
-					<button class="btn left-btn" @click="handleLeftClick">左移</button>
+					<button class="btn top-btn" @longtap="long"
+						@click="handleTopClick">{{$t('wheelMotor.Forward')}}</button>
+					<button class="btn right-btn" @click="handleRightClick">{{$t('wheelMotor.MoveRight')}}</button>
+					<button class="btn bottom-btn" @click="handleBottomClick">{{$t('wheelMotor.Backward')}}</button>
+					<button class="btn left-btn" @click="handleLeftClick">{{$t('wheelMotor.MoveLeft')}}</button>
 				</view>
 			</view>
 		</view>
 
 		<view style="padding: 30px 20px;">
-			<button style="color: #ffffff; background-color: #000000;" @click="next()">下一步</button>
+			<button style="color: #ffffff; background-color: #000000;"
+				@click="next()">{{$t('global.NextStep')}}</button>
 		</view>
 
 
@@ -45,7 +47,7 @@
 		data() {
 			return {
 				title: "蓝牙" as string | null,
-				wheelMotorTitle: "行走电机测试",
+				wheelMotorTitle: this.$t('wheelMotor.DriveMotor'),
 				speed: 1,
 				acceleration: 1
 			}
@@ -144,7 +146,7 @@
 
 	.btn {
 		position: absolute;
-		width: 80px;
+		//width: 80px;
 		border-color: black;
 		border-width: 1px;
 	}

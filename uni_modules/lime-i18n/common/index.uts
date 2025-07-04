@@ -1,0 +1,79 @@
+import { createComposer } from './composer'
+import { error, warn, getAllKeys } from './util'
+import { I18nErrorCodes } from './errors'
+import { AnyOrNull, NumberOrNull, StringOrNull, Composer } from './types'
+type I18nMode = "legacy" | "composition"
+
+// #ifndef APP
+type VuePlugin = any
+// #endif
+
+let i18n : UvueI18n | null = null
+class UvueI18n {
+	private __global : Composer
+	private __scope : EffectScope
+	constructor(options : UTSJSONObject = {}, root : Composer | null = null) {
+		this.__scope = effectScope()
+		this.__global = this.__scope.run(() : Composer => createComposer(UTSJSONObject.assign({}, options), root))!
+	}
+	get mode() : I18nMode {
+		return "composition"
+	}
+	get global() : Composer {
+		return this.__global
+	}
+	get availableLocales():string[] {
+		return getAllKeys(this.global.messages.value).sort()
+	}
+	dispose() {
+		this.__scope.stop()
+	}
+	get install() : VuePlugin {
+		const _install = (app : VueApp) => {
+			app.config.globalProperties.$i18n = i18n!
+			app.config.globalProperties.$t = function (key : string, values : AnyOrNull = null, locale : StringOrNull = null) : string {
+				const isLocale = typeof values == 'string'
+				const _values = isLocale ? null : values
+				const _locale = isLocale ? values as string : locale
+				return i18n!.global.t(key, _values, _locale)
+			}
+			app.config.globalProperties.$tc = function (key : string, choice : NumberOrNull = null, values : AnyOrNull = null, locale : StringOrNull = null) : string {
+				const isLocale = typeof values == 'string'
+				const _values = isLocale ? null : values
+				const _locale = isLocale ? values as string : locale
+				return i18n!.global.tc(key, choice, _values, _locale)
+			}
+			app.config.globalProperties.$d = function(date: any, key: StringOrNull = null, locale : StringOrNull = null, options: UTSJSONObject | null = null):string {
+				return i18n!.global.d(date, key, locale, options)
+			}
+			app.config.globalProperties.$n = function(number: number, key: StringOrNull = null, locale : AnyOrNull = null, options: UTSJSONObject | null = null):string {
+				const _locale = typeof locale == 'string' ? locale as string : null
+				const _options = typeof locale == 'object' && locale != null ? locale as UTSJSONObject : options
+				return i18n!.global.n(number, key, _locale, _options)
+			}
+			app.config.globalProperties.$locale = i18n!.global.locale
+		}
+		//  #ifdef APP-ANDROID
+		return definePlugin({
+			install: _install
+		})
+		// #endif
+		//  #ifndef APP-ANDROID
+		return _install
+		// #endif
+	}
+}
+
+export function createI18n(options : UTSJSONObject = {}) : UvueI18n {
+	// const __legacyMode = true
+	i18n = new UvueI18n(options)
+	return i18n!
+}
+
+export function useI18n(options : UTSJSONObject = {}) : Composer {
+	const instance = getCurrentInstance()
+	if (instance == null) {
+		error(I18nErrorCodes.MUST_BE_CALL_SETUP_TOP)
+	}
+	return new UvueI18n(options, i18n!.global).global
+}

@@ -1,7 +1,7 @@
 <template>
 	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
 		<template v-slot:right>
-			<button size="mini" style="width: 70px; padding: 0;" @click="quit">退出测试</button>
+			<button size="mini" style="width: 70px; padding: 0;" @click="quit">{{$t('global.ExitTest')}}</button>
 		</template>
 	</uni-navbar-lite>
 	<view class="page">
@@ -9,19 +9,19 @@
 			<text class="title">{{serveMachineMotorTitle}}</text>
 
 			<view class="space-view">
-				<text class="remark-text">速度(1-10代表1000-10000转，请用测速计进行测试)</text>
+				<text class="remark-text">{{$t('serveMachineMotor.Speed')}}</text>
 				<text class="">{{speed}}</text>
 			</view>
 			<slider :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
 				:value="speed" @changing="speedSliderChangeing" />
 
 			<view class="button-view">
-				<button class="btn" @click="confirm">确认</button>
+				<button class="btn" @click="confirm">{{$t('serveMachineMotor.Confirm')}}</button>
 			</view>
 		</view>
 
 		<view style="padding: 30px 20px;">
-			<button style="color: #ffffff; background-color: #000000;" @click="next">下一步</button>
+			<button style="color: #ffffff; background-color: #000000;" @click="next">{{$t('global.NextStep')}}</button>
 		</view>
 
 	</view>
@@ -32,7 +32,7 @@
 		data() {
 			return {
 				title: "蓝牙" as string | null,
-				serveMachineMotorTitle: "发球电机测试",
+				serveMachineMotorTitle: this.$t('serveMachineMotor.ServingMotor'),
 				speed: 1
 			}
 		},
@@ -101,7 +101,7 @@
 	}
 
 	.btn {
-		width: 80px;
+		// //width: 80px;
 		border-color: black;
 		border-width: 1px;
 	}
