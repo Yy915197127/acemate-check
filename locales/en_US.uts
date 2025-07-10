@@ -25,7 +25,9 @@ export default {
 		Receive: 'Receive Test Data',
 		remark1: 'Make sure the signal strength within 5 meters is below 70 dB; otherwise, there may be an antenna issue',
 		remark2: 'Please tap the Send button to test the transceiving function. Once the device receives the information, it will automatically test the receiving function',
-		remark3: 'Return data received. Bluetooth functionality test successful'
+		remark3: 'Return data received. Bluetooth functionality test successful',
+		toast: 'Entering factory mode...',
+		toast2: 'Failed to enter factory mode'
 	},
 
 	//wheel-motor

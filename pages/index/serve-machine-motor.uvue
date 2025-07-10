@@ -28,12 +28,13 @@
 </template>
 
 <script>
+	import { onSendCommand } from '@/uni_modules/ace-bluetooth';
 	export default {
 		data() {
 			return {
 				title: "蓝牙" as string | null,
 				serveMachineMotorTitle: this.$t('serveMachineMotor.ServingMotor'),
-				speed: 1
+				speed: 5
 			}
 		},
 
@@ -48,14 +49,21 @@
 
 			confirm() {
 				console.log("确认速度：" + this.speed);
+				onSendCommand("shot_test", "start", {
+					"up_speed": this.speed,
+					"down_speed": this.speed
+				});
 			},
 
 			next() {
+				onSendCommand("shot_test", "stop", "");
 				uni.navigateTo({
 					url: `/pages/index/steering-engine?title=${this.title}`
 				})
 			},
 			quit() {
+				//退出工厂模式
+				//onSendCommand("", "stop", "");
 				uni.navigateBack({
 					delta: 100,
 					animationType: "slide-out-bottom"

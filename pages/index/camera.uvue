@@ -25,6 +25,7 @@
 </template>
 
 <script>
+	import { onSendCommand } from '@/uni_modules/ace-bluetooth';
 	export default {
 		data() {
 			return {
@@ -54,6 +55,8 @@
 				})
 			},
 			quit() {
+				//退出工厂模式
+				//onSendCommand("", "stop", "");
 				uni.navigateBack({
 					delta: 100,
 					animationType: "slide-out-bottom"

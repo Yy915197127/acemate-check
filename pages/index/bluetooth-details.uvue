@@ -38,7 +38,7 @@
 </template>
 
 <script>
-	import { onConnectReadRSSIBut } from '@/uni_modules/ace-bluetooth';
+	import { onConnectReadRSSIBut, onSendCommand } from '@/uni_modules/ace-bluetooth';
 
 	export default {
 		data() {
@@ -53,40 +53,51 @@
 				receiveSucceedRemark: this.$t('bluetoothDetails.remark3'),
 				interval: 0,
 				rssi: 0,
-				status: false
+				status: false,
+				timeout: 0
 			}
 		},
 		onLoad(query) {
 			this.title = query.title
-			// this.interval = setInterval(() => {
-			// 	console.log('这段代码将每隔1秒执行一次');
-			// 	onConnectReadRSSIBut((rssi) => {
-			// 		this.rssi = rssi
-			// 		console.log("设备信号强度:" + rssi)
-			// 	})
-			// }, 1000);
-
-			setTimeout(() => {
-				this.status = true
-			}, 2000)
-
-			console.log("开启获取信号强度定时器")
-
+			this.interval = setInterval(() => {
+				onConnectReadRSSIBut((rssi) => {
+					this.rssi = rssi
+				})
+			}, 1000);
 		},
 
 		methods: {
 			send() {
-
+				//开启工厂模式,并测试收发功能
+				onSendCommand("", "start", "", (res) => {
+					console.log("蓝牙详情页面:" + res)
+					this.status = true
+					uni.hideLoading();
+					clearTimeout(this.timeout)
+				})
+				uni.showLoading({
+					title: this.$t('bluetoothDetails.toast'),
+					mask: true
+				})
+				this.timeout = setTimeout(() => {
+					clearTimeout(this.timeout)
+					uni.hideLoading();
+					uni.showToast({
+						title: this.$t('bluetoothDetails.toast2'),
+						icon: "error"
+					})
+				}, 15000);
 			},
 			next() {
-				console.log("销毁获取信号强度定时器")
 				clearInterval(this.interval);
 				uni.navigateTo({
 					url: `/pages/index/wheel-motor?title=${this.title}`
 				})
 			},
 			quit() {
-				console.log("销毁获取信号强度定时器")
+				//退出工厂模式
+				//onSendCommand("", "stop", "");
+
 				clearInterval(this.interval);
 				uni.navigateBack({
 					delta: 100,

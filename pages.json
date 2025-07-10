@@ -3,15 +3,12 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				// "navigationBarTitleText": "全局测试"
+				"navigationStyle": "custom"
 			}
 		},
 		{
 			//蓝牙列表
-			"path": "pages/index/bluetooth-list",
-			"style": {
-				"navigationBarTitleText": "蓝牙测试"
-			}
+			"path": "pages/index/bluetooth-list"
 		},
 		{
 			//蓝牙详情
@@ -90,21 +87,21 @@
 		"navigationBarTitleText": "",
 		"navigationBarBackgroundColor": "#f1f1f1",
 		"backgroundColor": "#f1f1f1"
+	},
+	"tabBar": {
+		"color": "#a3a7ad",
+		"fontSize": "16px",
+		"selectedColor": "#000000",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [{
+				"pagePath": "pages/index/index",
+				"text": "全局测试"
+			},
+			{
+				"pagePath": "pages/unit/unit",
+				"text": "单元测试"
+			}
+		]
 	}
-	// "tabBar": {
-	// 	"color": "#a3a7ad",
-	// 	"fontSize": "16px",
-	// 	"selectedColor": "#000000",
-	// 	"borderStyle": "black",
-	// 	"backgroundColor": "#ffffff",
-	// 	"list": [{
-	// 			"pagePath": "pages/index/index",
-	// 			"text": "全局测试"
-	// 		},
-	// 		{
-	// 			"pagePath": "pages/unit/unit",
-	// 			"text": "单元测试"
-	// 		}
-	// 	]
-	// }
 }

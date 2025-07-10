@@ -4,7 +4,7 @@
 			<text class="title">{{title}}</text>
 			<text class="remark-text">{{ramarkTitle}}</text>
 
-			<picker-view class="picker-view" indicator-style="height: 40px;" :value="value" @change="bindChange">
+			<picker-view class="picker-view" indicator-style="height: 50px;" :value="value" @change="bindChange">
 				<picker-view-column>
 					<view class="picker-item" v-for="(item,index) in offsets" :key="index">
 						<text class="picker-text">{{item}}°</text>
@@ -20,7 +20,7 @@
 	</view>
 </template>
 
-<script>
+<script lang="uts">
 	export default {
 		data() {
 			const _offsets = Array.from({ length: 31 }, (_, i) => 30 - i);
@@ -30,14 +30,13 @@
 				value: [0] as number[],
 				ramarkTitle: this.$t('steeringEngine.Observe'),
 				offsets: _offsets as number[],
-				pickerIndex: 0,
+				pickerIndex: 0
 			};
 		},
 
 		onLoad(options) {
 			if (options.data) {
 				const obj = JSON.parse(decodeURIComponent(options.data));
-				console.log(obj);
 				this.title = obj.title
 				this.type = obj.type
 				const index = this.offsets.findIndex(item => item === obj.offset)
@@ -49,8 +48,10 @@
 		methods: {
 			bindChange(e : UniPickerViewChangeEvent) {
 				const val = e.detail.value
+				console.log(val)
 				this.pickerIndex = val[0]
 			},
+
 			cancel() {
 				uni.closeDialogPage()
 			},
@@ -103,11 +104,11 @@
 	}
 
 	.picker-item {
-		height: 40px;
+		height: 50px;
 	}
 
 	.picker-text {
-		line-height: 40px;
+		line-height: 50px;
 		text-align: center;
 	}
 

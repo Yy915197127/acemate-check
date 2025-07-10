@@ -13,22 +13,25 @@
 				<text class="">{{speed}}</text>
 			</view>
 			<slider :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
-				:value="speed" @changing="speedSliderChangeing" @change="speedSliderChange" />
+				:value="speed" @changing="speedSliderChangeing" />
 
 			<view class="space-view">
 				<text class="remark-text">{{$t('wheelMotor.Acceleration')}}</text>
 				<text class="">{{acceleration}}</text>
 			</view>
 			<slider :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
-				:value="acceleration" @changing="accelerationSliderChangeing" @change="accelerationSliderChange" />
+				:value="acceleration" @changing="accelerationSliderChangeing" />
 
 			<view class="container-view">
 				<view class="container">
-					<button class="btn top-btn" @longtap="long"
-						@click="handleTopClick">{{$t('wheelMotor.Forward')}}</button>
-					<button class="btn right-btn" @click="handleRightClick">{{$t('wheelMotor.MoveRight')}}</button>
-					<button class="btn bottom-btn" @click="handleBottomClick">{{$t('wheelMotor.Backward')}}</button>
-					<button class="btn left-btn" @click="handleLeftClick">{{$t('wheelMotor.MoveLeft')}}</button>
+					<button class="btn top-btn" @touchstart="touchstartUp"
+						@touchend="touchend">{{$t('wheelMotor.Forward')}}</button>
+					<button class="btn right-btn" @touchstart="touchstartRight"
+						@touchend="touchend">{{$t('wheelMotor.MoveRight')}}</button>
+					<button class="btn bottom-btn" @touchstart="touchstartDown"
+						@touchend="touchend">{{$t('wheelMotor.Backward')}}</button>
+					<button class="btn left-btn" @touchstart="touchstartLeft"
+						@touchend="touchend">{{$t('wheelMotor.MoveLeft')}}</button>
 				</view>
 			</view>
 		</view>
@@ -43,13 +46,15 @@
 </template>
 
 <script>
+	import { onSendCommand } from '@/uni_modules/ace-bluetooth';
 	export default {
 		data() {
 			return {
 				title: "蓝牙" as string | null,
 				wheelMotorTitle: this.$t('wheelMotor.DriveMotor'),
-				speed: 1,
-				acceleration: 1
+				speed: 5,
+				acceleration: 5,
+				interval: 0,
 			}
 		},
 
@@ -58,35 +63,38 @@
 		},
 
 		methods: {
-			speedSliderChange(e : UniSliderChangeEvent) {
-				console.log("速度 发生变化：" + e.detail.value);
-
-			},
 			speedSliderChangeing(e : UniSliderChangeEvent) {
-				console.log("速度 发生变化：" + e.detail.value);
 				this.speed = e.detail.value
 			},
-			accelerationSliderChange(e : UniSliderChangeEvent) {
-				console.log("加速度 发生变化：" + e.detail.value);
-			},
 			accelerationSliderChangeing(e : UniSliderChangeEvent) {
-				console.log("加速度 发生变化：" + e.detail.value);
 				this.acceleration = e.detail.value
 			},
-			handleTopClick() {
-				console.log('上按钮点击');
+			touchstartUp() {
+				this.setWheelMotor("drive_up")
 			},
-			handleRightClick() {
-				console.log('右按钮点击');
+			touchstartDown() {
+				this.setWheelMotor("drive_down")
 			},
-			handleBottomClick() {
-				console.log('下按钮点击');
+			touchstartLeft() {
+				this.setWheelMotor("drive_left")
 			},
-			handleLeftClick() {
-				console.log('左按钮点击');
+			touchstartRight() {
+				this.setWheelMotor("drive_right")
 			},
-			long() {
-				console.log('长按');
+			touchend() {
+				clearInterval(this.interval);
+				onSendCommand("wheel_test", "stop", "");
+			},
+			setWheelMotor(direction : string) {
+				console.log(direction);
+				this.interval = setInterval(() => {
+					onSendCommand("wheel_test", "start", {
+						"direction": direction,
+						"speed": this.speed,
+						"acc": this.acceleration
+					});
+					console.log(Date.now());
+				}, 300);
 			},
 			next() {
 				uni.navigateTo({
@@ -94,6 +102,8 @@
 				})
 			},
 			quit() {
+				//退出工厂模式
+				//onSendCommand("", "stop", "");
 				uni.navigateBack({
 					delta: 100,
 					animationType: "slide-out-bottom"

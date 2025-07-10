@@ -56,6 +56,8 @@
 </template>
 
 <script>
+	import { onSendCommand } from '@/uni_modules/ace-bluetooth';
+	import { onPopupViewController } from '@/uni_modules/ace-revise-popup'
 	export default {
 		data() {
 			return {
@@ -73,41 +75,62 @@
 
 		onLoad(query) {
 			this.title = query.title
-			uni.$on("steering-engine", (res) => {
-				switch (res.type) {
-					case "turntable":
-						this.turntableOffset = res.offset
-						break;
-					case "cabinDoor":
-						this.cabinDoorOffset = res.offset
-						break;
-					case "pitching":
-						this.pitchingOffset = res.offset
-						break;
-					default:
-						break;
-				}
-			})
+			// uni.$on("steering-engine", (res) => {
+			// 	switch (res.type) {
+			// 		case "turntable":
+			// 			this.turntableOffset = res.offset
+			// 			onSendCommand("servo_test", "calibrate_zero", {
+			// 				"servo_type": "feeder_rotate",
+			// 				"angle_deg": this.turntableOffset
+			// 			});
+			// 			break;
+			// 		case "cabinDoor":
+			// 			this.cabinDoorOffset = res.offset
+			// 			onSendCommand("servo_test", "calibrate_zero", {
+			// 				"servo_type": "door_latch",
+			// 				"angle_deg": this.cabinDoorOffset
+			// 			});
+			// 			break;
+			// 		case "pitching":
+			// 			this.pitchingOffset = res.offset
+			// 			onSendCommand("servo_test", "calibrate_zero", {
+			// 				"servo_type": "launcher_pitch",
+			// 				"angle_deg": this.pitchingOffset
+			// 			});
+			// 			break;
+			// 		default:
+			// 			break;
+			// 	}
+			// })
 		},
 
-		onUnload() {
-			console.log("+++++++++++++++++++++++++++steering-engine停止监听+++++++++++++++++++++++++++")
-			uni.$off("steering-engine")
-		},
+		// onUnload() {
+		// 	console.log("+++++++++++++++++++++++++++steering-engine停止监听+++++++++++++++++++++++++++")
+		// 	uni.$off("steering-engine")
+		// },
 
 		methods: {
 			turntableBut(res : number) {
-				console.log(res)
+				onSendCommand("servo_test", "set_angle", {
+					"servo_type": "feeder_rotate",
+					"angle_deg": res / 2
+				});
 			},
 			turntableRevise() {
 				const obj = { "type": "turntable", "title": this.$t('steeringEngine.TurntableServoCalibrate'), "offset": this.turntableOffset };
 				this.openDialogPage(obj)
 			},
 			cabinDoorClose() {
-
+				onSendCommand("servo_test", "set_angle", {
+					"servo_type": "door_latch",
+					"angle_deg": 40
+				});
 			},
 			cabinDoorOpen() {
-
+				onSendCommand("servo_test", "set_angle", {
+					"servo_type": "door_latch",
+					"angle_deg": 115
+				});
 			},
 			cabinDoorRevise() {
 				const obj = { "type": "cabinDoor", "title": this.$t('steeringEngine.HatchServoCalibrate'), "offset": this.cabinDoorOffset };
@@ -118,15 +141,49 @@
 				this.openDialogPage(obj)
 			},
 			openDialogPage(obj : UTSJSONObject) {
-				uni.openDialogPage({
-					url: '/pages/dialog-page/revise-dialog?data=' + encodeURIComponent(JSON.stringify(obj)),
-					animationType: "fade-in",
-					animationDuration: 600
+				// uni.openDialogPage({
+				// 	url: '/pages/dialog-page/revise-dialog?data=' + encodeURIComponent(JSON.stringify(obj)),
+				// 	animationType: "fade-in",
+				// 	animationDuration: 600
+				// })
+
+				//弹出原生页面
+				onPopupViewController(obj, (res) => {
+					switch (obj['type']) {
+						case "turntable":
+							this.turntableOffset = res
+							onSendCommand("servo_test", "calibrate_zero", {
+								"servo_type": "feeder_rotate",
+								"angle_deg": this.turntableOffset
+							});
+							break;
+						case "cabinDoor":
+							this.cabinDoorOffset = res
+							onSendCommand("servo_test", "calibrate_zero", {
+								"servo_type": "door_latch",
+								"angle_deg": this.cabinDoorOffset
+							});
+							break;
+						case "pitching":
+							this.pitchingOffset = res
+							onSendCommand("servo_test", "calibrate_zero", {
+								"servo_type": "launcher_pitch",
+								"angle_deg": this.pitchingOffset
+							});
+							break;
+						default:
+							break;
+					}
 				})
+
 			},
 
 			angleSliderChange(e : UniSliderChangeEvent) {
 				console.log("俯仰角度发生变化：" + e.detail.value);
+				onSendCommand("servo_test", "set_angle", {
+					"servo_type": "launcher_pitch",
+					"angle_deg": e.detail.value
+				});
 			},
 			angleSliderChangeing(e : UniSliderChangeEvent) {
 				console.log("俯仰角度持续发生变化：" + e.detail.value);
@@ -138,6 +195,8 @@
 				})
 			},
 			quit() {
+				//退出工厂模式
+				//onSendCommand("", "stop", "");
 				uni.navigateBack({
 					delta: 100,
 					animationType: "slide-out-bottom"

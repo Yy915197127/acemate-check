@@ -1,4 +1,10 @@
 <template>
+	<uni-navbar-lite :title="title" :is-back="false" :nc-color="'#f1f1f1'">
+		<template v-slot:right>
+			<button size="mini" style="width: 70px; padding: 0;" @click="testRecord">测试记录</button>
+		</template>
+	</uni-navbar-lite>
+
 	<view class="content">
 		<button id="testButton" class="testButton" @click="button_click">{{$t('global.beginTesting')}}</button>
 	</view>
@@ -10,7 +16,7 @@
 	export default {
 		data() {
 			return {
-
+				title: "" as string | null,
 			}
 		},
 
@@ -20,10 +26,7 @@
 		},
 
 		onLoad() {
-			uni.setNavigationBarTitle({
-				// title: instance!.proxy!.$t('globalTest')
-				title: this.$t('global.globalTest')
-			})
+			this.title = this.$t('global.globalTest')
 		},
 
 		methods: {
@@ -31,6 +34,9 @@
 				uni.navigateTo({
 					url: '/pages/index/bluetooth-list'
 				})
+			},
+			testRecord() {
+
 			}
 		}
 	}

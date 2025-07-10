@@ -1,0 +1,18 @@
+
+import { UIModalPresentationStyle, UIModalTransitionStyle } from "UIKit";
+import { DispatchQueue } from "Dispatch";
+
+/* 校正弹窗 */
+export function onPopupViewController(obj : UTSJSONObject, callback : (offset : number) => void) {
+	DispatchQueue.main.async(execute = () : void => {
+		let popupVC = new PopupViewController()
+		popupVC.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
+		popupVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+		popupVC.reviseInfo = new ReviseInfo(type = obj['type'] as "", title = obj['title'] as "", offset = obj['offset'] as 0)
+		// popupVC.onReviseOffsetBlock((offset: number) => {
+		// 	console.log(offset);
+		// })
+		popupVC.onReviseOffsetBlock = callback
+		UTSiOS.getCurrentViewController().present(popupVC, animated = true)
+	})
+}

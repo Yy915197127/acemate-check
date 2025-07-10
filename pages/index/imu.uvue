@@ -31,16 +31,16 @@
 			</view>
 			<text class="remark-text">{{gyroscopeButtonRemark}}</text>
 			<view class="long-btn-view">
-				<view class="space-view" v-show="!isShowGyroscopeButton">
+				<!-- 				<view class="space-view" v-show="!isShowGyroscopeButton">
 					<button class="gyroscope-test-fall-btn"
 						@click="gyroscopeTestResultAction(false)">{{$t('imu.AngleAbnormal')}}</button>
 					<button class="gyroscope-test-succeed-btn"
 						@click="gyroscopeTestResultAction(true)">{{$t('imu.AngleNormal')}}</button>
-				</view>
-				<button class="long-btn" v-show="isShowGyroscopeButton"
+				</view> -->
+				<button :class="isShowGyroscopeButton ? 'long-btn' : 'long-btn-g'"
 					@click="gyroscopeButtonAction">{{gyroscopeButton}}</button>
 				<text class="remark-text"
-					:class="gyroscopeTestResultText?.includes($t('imu.observationresult')) ? '' : (gyroscopeTestResult ? 'high-G-test-succeed' : 'high-G-test-fall')"
+					:class="gyroscopeTestResultText?.includes($t('imu.AutoDetecting')) ? '' : (gyroscopeTestResult ? 'high-G-test-succeed' : 'high-G-test-fall')"
 					v-show="gyroscopeTestResultText?.length != 0">{{gyroscopeTestResultText}}</text>
 			</view>
 		</view>
@@ -51,13 +51,14 @@
 </template>
 
 <script>
+	import { onSendCommand, } from '@/uni_modules/ace-bluetooth';
 	export default {
 		data() {
 			return {
 				title: "蓝牙" as string | null,
-				ax: 0.02 as number,
+				ax: 0 as number,
 				ay: 0 as number,
-				az: 9.8 as number,
+				az: 0 as number,
 				isCounting: false,
 				countdown: 10,
 				highGTestResult: true as boolean,
@@ -68,7 +69,7 @@
 				HighGRemark: this.$t('imu.AccelerometerRemark1'),
 
 
-				yaw: 0.01 as number,
+				yaw: 0 as number,
 				rotationAngle: 0 as number,
 				gyroscopeTestResult: true as boolean,
 				isShowGyroscopeButton: true as boolean,
@@ -76,7 +77,7 @@
 				gyroscopeRemark: this.$t('imu.GyroscopeRemark1'),
 				gyroscopeButton: this.$t('global.StartDetection'),
 				gyroscopeButtonRemark: this.$t('imu.GyroscopeRemark2'),
-				gyroscopeTestResultText: "",
+				gyroscopeTestResultText: ""
 			}
 		},
 
@@ -87,6 +88,30 @@
 		methods: {
 			highGButtonAction() {
 				if (this.isCounting) return
+				let axArr : Array<number> = [];
+				let ayArr : Array<number> = [];
+				let azArr : Array<number> = [];
+				const interval = setInterval(() => {
+					onSendCommand("imu_test", "read", "", (res) => {
+						console.log("imu页面:" + res)
+						if (res["command"] == "imu_test") {
+							let data = res["data"]
+
+							let data_ax = data["ax"]
+							axArr.push(data_ax)
+							this.ax = data_ax;
+
+							let data_ay = data["ay"]
+							ayArr.push(data_ay)
+							this.ay = data_ay;
+
+							let data_az = data["az"]
+							azArr.push(data_az)
+							this.az = data_az;
+						}
+					})
+				}, 500);
+
 				this.HighGTestResultText = this.$t('imu.AutoDetecting')
 				this.isCounting = true
 				this.HighGButton = "10"
@@ -94,29 +119,74 @@
 					this.countdown--
 					this.HighGButton = `${this.countdown}`
 					if (this.countdown <= 0) {
+						clearInterval(interval)
 						clearInterval(timer)
 						this.isCounting = false
 						this.countdown = 10
 						this.HighGButton = this.$t('global.StartDetection')
-						this.HighGTestResultText = this.highGTestResult ? this.$t('imu.Normal') : this.$t('imu.Abnormal')
+						if (axArr.length > 0) {
+							this.ax = (axArr.reduce((acc, cur) => acc + cur, 0) / axArr.length).toFixed(3);
+						}
+						if (ayArr.length > 0) {
+							this.ay = (ayArr.reduce((acc, cur) => acc + cur, 0) / ayArr.length).toFixed(3);
+						}
+						if (azArr.length > 0) {
+							this.az = (azArr.reduce((acc, cur) => acc + cur, 0) / azArr.length).toFixed(3);
+						}
+
+						let isAx = Math.abs(this.ax) <= 0.2;
+						let isAy = Math.abs(this.ay) <= 0.2;
+						let isAz = this.az <= 10.0 && this.az >= 9.6
+
+						console.log(isAx)
+						console.log(isAy)
+						console.log(isAz)
+
+						this.highGTestResult = (isAx && isAy && isAz)
+
+						// this.HighGTestResultText = this.highGTestResult ? this.$t('imu.Normal') : this.$t('imu.Abnormal')
+						let abnormalAx = isAx ? "" : " ax"
+						let abnormalAy = isAy ? "" : " ay"
+						let abnormalAz = isAz ? "" : " az"
+						this.HighGTestResultText = this.highGTestResult ? this.$t('imu.Normal') : "检测结果:" + abnormalAx + abnormalAy + abnormalAz + "数据异常"
+
 					}
 				}, 1000)
 			},
 			gyroscopeButtonAction() {
-				this.gyroscopeTestResultText = this.$t('imu.observationresult')
-				this.isShowGyroscopeButton = false
+				this.gyroscopeTestResultText = this.$t('imu.AutoDetecting')
+				if (this.isShowGyroscopeButton) {
+					this.isShowGyroscopeButton = false
+					let yaw_interval = setInterval(() => {
+						onSendCommand("imu_test", "yaw_test", "", (res) => {
+							if (res["command"] == "imu_test") {
+								let data = res["data"]
+								this.rotationAngle = data["delta_yaw_deg"]
+								let status = data["status"]
+
+								clearInterval(yaw_interval)
+								this.isShowGyroscopeButton = true
+								this.gyroscopeTestResult = status == "success"
+								this.gyroscopeTestResultText = this.gyroscopeTestResult ? this.$t('imu.Normal') : this.$t('imu.Abnormal')
+							}
+						})
+					}, 500);
+				}
 			},
-			gyroscopeTestResultAction(res : boolean) {
-				this.isShowGyroscopeButton = true
-				this.gyroscopeTestResult = res
-				this.gyroscopeTestResultText = res ? this.$t('imu.Normal') : this.$t('imu.Abnormal')
-			},
+			// gyroscopeTestResultAction(res : boolean) {
+			// 	this.isShowGyroscopeButton = true
+			// 	this.gyroscopeTestResult = res
+			// 	this.gyroscopeTestResultText = res ? this.$t('imu.Normal') : this.$t('imu.Abnormal')
+			// 	clearInterval(this.yaw_interval)
+			// },
 			next() {
 				uni.navigateTo({
 					url: `/pages/index/pressure-sensor?title=${this.title}`
 				})
 			},
 			quit() {
+				//退出工厂模式
+				//onSendCommand("", "stop", "");
 				uni.navigateBack({
 					delta: 100,
 					animationType: "slide-out-bottom"
@@ -170,7 +240,15 @@
 
 	.long-btn {
 		width: 220px;
+		color: #000;
 		border-color: black;
+		border-width: 1px;
+	}
+
+	.long-btn-g {
+		width: 220px;
+		color: grey;
+		border-color: grey;
 		border-width: 1px;
 	}
 

@@ -1,8 +1,40 @@
 <script lang="uts">
+	import { onReconnectBlock } from '@/uni_modules/ace-bluetooth';
 	let firstBackTime = 0
 	export default {
 		onLaunch: function () {
 			console.log('App Launch')
+			let reconnectStatus = 1
+			onReconnectBlock((res) => {
+				console.log("全局监听蓝牙状态:" + res)
+				if (reconnectStatus != res) {
+					reconnectStatus = res
+					switch (res) {
+						case -1:
+							uni.showLoading({
+								title: "蓝牙已断开，正在尝试重连...",
+								mask: true
+							})
+							break;
+						case 0:
+							uni.hideLoading();
+							uni.showToast({
+								title: "重新连接失败，请手动连接",
+								icon: "error"
+							})
+							break;
+						case 1:
+							uni.hideLoading();
+							uni.showToast({
+								title: "重新连接成功"
+							})
+							break;
+						default:
+							break;
+					}
+				}
+
+			})
 		},
 		onShow: function () {
 			console.log('App Show')
@@ -30,7 +62,7 @@
 		// #endif
 		onExit: function () {
 			console.log('App Exit')
-		},
+		}
 	}
 </script>
 

@@ -16,7 +16,8 @@
 			</view>
 			<text class="remark-text">{{wifiRemark}}</text>
 			<view class="long-btn-view">
-				<button class="long-btn" @click="wifiButtonAction">{{wifiButton}}</button>
+				<button :class="isShowButton ? 'long-btn' : 'long-btn-g'"
+					@click="wifiButtonAction">{{wifiButton}}</button>
 			</view>
 		</view>
 		<view style="padding: 30px 20px;">
@@ -25,13 +26,15 @@
 	</scroll-view>
 </template>
 
-<script>
+<script lang="uts">
+	import { onSendCommand, onConnectToWifi } from '@/uni_modules/ace-bluetooth';
 	export default {
 		data() {
 			return {
 				title: "蓝牙" as string | null,
-				wifiname: 'acemate' as string,
-				status: true,
+				wifiname: '' as string,
+				status: false,
+				isShowButton: true,
 				wifiTitle: this.$t('WiFi.WiFiHotspot'),
 				wifiRemark: this.$t('WiFi.StartTest'),
 				wifiButton: this.$t('global.StartDetection'),
@@ -46,10 +49,41 @@
 
 		methods: {
 			wifiButtonAction() {
-				this.status = !this.status
 
+				if (!this.isShowButton) {
+					return
+				}
+				this.isShowButton = false
+				this.status = false
+				this.wifiname = "检测中..."
+				onSendCommand("wifi_test", "connect", "", (res) => {
+					console.log("wifi页面:" + res)
+					if (res["command"] == "wifi_test") {
+						let data = res["data"]
+						let ssid = data["ssid"]
+
+						this.isShowButton = true
+						uni.showLoading({
+							title: "正在连接设备WiFi热点...",
+							mask: true
+						})
+
+						onConnectToWifi(ssid, (status) => {
+							this.wifiname = status ? ssid : ''
+							this.status = status
+							uni.hideLoading();
+							uni.showToast({
+								title: status ? '连接热点成功' : '连接热点失败',
+								icon: status ? 'success' : 'error'
+							})
+						})
+					}
+				})
 			},
+
 			quit() {
+				//退出工厂模式
+				//onSendCommand("", "stop", "");
 				uni.navigateBack({
 					delta: 100,
 					animationType: "slide-out-bottom"
@@ -103,7 +137,15 @@
 
 	.long-btn {
 		width: 220px;
+		color: #000;
 		border-color: black;
+		border-width: 1px;
+	}
+
+	.long-btn-g {
+		width: 220px;
+		color: grey;
+		border-color: grey;
 		border-width: 1px;
 	}
 

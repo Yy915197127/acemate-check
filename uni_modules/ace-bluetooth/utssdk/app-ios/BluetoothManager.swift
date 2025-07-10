@@ -77,6 +77,12 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
 
     var versionBlock: ((String) -> Void)?
 
+    //接收设备返回的数据回调给UTS
+    var onProcessReceivedDataBlock: (([String: Any]) -> Void)?
+
+    // 重新连接回调给UTS
+    var onReconnectBlockUTS: ((NSNumber) -> Void)?
+
     //信号强度回调
     var connectDeviceReadRSSIBlock: ((NSNumber) -> Void)?
 
@@ -210,7 +216,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         if let localName = advertisementData[CBAdvertisementDataLocalNameKey] as? String,
             localName.contains(deviceName)
         {
-            console.log("设备广播名称：\(localName)")
+            // console.log("设备广播名称：\(localName)")
             //            onPeripheralDiscovered?(peripheral, RSSI, localName)
 
             // 检查设备名称是否已存在于列表中
@@ -223,7 +229,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 self.peripheralDic.updateValue(peripheral, forKey: localName)
                 onPeripheralDiscovered?(localName)
             } else {
-                console.log("设备 \(localName) 已存在于列表中，跳过添加")
+                // console.log("设备 \(localName) 已存在于列表中，跳过添加")
             }
 
         }
@@ -277,8 +283,9 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         bluetoothState = .disconnected
         isConnect = false
 
-        // 停止心跳定时器
-        stopHeartbeatTimer()
+        //装配测试不用发送心跳
+        // // 停止心跳定时器
+        // stopHeartbeatTimer()
 
         // 如果不是用户主动断开连接，尝试重新连接
         if !isDisconnectInitiatedByUser {
@@ -286,6 +293,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             if reconnectAttempts < maxRetries {
                 reconnectAttempts += 1
                 console.log("非用户主动断开，尝试重新连接，当前尝试次数: \(reconnectAttempts)/\(maxRetries)")
+                onReconnectBlockUTS?(-1)
 
                 // 延迟一段时间后尝试重新连接
                 DispatchQueue.main.asyncAfter(deadline: .now() + retryIntervalSeconds) {
@@ -312,6 +320,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             } else {
                 console.log("已达到最大重试次数 (\(maxRetries))，不再尝试重新连接")
                 targetPeripheral = nil
+                onReconnectBlockUTS?(0)
             }
         } else {
             // 用户主动断开连接，重置标志位
@@ -330,8 +339,6 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             console.log("读取RSSI出错: \(error.localizedDescription)")
             return
         }
-        console.log("当前RSSI: \(RSSI)")
-
         connectDeviceReadRSSIBlock?(RSSI)
     }
 
@@ -363,8 +370,9 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             peripheral.setNotifyValue(true, for: statusCharacteristic)
         }
 
-        // 启动心跳定时器
-        startHeartbeatTimer()
+        //装配测试不用发送心跳
+        // // 启动心跳定时器
+        // startHeartbeatTimer()
     }
 
     /// 特征通知状态更新的回调
@@ -378,6 +386,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 console.log("订阅状态特征通知失败：\(error.localizedDescription)")
             } else {
                 console.log(characteristic.isNotifying ? "已订阅状态特征通知" : "已停止状态特征通知订阅")
+                onReconnectBlockUTS?(1)
             }
         }
     }
@@ -431,10 +440,10 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         jsonDataBuffer += chunk
         resetPacketTimer()  // 每收到数据就重置超时
 
-        // 可能一次粘多条，循环拆
+        // 可能�������次粘多条，循环拆
         while let range = jsonDataBuffer.range(of: frameTail) {
 
-            // 取出 1 条完整帧（不含分隔符本身）
+            // 取出 1 条完整帧（不含分隔���本��）
             let jsonText = String(jsonDataBuffer[..<range.lowerBound])
 
             // 从缓冲区连同分隔符一并剔除
@@ -614,7 +623,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             case "versionInfo":
                 if let data = jsonObject["data"] as? [String: Any] {
                     if let version = data["version"] as? String {
-                        console.log("接收到版本信息, \(version)")
+                        console.log("接���到版本信息, \(version)")
                         versionBlock?(version)
                         let machineVersion = versionNumber(from: version)
                         let newVersion = versionNumber(from: currentVersion)
@@ -690,7 +699,11 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                     uiHandler?.bluetoothManager(self, didReceiveWiFiHotspot: ssid)
                     //                    connectToHotspot(ssid: ssid)
                 }
+            case "factory_test":
+                // case "factoryTestResult":
+                print("工厂模式收到设备返回数据: \(jsonObject)")
 
+                onProcessReceivedDataBlock?(jsonObject)
             default:
                 console.log("未知的响应类型: \(type)")
             }
@@ -986,7 +999,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     }
 
     /// 设置Serve训练模式
-    /// 配置设备进入Serve训练模式，并设置相关参数
+    /// 配置设备进入Serve训���模式��并设置��关参数
     func setServeData() {
         // 获取 ServeModeData 中的参数并发送
 
@@ -1131,6 +1144,14 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     // 串行队列用于处理命令发送
     private let commandSerialQueue = DispatchQueue(label: "com.acemate.commandQueue")
 
+    func onSendCommand(data: [String: Any], dataBlock: @escaping (([String: Any]) -> Void)) {
+        onProcessReceivedDataBlock = dataBlock
+        commandSerialQueue.async {
+            self.commandQueue.append(data)
+            self.processCommandQueue()
+        }
+    }
+
     func sendCommand(data: [String: Any]) {
         commandSerialQueue.async {
             self.commandQueue.append(data)
@@ -1158,7 +1179,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 self.lastCommandSentTime = now
 
                 do {
-                    //                    console.log("send_data: \(dataToSend)")
+                    console.log("send_data: \(dataToSend)")
                     let jsonData = try JSONSerialization.data(
                         withJSONObject: dataToSend, options: [])
                     if let jsonString = String(data: jsonData, encoding: .utf8),
@@ -1216,7 +1237,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     //                }
     //            }
     //        } catch {
-    //            console.log("JSON 序列化失败: \(error.localizedDescription)")
+    //            console.log("JSON ��列化失败: \(error.localizedDescription)")
     //        }
     //    }
 }
@@ -1227,7 +1248,7 @@ protocol BluetoothManagerUIHandler: AnyObject {
 
 // MARK: - 通知扩展
 extension Notification.Name {
-    /// 蓝牙状态变化���知
+    /// 蓝牙���态变������知
     static let bluetoothStateChanged = Notification.Name("bluetoothStateChanged")
     /// 设备状态变化通知
     static let carStateChanged = Notification.Name("carStateChanged")

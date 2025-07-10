@@ -6,10 +6,12 @@
 
 
 /* 引入 interface.uts 文件中定义的变量 */
-import { MyApiOptions, MyApiResult, MyApi, MyApiSync, BluetoothCallback, ConnectionStateBack } from '../interface.uts';
+import { MyApiOptions, MyApiResult, MyApi, MyApiSync, BluetoothCallback, ConnectionStateBack, ProcessReceivedBlock, ReconnectBlock } from '../interface.uts';
 
 /* 引入 unierror.uts 文件中定义的变量 */
 import { MyApiFailImpl } from '../unierror';
+import { NEHotspotConfiguration, NEHotspotConfigurationManager } from "NetworkExtension";
+
 
 
 /**
@@ -57,6 +59,11 @@ export function onConnectDevice(peripheral : string, callback : ConnectionStateB
 	BluetoothManager.shared.connectDeviceName(peripheral, callback)
 }
 
+/* 蓝牙断开连接重连状态 */
+export function onReconnectBlock(callback : ReconnectBlock) {
+	BluetoothManager.shared.onReconnectBlockUTS = callback
+}
+
 /* 断开蓝牙 */
 export function onDisconnectPeripheral() {
 	BluetoothManager.shared.disconnectPeripheral()
@@ -65,6 +72,36 @@ export function onDisconnectPeripheral() {
 /* 获取设备信号强度 */
 export function onConnectReadRSSIBut(callback : (rssi : number) => void) {
 	BluetoothManager.shared.connectDeviceReadRSSI(callback)
+}
+
+/* 向设备发送数据 */
+@UTSJS.keepAlive
+export function onSendCommand(command : string, action : string, data1 : any, callback ?: ProcessReceivedBlock) {
+	let sendData : Map<string, any> = new Map()
+	sendData.set("type", "factory_test")
+	sendData.set("command", command)
+	sendData.set("action", action)
+	sendData.set("data", data1)
+	BluetoothManager.shared.onSendCommand(data = sendData, dataBlock = (res : Map<string, any>) => {
+		callback?.(res)
+	})
+}
+
+/* 连接设备的WiFi热点 */
+export function onConnectToWifi(ssid : string, callback : (status : boolean) => void) {
+	let config = new NEHotspotConfiguration(ssid = ssid)
+	// let config = new NEHotspotConfiguration(ssid = ssid, passphrase = 'yzkj8888', isWEP = false)
+	config.joinOnce = true
+	NEHotspotConfigurationManager.shared.removeConfiguration(forSSID = ssid)
+	NEHotspotConfigurationManager.shared.apply(config, completionHandler = (error) => {
+		if (error === null) {
+			console.log('连接成功');
+			callback(true)
+		} else {
+			console.log('连接失败:', error);
+			callback(false)
+		}
+	});
 }
 
 /**

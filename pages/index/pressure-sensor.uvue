@@ -26,17 +26,19 @@
 </template>
 
 <script>
+	import { onSendCommand } from '@/uni_modules/ace-bluetooth';
 	export default {
 		data() {
 			return {
 				title: "蓝牙" as string | null,
-				ps: 788 as number,
-				status: true,
+				ps: 0 as number,
+				status: false,
 				isTesting: false,
 				psTitle: this.$t('pressureSensor.PressureSensor'),
 				psRemark: this.$t('pressureSensor.StartTest'),
 				psButton1: this.$t('global.StartDetection'),
 				psButton2: this.$t('pressureSensor.StopDetection'),
+				interval: 0,
 			}
 		},
 
@@ -48,6 +50,27 @@
 			psButtonAction() {
 				this.isTesting = !this.isTesting
 
+				if (this.isTesting) {
+					this.interval = setInterval(() => {
+						onSendCommand("pressure_test", "read", "", (res) => {
+							if (res["command"] == "pressure_test") {
+								let data = res["data"]
+								this.ps = data
+								console.log('bbbbb' + data)
+							}
+						})
+
+						onSendCommand("pressure_test", "tennis_test", "", (res) => {
+							if (res["command"] == "pressure_test") {
+								let data = res["data"]
+								console.log('aaaa' + res)
+							}
+						})
+
+					}, 500);
+				} else {
+					clearInterval(this.interval)
+				}
 			},
 			next() {
 				uni.navigateTo({
@@ -55,6 +78,8 @@
 				})
 			},
 			quit() {
+				//退出工厂模式
+				//onSendCommand("", "stop", "");
 				uni.navigateBack({
 					delta: 100,
 					animationType: "slide-out-bottom"
