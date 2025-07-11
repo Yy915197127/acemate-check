@@ -36,7 +36,9 @@
 				})
 			},
 			testRecord() {
-
+				uni.navigateTo({
+					url: '/pages/test_record/test-record-list'
+				})
 			}
 		}
 	}

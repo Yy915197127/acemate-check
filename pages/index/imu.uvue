@@ -26,7 +26,7 @@
 			<text class="title">{{gyroscopeTitle}}</text>
 			<text class="remark-text">{{gyroscopeRemark}}</text>
 			<view class="space-view">
-				<text>yzw: {{yaw}}</text>
+				<text>yaw: {{yaw}}</text>
 				<text>{{$t('imu.RotationAngle')+rotationAngle}}°</text>
 			</view>
 			<text class="remark-text">{{gyroscopeButtonRemark}}</text>
@@ -157,20 +157,23 @@
 				this.gyroscopeTestResultText = this.$t('imu.AutoDetecting')
 				if (this.isShowGyroscopeButton) {
 					this.isShowGyroscopeButton = false
-					let yaw_interval = setInterval(() => {
-						onSendCommand("imu_test", "yaw_test", "", (res) => {
-							if (res["command"] == "imu_test") {
-								let data = res["data"]
-								this.rotationAngle = data["delta_yaw_deg"]
-								let status = data["status"]
+					// let yaw_interval = setInterval(() => {
+					onSendCommand("imu_test", "yaw_test", "", (res) => {
+						if (res["command"] == "imu_test") {
 
-								clearInterval(yaw_interval)
-								this.isShowGyroscopeButton = true
-								this.gyroscopeTestResult = status == "success"
-								this.gyroscopeTestResultText = this.gyroscopeTestResult ? this.$t('imu.Normal') : this.$t('imu.Abnormal')
-							}
-						})
-					}, 500);
+							console.log(res)
+
+							let data = res["data"]
+							this.rotationAngle = data["delta_yaw_deg"]
+							let status = data["status"]
+
+							// clearInterval(yaw_interval)
+							this.isShowGyroscopeButton = true
+							this.gyroscopeTestResult = status == "success"
+							this.gyroscopeTestResultText = this.gyroscopeTestResult ? this.$t('imu.Normal') : this.$t('imu.Abnormal')
+						}
+					})
+					// }, 500);
 				}
 			},
 			// gyroscopeTestResultAction(res : boolean) {

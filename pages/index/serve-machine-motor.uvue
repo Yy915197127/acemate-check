@@ -9,12 +9,20 @@
 			<text class="title">{{serveMachineMotorTitle}}</text>
 
 			<view class="space-view">
-				<text class="remark-text">{{$t('serveMachineMotor.Speed')}}</text>
-				<text class="">{{speed}}</text>
+				<text class="remark-text">上电机</text>
+				<text class="">{{up_speed}}</text>
 			</view>
 			<slider :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
-				:value="speed" @changing="speedSliderChangeing" />
+				:value="up_speed" @changing="up_speedSliderChangeing" />
 
+			<view class="space-view">
+				<text class="remark-text">下电机</text>
+				<text class="">{{down_speed}}</text>
+			</view>
+			<slider :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
+				:value="down_speed" @changing="down_speedSliderChangeing" />
+
+			<text class="remark-text">(1-10代表1000-10000转，请用测速计进行测试)</text>
 			<view class="button-view">
 				<button class="btn" @click="confirm">{{$t('serveMachineMotor.Confirm')}}</button>
 			</view>
@@ -34,7 +42,8 @@
 			return {
 				title: "蓝牙" as string | null,
 				serveMachineMotorTitle: this.$t('serveMachineMotor.ServingMotor'),
-				speed: 5
+				up_speed: 5,
+				down_speed: 5
 			}
 		},
 
@@ -43,15 +52,18 @@
 		},
 
 		methods: {
-			speedSliderChangeing(e : UniSliderChangeEvent) {
-				this.speed = e.detail.value
+			up_speedSliderChangeing(e : UniSliderChangeEvent) {
+				this.up_speed = e.detail.value
+			},
+
+			down_speedSliderChangeing(e : UniSliderChangeEvent) {
+				this.down_speed = e.detail.value
 			},
 
 			confirm() {
-				console.log("确认速度：" + this.speed);
 				onSendCommand("shot_test", "start", {
-					"up_speed": this.speed,
-					"down_speed": this.speed
+					"up_speed": this.up_speed,
+					"down_speed": this.down_speed
 				});
 			},
 
@@ -92,7 +104,7 @@
 		flex-direction: row;
 		/* 两端布局 */
 		justify-content: space-between;
-		height: 40px;
+		// height: 40px;
 		margin-top: 15px;
 	}
 

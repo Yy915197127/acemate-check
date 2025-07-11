@@ -1,0 +1,63 @@
+<template>
+	<scroll-view class="page">
+		<view class="list-view" v-for="(name, index) in peripherals" :key="index" @click="testRecordDetails(index)">
+			<view class="space-view">
+				<text style="font-size: 18;">AceMate_020</text>
+				<text style="font-size: 16;"
+					:class="isSucceed ? 'test-succeed' : 'test-fall'">{{isSucceed ? '测试通过' : '测试异常'}}</text>
+			</view>
+			<text style="font-size: 13; color: gray; margin-top: 10px;">测试时间: 2025年07月10日 17:16</text>
+		</view>
+
+	</scroll-view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				isSucceed: false,
+				peripherals: ['name', 'name', 'name', 'name', 'name', 'name', 'name', 'name', 'name', 'name', 'name',] as string[],
+			};
+		},
+		methods: {
+			testRecordDetails(index) {
+				console.log(index)
+				uni.navigateTo({
+					url: '/pages/test_record/test-record-details'
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.page {
+		flex: 1;
+		background-color: $uni-bg-color-hover;
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.list-view {
+		padding: 20px;
+		background-color: white;
+		border-bottom: 0.5px solid $uni-text-color-disable;
+	}
+
+	.space-view {
+		/* 水平居中 */
+		align-items: center;
+		/* 横向排列 */
+		flex-direction: row;
+		/* 两端布局 */
+		justify-content: space-between;
+	}
+
+	.test-succeed {
+		color: green;
+	}
+
+	.test-fall {
+		color: darkred;
+	}
+</style>

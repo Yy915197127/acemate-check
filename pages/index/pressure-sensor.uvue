@@ -44,35 +44,34 @@
 
 		onLoad(query) {
 			this.title = query.title
+
+			this.interval = setInterval(() => {
+				onSendCommand("pressure_test", "read", "", (res) => {
+					if (res["command"] == "pressure_test") {
+						let data = res["data"]
+						this.ps = data
+						if (data > 400) {
+							this.status = true
+						}
+					}
+				})
+
+			}, 500);
 		},
 
 		methods: {
 			psButtonAction() {
 				this.isTesting = !this.isTesting
-
 				if (this.isTesting) {
-					this.interval = setInterval(() => {
-						onSendCommand("pressure_test", "read", "", (res) => {
-							if (res["command"] == "pressure_test") {
-								let data = res["data"]
-								this.ps = data
-								console.log('bbbbb' + data)
-							}
-						})
-
-						onSendCommand("pressure_test", "tennis_test", "", (res) => {
-							if (res["command"] == "pressure_test") {
-								let data = res["data"]
-								console.log('aaaa' + res)
-							}
-						})
-
-					}, 500);
+					//开启网球检测
+					onSendCommand("pressure_test", "tennis_test", "")
 				} else {
 					clearInterval(this.interval)
+					onSendCommand("pressure_test", "stop", "")
 				}
 			},
 			next() {
+				clearInterval(this.interval)
 				uni.navigateTo({
 					url: `/pages/index/camera?title=${this.title}`
 				})
