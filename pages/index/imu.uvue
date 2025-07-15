@@ -31,14 +31,16 @@
 			</view>
 			<text class="remark-text">{{gyroscopeButtonRemark}}</text>
 			<view class="long-btn-view">
-				<!-- 				<view class="space-view" v-show="!isShowGyroscopeButton">
-					<button class="gyroscope-test-fall-btn"
-						@click="gyroscopeTestResultAction(false)">{{$t('imu.AngleAbnormal')}}</button>
-					<button class="gyroscope-test-succeed-btn"
-						@click="gyroscopeTestResultAction(true)">{{$t('imu.AngleNormal')}}</button>
-				</view> -->
-				<button :class="isShowGyroscopeButton ? 'long-btn' : 'long-btn-g'"
-					@click="gyroscopeButtonAction">{{gyroscopeButton}}</button>
+				<!-- <button :class="isShowGyroscopeButton ? 'long-btn' : 'long-btn-g'"
+					@click="gyroscopeButtonAction">{{gyroscopeButton}}</button> -->
+
+				<view class="space-view">
+					<button :class="isShowGyroscopeButton ? 'long-btn' : 'long-btn-g'"
+						@click="gyroscopeButtonAction('left')">向左旋转测试</button>
+					<button :class="isShowGyroscopeButton ? 'long-btn' : 'long-btn-g'"
+						@click="gyroscopeButtonAction('right')">向右旋转测试</button>
+				</view>
+
 				<text class="remark-text"
 					:class="gyroscopeTestResultText?.includes($t('imu.AutoDetecting')) ? '' : (gyroscopeTestResult ? 'high-G-test-succeed' : 'high-G-test-fall')"
 					v-show="gyroscopeTestResultText?.length != 0">{{gyroscopeTestResultText}}</text>
@@ -56,6 +58,7 @@
 		data() {
 			return {
 				title: "蓝牙" as string | null,
+				aceid: '',
 				ax: 0 as number,
 				ay: 0 as number,
 				az: 0 as number,
@@ -83,6 +86,17 @@
 
 		onLoad(query) {
 			this.title = query.title
+			this.aceid = query.aceid
+
+			//用于测试
+			//更新测试结果
+			const success = ClassManager.updateClass(this.aceid, {
+				highG: true,
+				HighG_remark: 'ax: 0.31',
+				gyroscope: true
+			})
+			//用于测试
+
 		},
 
 		methods: {
@@ -134,9 +148,9 @@
 							this.az = (azArr.reduce((acc, cur) => acc + cur, 0) / azArr.length).toFixed(3);
 						}
 
-						let isAx = Math.abs(this.ax) <= 0.2;
-						let isAy = Math.abs(this.ay) <= 0.2;
-						let isAz = this.az <= 10.0 && this.az >= 9.6
+						let isAx = Math.abs(this.ax) <= 0.4;
+						let isAy = Math.abs(this.ay) <= 0.4;
+						let isAz = this.az <= 10.1 && this.az >= 9.5
 
 						console.log(isAx)
 						console.log(isAy)
@@ -144,7 +158,6 @@
 
 						this.highGTestResult = (isAx && isAy && isAz)
 
-						// this.HighGTestResultText = this.highGTestResult ? this.$t('imu.Normal') : this.$t('imu.Abnormal')
 						let abnormalAx = isAx ? "" : " ax"
 						let abnormalAy = isAy ? "" : " ay"
 						let abnormalAz = isAz ? "" : " az"
@@ -153,38 +166,47 @@
 					}
 				}, 1000)
 			},
-			gyroscopeButtonAction() {
+			gyroscopeButtonAction(type) {
 				this.gyroscopeTestResultText = this.$t('imu.AutoDetecting')
 				if (this.isShowGyroscopeButton) {
 					this.isShowGyroscopeButton = false
-					// let yaw_interval = setInterval(() => {
-					onSendCommand("imu_test", "yaw_test", "", (res) => {
+
+					onSendCommand("imu_test", "yaw_test", {
+						"angle": type == 'left' ? 90 : -90
+					}, (res) => {
 						if (res["command"] == "imu_test") {
-
 							console.log(res)
-
 							let data = res["data"]
-							this.rotationAngle = data["delta_yaw_deg"]
-							let status = data["status"]
-
-							// clearInterval(yaw_interval)
+							this.rotationAngle = data["actual_angle"]
 							this.isShowGyroscopeButton = true
-							this.gyroscopeTestResult = status == "success"
-							this.gyroscopeTestResultText = this.gyroscopeTestResult ? this.$t('imu.Normal') : this.$t('imu.Abnormal')
+							uni.showModal({
+								title: '旋转角度是否正常',
+								cancelText: '异常',
+								confirmText: '正常',
+								success: (result) => {
+									this.gyroscopeTestResult = result.confirm
+									this.gyroscopeTestResultText = this.gyroscopeTestResult ? this.$t('imu.Normal') : this.$t('imu.Abnormal')
+									switch (type) {
+										case 'left':
+
+											break;
+										case 'right':
+
+											break;
+										default:
+											break;
+									}
+								}
+							})
 						}
 					})
-					// }, 500);
 				}
 			},
-			// gyroscopeTestResultAction(res : boolean) {
-			// 	this.isShowGyroscopeButton = true
-			// 	this.gyroscopeTestResult = res
-			// 	this.gyroscopeTestResultText = res ? this.$t('imu.Normal') : this.$t('imu.Abnormal')
-			// 	clearInterval(this.yaw_interval)
-			// },
+
 			next() {
 				uni.navigateTo({
-					url: `/pages/index/pressure-sensor?title=${this.title}`
+					// url: `/pages/index/pressure-sensor?title=${this.title}&aceid=${this.aceid}`
+					url: `/pages/index/serve-machine-motor?title=${this.title}&aceid=${this.aceid}`
 				})
 			},
 			quit() {
@@ -220,6 +242,7 @@
 		/* 两端布局 */
 		justify-content: space-between;
 		margin-top: 15px;
+		width: 100%;
 	}
 
 	.btn {
@@ -242,14 +265,14 @@
 	}
 
 	.long-btn {
-		width: 220px;
+		// width: 90px;
 		color: #000;
 		border-color: black;
 		border-width: 1px;
 	}
 
 	.long-btn-g {
-		width: 220px;
+		// width: 90px;
 		color: grey;
 		border-color: grey;
 		border-width: 1px;
@@ -261,19 +284,5 @@
 
 	.high-G-test-fall {
 		color: darkred;
-	}
-
-	.gyroscope-test-succeed-btn {
-		border-color: black;
-		border-width: 1px;
-		margin: 0 30px;
-	}
-
-	.gyroscope-test-fall-btn {
-		color: #fff;
-		border-color: black;
-		background-color: darkred;
-		border-width: 1px;
-		margin: 0 30px;
 	}
 </style>

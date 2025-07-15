@@ -1,31 +1,55 @@
 <template>
-	<scroll-view class="page">
-		<view class="list-view" v-for="(name, index) in peripherals" :key="index" @click="testRecordDetails(index)">
+	<!-- 	<scroll-view class="page">
+		<view class="list-view" v-for="(details, index) in items" :key="index" @click="testRecordDetails(details.id)">
 			<view class="space-view">
-				<text style="font-size: 18;">AceMate_020</text>
+				<text style="font-size: 18;">设备: {{details.name}}</text>
 				<text style="font-size: 16;"
-					:class="isSucceed ? 'test-succeed' : 'test-fall'">{{isSucceed ? '测试通过' : '测试异常'}}</text>
+					:class="details.isSucceed ? 'test-succeed' : 'test-fall'">{{details.isSucceed ? '测试通过' : '测试异常'}}</text>
 			</view>
-			<text style="font-size: 13; color: gray; margin-top: 10px;">测试时间: 2025年07月10日 17:16</text>
+			<text style="font-size: 13; color: gray; margin-top: 10px;">测试时间: {{details.createdTime}}</text>
 		</view>
+	</scroll-view> -->
 
-	</scroll-view>
+	<list-view :enable-back-to-top="true" class="page">
+		<list-item :class="['list-item', index === items.length - 1 ? 'last-child' : '']"
+			v-for="(details, index) in items" :key="index" @click="testRecordDetails(details)">
+			<view class="space-view">
+				<text style="font-size: 18;">设备: {{details.name}}</text>
+				<text style="font-size: 16;"
+					:class="details.isSucceed ? 'test-succeed' : 'test-fall'">{{details.isSucceed ? '测试通过' : '测试异常'}}</text>
+			</view>
+			<text style="font-size: 13; color: gray; margin-top: 10px;">测试时间: {{details.createdTime}}</text>
+		</list-item>
+	</list-view>
+
 </template>
 
 <script>
+	import { on_fetchAllTestDetailsDB, on_deleteTestDetailsDB } from '@/uni_modules/ace-test-details'
+	import { onBluetoothManager, onConnectDevice, onStartScanning, onStopScanning } from '@/uni_modules/ace-bluetooth'
+	import TestDetailsM from '@/models/TestDetailsM'
 	export default {
 		data() {
 			return {
-				isSucceed: false,
-				peripherals: ['name', 'name', 'name', 'name', 'name', 'name', 'name', 'name', 'name', 'name', 'name',] as string[],
+				items: [] as TestDetailsM,
 			};
 		},
+
+		onLoad() {
+			const Details = on_fetchAllTestDetailsDB()
+			this.items = Details.map(item => JSON.parseObject<TestDetailsM>(item))
+			console.log(this.items)
+		},
 		methods: {
-			testRecordDetails(index) {
-				console.log(index)
+			testRecordDetails(details) {
 				uni.navigateTo({
-					url: '/pages/test_record/test-record-details'
+					url: '/pages/test_record/test-record-details?details=' + JSON.stringify(details)
 				})
+
+
+				//增加左滑删除
+				// on_deleteTestDetailsDB(details.id)
+
 			}
 		}
 	}
@@ -35,13 +59,16 @@
 	.page {
 		flex: 1;
 		background-color: $uni-bg-color-hover;
-		padding-bottom: env(safe-area-inset-bottom);
 	}
 
-	.list-view {
+	.list-item {
 		padding: 20px;
 		background-color: white;
 		border-bottom: 0.5px solid $uni-text-color-disable;
+	}
+
+	.last-child {
+		margin-bottom: env(safe-area-inset-bottom);
 	}
 
 	.space-view {

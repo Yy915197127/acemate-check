@@ -40,9 +40,6 @@
 			/* 蓝牙列表回调 */
 			onBluetoothManager((res) => {
 				this.peripherals = res
-				// this.peripherals.push(...res)
-				// this.peripherals.push(...res)
-				// this.peripherals.push(...res)
 			});
 			/* 开始扫描 */
 			onStartScanning()

@@ -156,8 +156,6 @@ export const myApiSync : MyApiSync = function (paramA : boolean) : MyApiResult {
 		fieldC: 'some message'
 	};
 
-	BluetoothManager.shared.startScanning()
-
 	return res;
 }
 

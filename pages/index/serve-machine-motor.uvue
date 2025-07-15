@@ -41,6 +41,7 @@
 		data() {
 			return {
 				title: "蓝牙" as string | null,
+				aceid: '',
 				serveMachineMotorTitle: this.$t('serveMachineMotor.ServingMotor'),
 				up_speed: 5,
 				down_speed: 5
@@ -49,6 +50,15 @@
 
 		onLoad(query) {
 			this.title = query.title
+			this.aceid = query.aceid
+
+			//用于测试
+			//更新测试结果
+			const success = ClassManager.updateClass(this.aceid, {
+				shot: true
+			})
+			//用于测试
+
 		},
 
 		methods: {
@@ -70,7 +80,7 @@
 			next() {
 				onSendCommand("shot_test", "stop", "");
 				uni.navigateTo({
-					url: `/pages/index/steering-engine?title=${this.title}`
+					url: `/pages/index/steering-engine?title=${this.title}&aceid=${this.aceid}`
 				})
 			},
 			quit() {

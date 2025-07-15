@@ -1,0 +1,116 @@
+export default class TestDetailsModel {
+
+	id : string						  //键唯一
+	name : string					  //测试设备蓝牙名
+
+	createdAt : number = Date.now()   //测试开始时间戳
+	createdTime : string			  //测试开始时间
+
+	rssi : number = 0				  //信号强度
+	sAndr : boolean = false			  //收发功能
+
+	wheel : boolean = false			  //行走电机
+
+	shot : boolean = false			  //发球电机
+
+	feeder_rotate : boolean = false   //转盘舵机
+	door_latch : boolean = false	  //舱门舵机
+	launcher_pitch : boolean = false  //俯仰舵机
+
+	highG : boolean = false			  //重力加速度
+	HighG_remark : string = ''		  //测试异常说明
+	gyroscope : boolean = false		  //陀螺仪
+
+	pressure : boolean = false		  //压力传感器
+
+	camera : boolean = false  		  //摄像头
+
+	wifi : boolean = false		 	  //WiFi热点
+	wifi_name : string = '' 		  //WiFi名
+	isSucceed : boolean = false		  //整体测试状态
+
+	// 构造函数
+	constructor(name : string) {
+		this.id = this.generateId()
+		this.createdTime = this.formatTimestamp(this.createdAt)
+		this.name = name
+	}
+
+	// 自定义键
+	private generateId() : string {
+		return 'ace_' + Date.now();
+	}
+
+	// 自定义时间格式
+	private formatTimestamp(timestamp : number, format : string = 'YYYY-MM-DD HH:mm:ss') : string {
+		const date = new Date(timestamp)
+
+		const year = date.getFullYear()
+		const month = (date.getMonth() + 1).toString().padStart(2, '0')
+		const day = date.getDate().toString().padStart(2, '0')
+		const hours = date.getHours().toString().padStart(2, '0')
+		const minutes = date.getMinutes().toString().padStart(2, '0')
+		const seconds = date.getSeconds().toString().padStart(2, '0')
+
+		return format
+			.replace('YYYY', year.toString())
+			.replace('MM', month)
+			.replace('DD', day)
+			.replace('HH', hours)
+			.replace('mm', minutes)
+			.replace('ss', seconds)
+	}
+
+
+	// 序列化方法
+	toJSON() : any {
+		return {
+			id: this.id,
+			name: this.name,
+			createdAt: this.createdAt,
+			createdTime: this.createdTime,
+			rssi: this.rssi,
+			sAndr: this.sAndr,
+			wheel: this.wheel,
+			shot: this.shot,
+			feeder_rotate: this.feeder_rotate,
+			door_latch: this.door_latch,
+			launcher_pitch: this.launcher_pitch,
+			highG: this.highG,
+			HighG_remark: this.HighG_remark,
+			gyroscope: this.gyroscope,
+			pressure: this.pressure,
+			camera: this.camera,
+			wifi: this.wifi,
+			wifi_name: this.wifi_name,
+			isSucceed: this.sAndr && this.wheel && this.shot && this.feeder_rotate && this.door_latch && this.launcher_pitch && this.highG && this.gyroscope && this.pressure && this.camera && this.wifi
+		}
+	}
+
+	// 反序列化方法
+	static fromJSON(json : any) : TestDetailsModel {
+		const item = new TestDetailsModel(json.name)
+
+		item.id = json.id
+		item.isSucceed = json.sAndr && json.wheel && json.shot && json.feeder_rotate && json.door_latch && json.launcher_pitch && json.highG && json.gyroscope && json.pressure && json.camera && json.wifi || false
+		item.createdAt = json.createdAt || Date.now()
+		item.createdTime = json.createdTime || ''
+		item.rssi = json.rssi || 0
+		item.sAndr = json.sAndr || false
+		item.wheel = json.wheel || false
+		item.shot = json.shot || false
+		item.feeder_rotate = json.feeder_rotate || false
+		item.door_latch = json.door_latch || false
+		item.launcher_pitch = json.launcher_pitch || false
+		item.highG = json.highG || false
+		item.HighG_remark = json.HighG_remark || ''
+		item.gyroscope = json.gyroscope || false
+		item.pressure = json.pressure || false
+		item.camera = json.camera || false
+		item.wifi = json.wifi || false
+		item.wifi_name = json.wifi_name || ''
+
+		return item
+	}
+
+}

@@ -26,6 +26,13 @@
 			}
 		},
 		{
+			//IMU
+			"path": "pages/index/imu",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
 			//发球电机
 			"path": "pages/index/serve-machine-motor",
 			"style": {
@@ -44,13 +51,6 @@
 			"path": "pages/dialog-page/revise-dialog",
 			"style": {
 				"navigationBarTitleText": ""
-			}
-		},
-		{
-			//IMU
-			"path": "pages/index/imu",
-			"style": {
-				"navigationStyle": "custom"
 			}
 		},
 		{

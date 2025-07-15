@@ -1,0 +1,9 @@
+{
+	"deploymentTarget": "16.0",
+	"dependencies-pods": [{
+		"name": "FMDB",
+		"repo": {
+			"git": "https://github.com/ccgus/fmdb.git"
+		}
+	}]
+}

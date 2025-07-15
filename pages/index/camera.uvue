@@ -15,7 +15,7 @@
 			</view>
 			<text class="remark-text">{{cameraRemark}}</text>
 			<view class="long-btn-view">
-				<button class="long-btn" @click="cameraButtonAction">{{cameraButton}}</button>
+				<button class="long-btn" @click="cameraButtonAction">{{isCamera ? "开始检测" : "停止检测"}}</button>
 			</view>
 		</view>
 		<view style="padding: 30px 20px;">
@@ -30,28 +30,55 @@
 		data() {
 			return {
 				title: "蓝牙" as string | null,
-				height: 1.5 as number,
-				depth: 1.5 as number,
-				lr: 1.5 as number,
+				aceid: '',
+				height: 0 as number,
+				depth: 0 as number,
+				lr: 0 as number,
 				cameraTitle: this.$t('camera.Camera'),
 				tennisRemark: this.$t('camera.Coordinates'),
 				cameraRemark: this.$t('camera.StartTest'),
-				cameraButton: this.$t('global.StartDetection')
+				cameraButton: this.$t('global.StartDetection'),
+				isCamera: true
 			}
 		},
 
 		onLoad(query) {
 			this.title = query.title
+			this.aceid = query.aceid
+			//用于测试
+			//更新测试结果
+			const success = ClassManager.updateClass(this.aceid, {
+				camera: true
+			})
+			//用于测试
 		},
 
 		methods: {
 			cameraButtonAction() {
+				this.isCamera = !this.isCamera
+				onSendCommand("camera_test", this.isCamera ? "stop" : "tennis_test", "", (res) => {
 
+					if (res["action"] == "tennis_test") {
+						let data = res["data"]
+						this.height = data["y"] ?? 0
+						this.depth = data["z"] ?? 0
+						this.lr = data["x"] ?? 0
+					} else {
+						uni.showModal({
+							title: '摄像头功能是否正常',
+							cancelText: '异常',
+							confirmText: '正常',
+							success: (result) => {
+								console.log(result.confirm)
+							}
+						})
+					}
+				})
 
 			},
 			next() {
 				uni.navigateTo({
-					url: `/pages/index/wifi?title=${this.title}`
+					url: `/pages/index/wifi?title=${this.title}&aceid=${this.aceid}`
 				})
 			},
 			quit() {

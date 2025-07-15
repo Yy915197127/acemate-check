@@ -31,6 +31,7 @@
 		data() {
 			return {
 				title: "蓝牙" as string | null,
+				aceid: '',
 				ps: 0 as number,
 				status: false,
 				isTesting: false,
@@ -44,19 +45,23 @@
 
 		onLoad(query) {
 			this.title = query.title
-
+			this.aceid = query.aceid
 			this.interval = setInterval(() => {
 				onSendCommand("pressure_test", "read", "", (res) => {
 					if (res["command"] == "pressure_test") {
-						let data = res["data"]
-						this.ps = data
-						if (data > 400) {
-							this.status = true
-						}
+						this.ps = res["data"]["pressure"]
+						this.status = this.ps > 300
 					}
 				})
 
 			}, 500);
+
+			//用于测试
+			//更新测试结果
+			const success = ClassManager.updateClass(this.aceid, {
+				pressure: true
+			})
+			//用于测试
 		},
 
 		methods: {
@@ -66,14 +71,14 @@
 					//开启网球检测
 					onSendCommand("pressure_test", "tennis_test", "")
 				} else {
-					clearInterval(this.interval)
 					onSendCommand("pressure_test", "stop", "")
 				}
 			},
 			next() {
 				clearInterval(this.interval)
+				onSendCommand("pressure_test", "stop", "")
 				uni.navigateTo({
-					url: `/pages/index/camera?title=${this.title}`
+					url: `/pages/index/camera?title=${this.title}&aceid=${this.aceid}`
 				})
 			},
 			quit() {

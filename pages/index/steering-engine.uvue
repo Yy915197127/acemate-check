@@ -62,6 +62,7 @@
 		data() {
 			return {
 				title: "蓝牙" as string | null,
+				aceid: '',
 				turntableTitle: this.$t('steeringEngine.TurntableServo'),
 				cabinDoorTitle: this.$t('steeringEngine.HatchServo'),
 				pitchingTitle: this.$t('steeringEngine.PitchServo'),
@@ -75,39 +76,26 @@
 
 		onLoad(query) {
 			this.title = query.title
-			// uni.$on("steering-engine", (res) => {
-			// 	switch (res.type) {
-			// 		case "turntable":
-			// 			this.turntableOffset = res.offset
-			// 			onSendCommand("servo_test", "calibrate_zero", {
-			// 				"servo_type": "feeder_rotate",
-			// 				"angle_deg": this.turntableOffset
-			// 			});
-			// 			break;
-			// 		case "cabinDoor":
-			// 			this.cabinDoorOffset = res.offset
-			// 			onSendCommand("servo_test", "calibrate_zero", {
-			// 				"servo_type": "door_latch",
-			// 				"angle_deg": this.cabinDoorOffset
-			// 			});
-			// 			break;
-			// 		case "pitching":
-			// 			this.pitchingOffset = res.offset
-			// 			onSendCommand("servo_test", "calibrate_zero", {
-			// 				"servo_type": "launcher_pitch",
-			// 				"angle_deg": this.pitchingOffset
-			// 			});
-			// 			break;
-			// 		default:
-			// 			break;
-			// 	}
-			// })
-		},
+			this.aceid = query.aceid
 
-		// onUnload() {
-		// 	console.log("+++++++++++++++++++++++++++steering-engine停止监听+++++++++++++++++++++++++++")
-		// 	uni.$off("steering-engine")
-		// },
+
+			//用于测试
+			//更新测试结果
+			const success = ClassManager.updateClass(this.aceid, {
+				feeder_rotate: true,
+				door_latch: true,
+				launcher_pitch: true
+			})
+			//用于测试
+
+			//读取校正数据
+			onSendCommand("servo_test", "get_offset_angle", "", (res) => {
+				let data = res["data"]
+				this.turntableOffset = data['feeder_rotate']
+				this.cabinDoorOffset = data['door_latch']
+				this.pitchingOffset = data['launcher_pitch']
+			});
+		},
 
 		methods: {
 			turntableBut(res : number) {
@@ -141,11 +129,6 @@
 				this.openDialogPage(obj)
 			},
 			openDialogPage(obj : UTSJSONObject) {
-				// uni.openDialogPage({
-				// 	url: '/pages/dialog-page/revise-dialog?data=' + encodeURIComponent(JSON.stringify(obj)),
-				// 	animationType: "fade-in",
-				// 	animationDuration: 600
-				// })
 
 				//弹出原生页面
 				onPopupViewController(obj, (res) => {
@@ -191,7 +174,8 @@
 			},
 			next() {
 				uni.navigateTo({
-					url: `/pages/index/imu?title=${this.title}`
+					// url: `/pages/index/imu?title=${this.title}&aceid=${this.aceid}`
+					url: `/pages/index/pressure-sensor?title=${this.title}&aceid=${this.aceid}`
 				})
 			},
 			quit() {

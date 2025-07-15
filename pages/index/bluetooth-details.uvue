@@ -39,11 +39,14 @@
 
 <script>
 	import { onConnectReadRSSIBut, onSendCommand } from '@/uni_modules/ace-bluetooth';
+	import { on_insertTestDetailsDB, on_updateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
+	import TestDetailsM from '@/models/TestDetailsM'
 
 	export default {
 		data() {
 			return {
 				title: "" as string | null,
+				aceid: '',
 				rssiTitle: this.$t('bluetoothDetails.SignalStrength'),
 				rssiRemark: this.$t('bluetoothDetails.remark1'),
 				receiveSendDataTitle: this.$t('bluetoothDetails.TransceivingFunction'),
@@ -68,12 +71,20 @@
 
 		methods: {
 			send() {
+				//创建测试记录数据
+				const aceid = 'ace_' + Date.now()
+				on_insertTestDetailsDB(aceid, this.title)
+
 				//开启工厂模式,并测试收发功能
 				onSendCommand("", "start", "", (res) => {
-					console.log("蓝牙详情页面:" + res)
 					this.status = true
 					uni.hideLoading();
 					clearTimeout(this.timeout)
+					let model = JSON.parseObject<TestDetailsM>(on_fetchTestDetailsDB(aceid))
+					console.log(model)
+					model.rssi = this.rssi
+					model.sAndr = true
+					on_updateTestDetailsDB(aceid, JSON.stringify(model))
 				})
 				uni.showLoading({
 					title: this.$t('bluetoothDetails.toast'),
@@ -91,7 +102,7 @@
 			next() {
 				clearInterval(this.interval);
 				uni.navigateTo({
-					url: `/pages/index/wheel-motor?title=${this.title}`
+					url: `/pages/index/wheel-motor?title=${this.title}&aceid=${this.aceid}`
 				})
 			},
 			quit() {

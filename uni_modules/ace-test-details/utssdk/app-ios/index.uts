@@ -1,0 +1,30 @@
+
+// 查询全部
+export function on_fetchAllTestDetailsDB() : string[] {
+	return DatabaseManager.shared.fetchAllTestDetailsDB()
+}
+
+// 分页查询
+export function on_fetchTestDetailsPageDB(page : number, pageSize : number) : string[] {
+	return DatabaseManager.shared.fetchTestDetailsPageDB(page = page, pageSize = pageSize)
+}
+
+// 根据aceid全等查询
+export function on_fetchTestDetailsDB(aceid : string) : string {
+	return DatabaseManager.shared.fetchTestDetailsDB(aceid = aceid) ?? ""
+}
+
+// 插入
+export function on_insertTestDetailsDB(aceID : string, name : string) {
+	DatabaseManager.shared.UTS_insertTestDetailsDB(aceID, name)
+}
+
+// 更新（根据aceid）
+export function on_updateTestDetailsDB(aceid : string, deviceJson : string) {
+	return DatabaseManager.shared.UTS_updateTestDetailsDB(aceid = aceid, deviceJson = deviceJson)
+}
+
+// 删除（根据id）
+export function on_deleteTestDetailsDB(id : number) {
+	return DatabaseManager.shared.deleteTestDetailsDB(id = id)
+}

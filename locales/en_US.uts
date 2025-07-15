@@ -71,7 +71,7 @@ export default {
 	imu: {
 		Accelerometer: 'Accelerometer @:global.Test',
 		AccelerometerRemark1: 'Before testing the accelerometer, please place the machine flat on the ground. To ensure data accuracy, do not touch the machine during testing',
-		AccelerometerRemark2: 'The test lasts 10 seconds. During this period, ax and ay average values should be 0 (±0.2), and az should be 9.8 (±0.2). Otherwise, it is abnormal',
+		AccelerometerRemark2: 'The test lasts 10 seconds. During this period, ax and ay average values should be 0 (±0.4), and az should be 9.8 (±0.3). Otherwise, it is abnormal',
 		Gyroscope: 'Gyroscope @:global.Test',
 		GyroscopeRemark1: 'Before testing the gyroscope, please place the machine flat on the ground. To ensure data accuracy, do not touch the machine during testing',
 		GyroscopeRemark2: 'After the test begins, the machine will slowly rotate about 90°. Once rotation is complete, check whether the body rotation angle matches the displayed value',

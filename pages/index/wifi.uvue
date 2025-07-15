@@ -32,6 +32,7 @@
 		data() {
 			return {
 				title: "蓝牙" as string | null,
+				aceid: '',
 				wifiname: '' as string,
 				status: false,
 				isShowButton: true,
@@ -45,6 +46,15 @@
 
 		onLoad(query) {
 			this.title = query.title
+			this.aceid = query.aceid
+
+			//用于测试
+			//更新测试结果
+			const success = ClassManager.updateClass(this.aceid, {
+				wifi: true,
+				wifi_name: 'Acemate_0030'
+			})
+			//用于测试
 		},
 
 		methods: {
@@ -88,6 +98,9 @@
 					delta: 100,
 					animationType: "slide-out-bottom"
 				})
+
+				console.log(ClassManager.getAllClasses())
+
 			}
 		}
 	}

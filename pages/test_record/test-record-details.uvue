@@ -4,11 +4,12 @@
 			<text class="title">蓝牙</text>
 			<view class="space-view">
 				<text>信号强度</text>
-				<text>-67db</text>
+				<text>{{testDetails.rssi}}</text>
 			</view>
 			<view class="space-view">
 				<text>收发功能</text>
-				<text :class="isSucceed ? 'test-succeed' : 'test-fall'">{{isSucceed ? '正常' : '异常'}}</text>
+				<text
+					:class="testDetails.sAndr ? 'test-succeed' : 'test-fall'">{{testDetails.sAndr ? '正常' : '异常'}}</text>
 			</view>
 		</view>
 
@@ -16,11 +17,12 @@
 			<text class="title">电机</text>
 			<view class="space-view">
 				<text>行走电机</text>
-				<text :class="isSucceed ? 'test-succeed' : 'test-fall'">{{isSucceed ? '正常' : '异常'}}</text>
+				<text
+					:class="testDetails.wheel ? 'test-succeed' : 'test-fall'">{{testDetails.wheel ? '正常' : '异常'}}</text>
 			</view>
 			<view class="space-view">
 				<text>发球电机</text>
-				<text :class="isSucceed ? 'test-succeed' : 'test-fall'">{{isSucceed ? '正常' : '异常'}}</text>
+				<text :class="testDetails.shot ? 'test-succeed' : 'test-fall'">{{testDetails.shot ? '正常' : '异常'}}</text>
 			</view>
 		</view>
 
@@ -28,15 +30,18 @@
 			<text class="title">舵机</text>
 			<view class="space-view">
 				<text>转盘舵机</text>
-				<text :class="isSucceed ? 'test-succeed' : 'test-fall'">{{isSucceed ? '正常' : '异常'}}</text>
+				<text
+					:class="testDetails.feeder_rotate ? 'test-succeed' : 'test-fall'">{{testDetails.feeder_rotate ? '正常' : '异常'}}</text>
 			</view>
 			<view class="space-view">
 				<text>舱门舵机</text>
-				<text :class="isSucceed ? 'test-succeed' : 'test-fall'">{{isSucceed ? '正常' : '异常'}}</text>
+				<text
+					:class="testDetails.door_latch ? 'test-succeed' : 'test-fall'">{{testDetails.door_latch ? '正常' : '异常'}}</text>
 			</view>
 			<view class="space-view">
 				<text>俯仰舵机</text>
-				<text :class="isSucceed ? 'test-succeed' : 'test-fall'">{{isSucceed ? '正常' : '异常'}}</text>
+				<text
+					:class="testDetails.launcher_pitch ? 'test-succeed' : 'test-fall'">{{testDetails.launcher_pitch ? '正常' : '异常'}}</text>
 			</view>
 		</view>
 
@@ -44,23 +49,22 @@
 			<text class="title">IMU</text>
 			<view class="space-view">
 				<text>重力加速度</text>
-				<text :class="isSucceed ? 'test-succeed' : 'test-fall'">{{isSucceed ? 'ax: 0.02' : 'ax: 0.02'}}</text>
+				<text
+					:class="testDetails.highG ? 'test-succeed' : 'test-fall'">{{testDetails.highG ? '正常' : testDetails.HighG_remark}}</text>
 			</view>
 			<view class="space-view">
 				<text>陀螺仪</text>
-				<text :class="isSucceed ? 'test-succeed' : 'test-fall'">{{isSucceed ? '正常' : '异常'}}</text>
+				<text
+					:class="testDetails.gyroscope ? 'test-succeed' : 'test-fall'">{{testDetails.gyroscope ? '正常' : '异常'}}</text>
 			</view>
 		</view>
 
 		<view class="list-view">
 			<text class="title">压力传感器</text>
 			<view class="space-view">
-				<text>压力值</text>
-				<text :class="isSucceed ? 'test-succeed' : 'test-fall'">{{isSucceed ? '正常' : '异常'}}</text>
-			</view>
-			<view class="space-view">
 				<text>网球检测</text>
-				<text :class="isSucceed ? 'test-succeed' : 'test-fall'">{{isSucceed ? '正常' : '异常'}}</text>
+				<text
+					:class="testDetails.pressure ? 'test-succeed' : 'test-fall'">{{testDetails.pressure ? '正常' : '异常'}}</text>
 			</view>
 		</view>
 
@@ -68,7 +72,8 @@
 			<text class="title">摄像头</text>
 			<view class="space-view">
 				<text>网球识别</text>
-				<text :class="isSucceed ? 'test-succeed' : 'test-fall'">{{isSucceed ? '正常' : '异常'}}</text>
+				<text
+					:class="testDetails.camera ? 'test-succeed' : 'test-fall'">{{testDetails.camera ? '正常' : '异常'}}</text>
 			</view>
 		</view>
 
@@ -76,28 +81,33 @@
 			<text class="title">WiFi热点</text>
 			<view class="space-view">
 				<text>WiFi名称</text>
-				<text>{{isSucceed ? 'Acemate_04' : 'Acemate_04'}}</text>
+				<text>{{testDetails.wifi_name}}</text>
 			</view>
 			<view class="space-view">
 				<text>WiFi连接</text>
-				<text :class="isSucceed ? 'test-succeed' : 'test-fall'">{{isSucceed ? '正常' : '异常'}}</text>
+				<text :class="testDetails.wifi ? 'test-succeed' : 'test-fall'">{{testDetails.wifi ? '正常' : '异常'}}</text>
 			</view>
 		</view>
 
 	</scroll-view>
 </template>
 
-<script>
+<script lang="uts">
+	import TestDetailsM from '@/models/TestDetailsM'
+
 	export default {
 		data() {
 			return {
-				isSucceed: false,
+				testDetails: TestDetailsM
 			};
 		},
-		onLoad() {
-			uni.setNavigationBarTitle({
-				title: "AceMate_020"
-			})
+		onLoad(options) {
+			if (options.details) {
+				this.testDetails = JSON.parse(decodeURIComponent(options.details));
+				uni.setNavigationBarTitle({
+					title: this.testDetails.name
+				})
+			}
 		},
 		methods: {
 

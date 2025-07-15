@@ -25,13 +25,13 @@
 			<view class="container-view">
 				<view class="container">
 					<button class="btn top-btn" @touchstart="touchstartUp"
-						@touchend="touchend">{{$t('wheelMotor.Forward')}}</button>
+						@touchend="touchend('前进')">{{$t('wheelMotor.Forward')}}</button>
 					<button class="btn right-btn" @touchstart="touchstartRight"
-						@touchend="touchend">{{$t('wheelMotor.MoveRight')}}</button>
+						@touchend="touchend('右移')">{{$t('wheelMotor.MoveRight')}}</button>
 					<button class="btn bottom-btn" @touchstart="touchstartDown"
-						@touchend="touchend">{{$t('wheelMotor.Backward')}}</button>
+						@touchend="touchend('后退')">{{$t('wheelMotor.Backward')}}</button>
 					<button class="btn left-btn" @touchstart="touchstartLeft"
-						@touchend="touchend">{{$t('wheelMotor.MoveLeft')}}</button>
+						@touchend="touchend('左移')">{{$t('wheelMotor.MoveLeft')}}</button>
 				</view>
 			</view>
 		</view>
@@ -47,19 +47,35 @@
 
 <script>
 	import { onSendCommand } from '@/uni_modules/ace-bluetooth';
+
 	export default {
 		data() {
 			return {
 				title: "蓝牙" as string | null,
+				aceid: '',
 				wheelMotorTitle: this.$t('wheelMotor.DriveMotor'),
 				speed: 5,
 				acceleration: 5,
 				interval: 0,
+				isUp: false,
+				isRight: false,
+				isDown: false,
+				isLeft: false,
 			}
 		},
 
 		onLoad(query) {
 			this.title = query.title
+			this.aceid = query.aceid
+
+
+			//用于测试
+			//更新测试结果
+			const success = ClassManager.updateClass(this.aceid, {
+				wheel: true
+			})
+			//用于测试
+
 		},
 
 		methods: {
@@ -81,9 +97,32 @@
 			touchstartRight() {
 				this.setWheelMotor("drive_right")
 			},
-			touchend() {
+			touchend(res) {
 				clearInterval(this.interval);
 				onSendCommand("wheel_test", "stop", "");
+				uni.showModal({
+					title: res + '是否正常',
+					cancelText: '异常',
+					confirmText: '正常',
+					success: (result) => {
+						switch (res) {
+							case '前进':
+								this.isUp = result.confirm
+								break;
+							case '右移':
+								this.isRight = result.confirm
+								break;
+							case '后退':
+								this.isDown = result.confirm
+								break;
+							case '左移':
+								this.isLeft = result.confirm
+								break;
+							default:
+								break;
+						}
+					}
+				})
 			},
 			setWheelMotor(direction : string) {
 				console.log(direction);
@@ -98,7 +137,8 @@
 			},
 			next() {
 				uni.navigateTo({
-					url: `/pages/index/serve-machine-motor?title=${this.title}`
+					// url: `/pages/index/serve-machine-motor?title=${this.title}&aceid=${this.aceid}`
+					url: `/pages/index/imu?title=${this.title}&aceid=${this.aceid}`
 				})
 			},
 			quit() {
