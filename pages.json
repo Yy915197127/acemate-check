@@ -47,8 +47,8 @@
 			}
 		},
 		{
-			//舵机校正
-			"path": "pages/dialog-page/revise-dialog",
+			//舵机测试结果弹窗
+			"path": "pages/dialog-page/result-dialog",
 			"style": {
 				"navigationBarTitleText": ""
 			}
@@ -94,7 +94,6 @@
 				"navigationBarTitleText": "单元测试"
 			}
 		}
-
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

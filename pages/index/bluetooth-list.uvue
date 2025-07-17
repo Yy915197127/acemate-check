@@ -20,13 +20,6 @@
 	export default {
 		data() {
 			return {
-				title: 'createCanvasContextAsync',
-				canvas: null as UniCanvasElement | null,
-				canvasContext: null as CanvasContext | null,
-				renderingContext: null as CanvasRenderingContext2D | null,
-				canvasWidth: 0,
-				canvasHeight: 0,
-				fontLoaded: false,
 				peripherals: [] as string[],
 				angle: 0,
 				timer: 0 as number,

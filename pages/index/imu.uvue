@@ -54,6 +54,7 @@
 
 <script>
 	import { onSendCommand, } from '@/uni_modules/ace-bluetooth';
+	import { on_updateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
 	export default {
 		data() {
 			return {
@@ -87,16 +88,6 @@
 		onLoad(query) {
 			this.title = query.title
 			this.aceid = query.aceid
-
-			//用于测试
-			//更新测试结果
-			const success = ClassManager.updateClass(this.aceid, {
-				highG: true,
-				HighG_remark: 'ax: 0.31',
-				gyroscope: true
-			})
-			//用于测试
-
 		},
 
 		methods: {
@@ -113,15 +104,15 @@
 
 							let data_ax = data["ax"]
 							axArr.push(data_ax)
-							this.ax = data_ax;
+							this.ax = data_ax.toFixed(2);
 
 							let data_ay = data["ay"]
 							ayArr.push(data_ay)
-							this.ay = data_ay;
+							this.ay = data_ay.toFixed(2);
 
 							let data_az = data["az"]
 							azArr.push(data_az)
-							this.az = data_az;
+							this.az = data_az.toFixed(2);
 						}
 					})
 				}, 500);
@@ -139,13 +130,13 @@
 						this.countdown = 10
 						this.HighGButton = this.$t('global.StartDetection')
 						if (axArr.length > 0) {
-							this.ax = (axArr.reduce((acc, cur) => acc + cur, 0) / axArr.length).toFixed(3);
+							this.ax = (axArr.reduce((acc, cur) => acc + cur, 0) / axArr.length).toFixed(2);
 						}
 						if (ayArr.length > 0) {
-							this.ay = (ayArr.reduce((acc, cur) => acc + cur, 0) / ayArr.length).toFixed(3);
+							this.ay = (ayArr.reduce((acc, cur) => acc + cur, 0) / ayArr.length).toFixed(2);
 						}
 						if (azArr.length > 0) {
-							this.az = (azArr.reduce((acc, cur) => acc + cur, 0) / azArr.length).toFixed(3);
+							this.az = (azArr.reduce((acc, cur) => acc + cur, 0) / azArr.length).toFixed(2);
 						}
 
 						let isAx = Math.abs(this.ax) <= 0.4;
@@ -158,11 +149,18 @@
 
 						this.highGTestResult = (isAx && isAy && isAz)
 
-						let abnormalAx = isAx ? "" : " ax"
-						let abnormalAy = isAy ? "" : " ay"
-						let abnormalAz = isAz ? "" : " az"
-						this.HighGTestResultText = this.highGTestResult ? this.$t('imu.Normal') : "检测结果:" + abnormalAx + abnormalAy + abnormalAz + "数据异常"
+						let abnormalAx = isAx ? "" : `ax: ${this.ax} `
+						let abnormalAy = isAy ? "" : `ay: ${this.ay} `
+						let abnormalAz = isAz ? "" : `az: ${this.az} `
+						this.HighGTestResultText = this.highGTestResult ? this.$t('imu.Normal') : abnormalAx + abnormalAy + abnormalAz + "数据异常"
 
+						//先取再更新
+						let model = on_fetchTestDetailsDB(this.aceid)
+						if (model) {
+							model.highG = this.highGTestResult
+							model.HighG_remark = this.highGTestResult ? '' : this.HighGTestResultText
+							on_updateTestDetailsDB(this.aceid, model)
+						}
 					}
 				}, 1000)
 			},
@@ -186,15 +184,12 @@
 								success: (result) => {
 									this.gyroscopeTestResult = result.confirm
 									this.gyroscopeTestResultText = this.gyroscopeTestResult ? this.$t('imu.Normal') : this.$t('imu.Abnormal')
-									switch (type) {
-										case 'left':
 
-											break;
-										case 'right':
-
-											break;
-										default:
-											break;
+									//先取再更新
+									let model = on_fetchTestDetailsDB(this.aceid)
+									if (model) {
+										model.gyroscope = result.confirm
+										on_updateTestDetailsDB(this.aceid, model)
 									}
 								}
 							})

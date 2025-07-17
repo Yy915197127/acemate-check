@@ -27,6 +27,7 @@
 
 <script>
 	import { onSendCommand } from '@/uni_modules/ace-bluetooth';
+	import { on_updateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
 	export default {
 		data() {
 			return {
@@ -49,19 +50,20 @@
 			this.interval = setInterval(() => {
 				onSendCommand("pressure_test", "read", "", (res) => {
 					if (res["command"] == "pressure_test") {
-						this.ps = res["data"]["pressure"]
-						this.status = this.ps > 300
+						this.ps = res["data"]["pressure"] ?? 0
+						this.status = this.ps > 200
+						if (this.ps > 200) {
+							//先取再更新
+							let model = on_fetchTestDetailsDB(this.aceid)
+							if (model) {
+								model.pressure = true
+								on_updateTestDetailsDB(this.aceid, model)
+							}
+						}
 					}
 				})
 
 			}, 500);
-
-			//用于测试
-			//更新测试结果
-			const success = ClassManager.updateClass(this.aceid, {
-				pressure: true
-			})
-			//用于测试
 		},
 
 		methods: {

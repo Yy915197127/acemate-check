@@ -1,0 +1,32 @@
+
+export type TestDetailsM = {
+	id : number               //键
+	aceid : string            //设备存储ID
+	name : string			  //测试设备蓝牙名
+
+	createdAt : number  	  //测试开始时间戳
+	createdTime : string	  //测试开始时间
+
+	rssi : number			  //信号强度
+	sAndr : boolean		      //收发功能
+
+	wheel : boolean			  //行走电机
+
+	shot : boolean			  //发球电机
+
+	feeder_rotate : boolean   //转盘舵机
+	door_latch : boolean	  //舱门舵机
+	launcher_pitch : boolean  //俯仰舵机
+
+	highG : boolean			  //重力加速度
+	HighG_remark : string	  //测试异常说明
+	gyroscope : boolean		  //陀螺仪
+
+	pressure : boolean		  //压力传感器
+
+	camera : boolean		  //摄像头
+
+	wifi : boolean		 	  //WiFi热点
+	wifi_name : string 		  //WiFi名
+	isSucceed : boolean	      //整体测试状态
+}

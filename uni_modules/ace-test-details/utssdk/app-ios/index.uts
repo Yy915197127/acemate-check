@@ -1,17 +1,22 @@
 
+/* 引入 interface.uts 文件中定义的变量 */
+import { TestDetailsM } from '../interface.uts';
+
+
 // 查询全部
-export function on_fetchAllTestDetailsDB() : string[] {
+export function on_fetchAllTestDetailsDB() : Array<any> {
 	return DatabaseManager.shared.fetchAllTestDetailsDB()
 }
 
 // 分页查询
-export function on_fetchTestDetailsPageDB(page : number, pageSize : number) : string[] {
+export function on_fetchTestDetailsPageDB(page : number, pageSize : number) : Array<any> {
 	return DatabaseManager.shared.fetchTestDetailsPageDB(page = page, pageSize = pageSize)
 }
 
 // 根据aceid全等查询
-export function on_fetchTestDetailsDB(aceid : string) : string {
-	return DatabaseManager.shared.fetchTestDetailsDB(aceid = aceid) ?? ""
+export function on_fetchTestDetailsDB(aceid : string) : TestDetailsM {
+	const mojson = DatabaseManager.shared.fetchTestDetailsDB(aceid = aceid) ?? ""
+	return JSON.parseObject<TestDetailsM>(mojson) ?? new TestDetailsM()
 }
 
 // 插入
@@ -20,11 +25,11 @@ export function on_insertTestDetailsDB(aceID : string, name : string) {
 }
 
 // 更新（根据aceid）
-export function on_updateTestDetailsDB(aceid : string, deviceJson : string) {
-	return DatabaseManager.shared.UTS_updateTestDetailsDB(aceid = aceid, deviceJson = deviceJson)
+export function on_updateTestDetailsDB(aceid : string, model : TestDetailsM) {
+	DatabaseManager.shared.UTS_updateTestDetailsDB(aceid = aceid, deviceJson = JSON.stringify(model) ?? "")
 }
 
 // 删除（根据id）
 export function on_deleteTestDetailsDB(id : number) {
-	return DatabaseManager.shared.deleteTestDetailsDB(id = id)
+	DatabaseManager.shared.deleteTestDetailsDB(id = id)
 }

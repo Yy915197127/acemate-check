@@ -37,6 +37,7 @@
 
 <script>
 	import { onSendCommand } from '@/uni_modules/ace-bluetooth';
+	import { on_updateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
 	export default {
 		data() {
 			return {
@@ -51,14 +52,10 @@
 		onLoad(query) {
 			this.title = query.title
 			this.aceid = query.aceid
+		},
 
-			//用于测试
-			//更新测试结果
-			const success = ClassManager.updateClass(this.aceid, {
-				shot: true
-			})
-			//用于测试
-
+		onUnload() {
+			onSendCommand("shot_test", "stop", "");
 		},
 
 		methods: {
@@ -79,8 +76,23 @@
 
 			next() {
 				onSendCommand("shot_test", "stop", "");
-				uni.navigateTo({
-					url: `/pages/index/steering-engine?title=${this.title}&aceid=${this.aceid}`
+				uni.showModal({
+					title: '发球电机是否正常',
+					cancelText: '异常',
+					confirmText: '正常',
+					success: (result) => {
+						//先取再更新
+						let model = on_fetchTestDetailsDB(this.aceid)
+						if (model) {
+							model.shot = result.confirm
+							on_updateTestDetailsDB(this.aceid, model)
+						}
+						setTimeout(() => {
+							uni.navigateTo({
+								url: `/pages/index/steering-engine?title=${this.title}&aceid=${this.aceid}`
+							})
+						}, 500)
+					}
 				})
 			},
 			quit() {

@@ -47,7 +47,7 @@
 
 <script>
 	import { onSendCommand } from '@/uni_modules/ace-bluetooth';
-
+	import { on_updateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
 	export default {
 		data() {
 			return {
@@ -67,15 +67,6 @@
 		onLoad(query) {
 			this.title = query.title
 			this.aceid = query.aceid
-
-
-			//用于测试
-			//更新测试结果
-			const success = ClassManager.updateClass(this.aceid, {
-				wheel: true
-			})
-			//用于测试
-
 		},
 
 		methods: {
@@ -121,6 +112,16 @@
 							default:
 								break;
 						}
+
+						if (this.isUp && this.isRight && this.isDown && this.isLeft) {
+							//先取再更新
+							let model = on_fetchTestDetailsDB(this.aceid)
+							if (model) {
+								model.wheel = true
+								on_updateTestDetailsDB(this.aceid, model)
+							}
+						}
+
 					}
 				})
 			},
@@ -137,7 +138,6 @@
 			},
 			next() {
 				uni.navigateTo({
-					// url: `/pages/index/serve-machine-motor?title=${this.title}&aceid=${this.aceid}`
 					url: `/pages/index/imu?title=${this.title}&aceid=${this.aceid}`
 				})
 			},

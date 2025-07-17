@@ -1,0 +1,115 @@
+<template>
+	<view id="dialog1" class="dialog-container">
+		<view class="dialog-content">
+			<text class="title">{{title}}</text>
+			<view class="space-view">
+				<text>转盘舵机: </text>
+				<radio-group @change="feeder_rotateChange" style="flex-direction: row;">
+					<radio value="1" activeBackgroundColor="#90E174" style="margin-right: 10px">正常</radio>
+					<radio value="0" activeBackgroundColor="#dd524d">异常</radio>
+				</radio-group>
+			</view>
+			<view class="space-view">
+				<text>舱门舵机: </text>
+				<radio-group @change="door_latchChange" style="flex-direction: row;">
+					<radio value="1" activeBackgroundColor="#90E174" style="margin-right: 10px">正常</radio>
+					<radio value="0" activeBackgroundColor="#dd524d">异常</radio>
+				</radio-group>
+			</view>
+			<view class="space-view">
+				<text>俯仰舵机: </text>
+				<radio-group @change="launcher_pitchChange" style="flex-direction: row;">
+					<radio value="1" activeBackgroundColor="#90E174" style="margin-right: 10px">正常</radio>
+					<radio value="0" activeBackgroundColor="#dd524d">异常</radio>
+				</radio-group>
+			</view>
+			<text class="remark-text" v-show="isShow">请选择正常或异常！</text>
+			<button class="save-btn" @click="save">确定</button>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+	export default {
+		data() {
+			return {
+				title: '选择测试结果',
+				feeder_rotate: -1,
+				door_latch: -1,
+				launcher_pitch: -1,
+				isShow: false
+			};
+		},
+
+		methods: {
+			feeder_rotateChange(e : UniradioGroupChangeEvent) {
+				this.feeder_rotate = e.detail.value
+			},
+			door_latchChange(e : UniradioGroupChangeEvent) {
+				this.door_latch = e.detail.value
+			},
+			launcher_pitchChange(e : UniradioGroupChangeEvent) {
+				this.launcher_pitch = e.detail.value
+			},
+			save() {
+				if (this.feeder_rotate == -1 || this.door_latch == -1 || this.launcher_pitch == -1) {
+					this.isShow = true
+				} else {
+					const obj = { "feeder_rotate": this.feeder_rotate, "door_latch": this.door_latch, "launcher_pitch": this.launcher_pitch };
+					uni.$emit('result-dialog', obj)
+					uni.closeDialogPage()
+				}
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.dialog-container {
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.3);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.dialog-content {
+		width: 80%;
+		padding: 20px;
+		background-color: #fff;
+		border-radius: 6px;
+		display: flex;
+		align-items: center;
+	}
+
+	.title {
+		color: black;
+		font-size: 18;
+		font-weight: bold;
+	}
+
+	.remark-text {
+		font-size: 13;
+		line-height: 1.4;
+		color: #dd524d;
+		margin-top: 15px;
+	}
+
+	.space-view {
+		width: 80%;
+		/* 水平居中 */
+		align-items: center;
+		/* 横向排列 */
+		flex-direction: row;
+		/* 两端布局 */
+		justify-content: space-between;
+		margin-top: 15px;
+	}
+
+	.save-btn {
+		margin-top: 20px;
+		background-color: black;
+		color: white;
+	}
+</style>

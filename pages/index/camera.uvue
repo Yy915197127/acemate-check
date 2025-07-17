@@ -9,9 +9,9 @@
 			<text class="title">{{cameraTitle}}</text>
 			<text class="remark-text">{{tennisRemark}}</text>
 			<view class="space-view">
-				<text>{{$t('camera.Height')+height}}m</text>
-				<text>{{$t('camera.Depth')+depth}}m</text>
-				<text>{{$t('camera.LeftRight')+lr}}m</text>
+				<text>{{$t('camera.Height')+height.toFixed(2)}}m</text>
+				<text>{{$t('camera.Depth')+depth.toFixed(2)}}m</text>
+				<text>{{$t('camera.LeftRight')+lr.toFixed(2)}}m</text>
 			</view>
 			<text class="remark-text">{{cameraRemark}}</text>
 			<view class="long-btn-view">
@@ -26,6 +26,7 @@
 
 <script>
 	import { onSendCommand } from '@/uni_modules/ace-bluetooth';
+	import { on_updateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
 	export default {
 		data() {
 			return {
@@ -45,12 +46,6 @@
 		onLoad(query) {
 			this.title = query.title
 			this.aceid = query.aceid
-			//用于测试
-			//更新测试结果
-			const success = ClassManager.updateClass(this.aceid, {
-				camera: true
-			})
-			//用于测试
 		},
 
 		methods: {
@@ -69,12 +64,16 @@
 							cancelText: '异常',
 							confirmText: '正常',
 							success: (result) => {
-								console.log(result.confirm)
+								//先取再更新
+								let model = on_fetchTestDetailsDB(this.aceid)
+								if (model) {
+									model.camera = result.confirm
+									on_updateTestDetailsDB(this.aceid, model)
+								}
 							}
 						})
 					}
 				})
-
 			},
 			next() {
 				uni.navigateTo({

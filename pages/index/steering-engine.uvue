@@ -58,6 +58,7 @@
 <script>
 	import { onSendCommand } from '@/uni_modules/ace-bluetooth';
 	import { onPopupViewController } from '@/uni_modules/ace-revise-popup'
+	import { on_updateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
 	export default {
 		data() {
 			return {
@@ -78,16 +79,6 @@
 			this.title = query.title
 			this.aceid = query.aceid
 
-
-			//用于测试
-			//更新测试结果
-			const success = ClassManager.updateClass(this.aceid, {
-				feeder_rotate: true,
-				door_latch: true,
-				launcher_pitch: true
-			})
-			//用于测试
-
 			//读取校正数据
 			onSendCommand("servo_test", "get_offset_angle", "", (res) => {
 				let data = res["data"]
@@ -95,6 +86,29 @@
 				this.cabinDoorOffset = data['door_latch']
 				this.pitchingOffset = data['launcher_pitch']
 			});
+
+			uni.$on('result-dialog', (res : UTSJSONObject) => {
+
+				//先取再更新
+				let model = on_fetchTestDetailsDB(this.aceid)
+				if (model) {
+					model.feeder_rotate = res.feeder_rotate === '1'
+					model.door_latch = res.door_latch === '1'
+					model.launcher_pitch = res.launcher_pitch === '1'
+					on_updateTestDetailsDB(this.aceid, model)
+				}
+
+				setTimeout(() => {
+					uni.navigateTo({
+						url: `/pages/index/pressure-sensor?title=${this.title}&aceid=${this.aceid}`
+					})
+				}, 500)
+
+			})
+		},
+
+		onUnload() {
+			uni.$off("result-dialog")
 		},
 
 		methods: {
@@ -173,10 +187,13 @@
 				this.angle = e.detail.value
 			},
 			next() {
-				uni.navigateTo({
-					// url: `/pages/index/imu?title=${this.title}&aceid=${this.aceid}`
-					url: `/pages/index/pressure-sensor?title=${this.title}&aceid=${this.aceid}`
+				uni.openDialogPage({
+					url: "/pages/dialog-page/result-dialog"
 				})
+
+				// uni.navigateTo({
+				// 	url: `/pages/index/pressure-sensor?title=${this.title}&aceid=${this.aceid}`
+				// })
 			},
 			quit() {
 				//退出工厂模式

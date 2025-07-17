@@ -28,6 +28,7 @@
 
 <script lang="uts">
 	import { onSendCommand, onConnectToWifi } from '@/uni_modules/ace-bluetooth';
+	import { on_updateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
 	export default {
 		data() {
 			return {
@@ -48,18 +49,17 @@
 			this.title = query.title
 			this.aceid = query.aceid
 
-			//用于测试
-			//更新测试结果
-			const success = ClassManager.updateClass(this.aceid, {
-				wifi: true,
-				wifi_name: 'Acemate_0030'
-			})
-			//用于测试
+			// 防止开启热点后断联, 直接写入测试数据
+			// let model = on_fetchTestDetailsDB(this.aceid)
+			// if (model) {
+			// 	model.wifi_name = "Acemate_096"
+			// 	model.wifi = true
+			// 	on_updateTestDetailsDB(this.aceid, model)
+			// }
 		},
 
 		methods: {
 			wifiButtonAction() {
-
 				if (!this.isShowButton) {
 					return
 				}
@@ -77,10 +77,18 @@
 							title: "正在连接设备WiFi热点...",
 							mask: true
 						})
-
 						onConnectToWifi(ssid, (status) => {
 							this.wifiname = status ? ssid : ''
 							this.status = status
+
+							//先取再更新
+							let model = on_fetchTestDetailsDB(this.aceid)
+							if (model) {
+								model.wifi_name = this.wifiname
+								model.wifi = status
+								on_updateTestDetailsDB(this.aceid, model)
+							}
+
 							uni.hideLoading();
 							uni.showToast({
 								title: status ? '连接热点成功' : '连接热点失败',
@@ -98,9 +106,6 @@
 					delta: 100,
 					animationType: "slide-out-bottom"
 				})
-
-				console.log(ClassManager.getAllClasses())
-
 			}
 		}
 	}

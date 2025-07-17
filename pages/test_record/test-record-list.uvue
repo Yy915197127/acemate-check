@@ -1,56 +1,165 @@
 <template>
-	<!-- 	<scroll-view class="page">
-		<view class="list-view" v-for="(details, index) in items" :key="index" @click="testRecordDetails(details.id)">
-			<view class="space-view">
-				<text style="font-size: 18;">设备: {{details.name}}</text>
-				<text style="font-size: 16;"
-					:class="details.isSucceed ? 'test-succeed' : 'test-fall'">{{details.isSucceed ? '测试通过' : '测试异常'}}</text>
-			</view>
-			<text style="font-size: 13; color: gray; margin-top: 10px;">测试时间: {{details.createdTime}}</text>
-		</view>
-	</scroll-view> -->
+	<list-view :enable-back-to-top="true" class="page" :direction="direction" @scrolltolower="scrolltolower"
+		:lower-threshold="300" @scroll="scroll">
+		<list-item v-for="(details, index) in items" :key="index">
+			<view :class="['list-item-area', 'space-view', index === items.length - 1 ? 'last-child' : '']"
+				:style="{width:`${windowWidth+80}px`,transform: currentIndex === index ? `translateX(${offsetX}px)`:''}"
+				@touchstart="touchStart($event, index)" @touchmove="touchMove($event, index)"
+				@touchend="touchEnd($event, index)">
 
-	<list-view :enable-back-to-top="true" class="page">
-		<list-item :class="['list-item', index === items.length - 1 ? 'last-child' : '']"
-			v-for="(details, index) in items" :key="index" @click="testRecordDetails(details)">
-			<view class="space-view">
-				<text style="font-size: 18;">设备: {{details.name}}</text>
-				<text style="font-size: 16;"
-					:class="details.isSucceed ? 'test-succeed' : 'test-fall'">{{details.isSucceed ? '测试通过' : '测试异常'}}</text>
+				<view class="list-item" :style="{width:`${windowWidth}px`, padding: '10px 20px' } "
+					@click="testRecordDetails(details, index)">
+					<view class="space-view">
+						<text style="font-size: 18;">设备: {{details.name}}</text>
+						<text style="font-size: 16;"
+							:class="details.isSucceed ? 'test-succeed' : 'test-fall'">{{details.isSucceed ? '测试通过' : '测试异常'}}</text>
+					</view>
+					<text style="font-size: 13; color: gray; margin-top: 10px;">测试时间: {{details.createdTime}}</text>
+				</view>
+
+				<!-- 删除按钮 -->
+				<view class="delete-btn" @click="handleDelete(details, index)">
+					<text style="color: white;">删除</text>
+				</view>
+
 			</view>
-			<text style="font-size: 13; color: gray; margin-top: 10px;">测试时间: {{details.createdTime}}</text>
 		</list-item>
 	</list-view>
 
 </template>
 
 <script>
-	import { on_fetchAllTestDetailsDB, on_deleteTestDetailsDB } from '@/uni_modules/ace-test-details'
-	import { onBluetoothManager, onConnectDevice, onStartScanning, onStopScanning } from '@/uni_modules/ace-bluetooth'
-	import TestDetailsM from '@/models/TestDetailsM'
+	import { on_fetchTestDetailsPageDB, on_deleteTestDetailsDB } from '@/uni_modules/ace-test-details'
+
 	export default {
 		data() {
 			return {
-				items: [] as TestDetailsM,
+				items: [] as TestDetailsM[],
+				page: 1,
+				pageSize: 20,
+				isLoadMore: true,
+				windowWidth: uni.getWindowInfo().windowWidth,
+				direction: "vertical",
+				startX: 0,
+				startY: 0,
+				offsetX: 0,
+				isSliding: false,
+				currentIndex: -1,
 			};
 		},
 
 		onLoad() {
-			const Details = on_fetchAllTestDetailsDB()
-			this.items = Details.map(item => JSON.parseObject<TestDetailsM>(item))
-			console.log(this.items)
+			this.getGata()
 		},
+
 		methods: {
-			testRecordDetails(details) {
+			getGata() {
+				if (!this.isLoadMore) {
+					return
+				}
+				const Details = on_fetchTestDetailsPageDB(this.page, this.pageSize)
+				if (Details.length > 0) {
+					this.items.push(...Details.map(item => JSON.parseObject<TestDetailsM>(item)))
+				}
+				if (Details.length == this.pageSize) {
+					//允许加载更多
+					this.page++
+				} else {
+					//禁止加载更多
+					this.isLoadMore = false
+				}
+			},
+
+			scroll() {
+				if (this.offsetX != 0 && this.currentIndex != -1) {
+					this.offsetX = 0
+					this.currentIndex = -1
+				}
+			},
+			scrolltolower(e) {
+				this.getGata()
+			},
+
+			testRecordDetails(details, index) {
+				if (this.offsetX != 0 && this.currentIndex == index) {
+					this.offsetX = 0
+					this.currentIndex = -1
+					return
+				}
 				uni.navigateTo({
 					url: '/pages/test_record/test-record-details?details=' + JSON.stringify(details)
 				})
+			},
 
+			touchStart(e, index) {
+				if (this.offsetX != 0 && this.currentIndex != index) {
+					this.offsetX = 0
+					this.currentIndex = -1
+				}
+				this.currentIndex = index
+				this.startX = e.touches[0].clientX
+				this.startY = e.touches[0].clientY
+			},
 
-				//增加左滑删除
-				// on_deleteTestDetailsDB(details.id)
+			touchMove(e, index) {
+				if (this.currentIndex !== index) return
 
-			}
+				const touchX = e.touches[0].clientX
+				const touchY = e.touches[0].clientY
+				const deltaX = touchX - this.startX
+				const deltaY = touchY - this.startY
+
+				// 判断是否是水平滑动（防止上下滑动误触）
+				if (!this.isSliding) {
+					// 如果垂直滑动距离大于水平滑动距离，则不处理
+					if (Math.abs(deltaY) > Math.abs(deltaX)) {
+						return
+					}
+					this.isSliding = true
+				}
+
+				// 限制左右滑动范围
+				if (deltaX > 0) {
+					// 向右滑动，最多回到原位
+					this.offsetX = Math.min(0, this.offsetX + deltaX)
+				} else {
+					// 向左滑动，最多滑动80px（删除按钮宽度）
+					this.offsetX = Math.max(-80, this.offsetX + deltaX)
+				}
+
+				this.startX = touchX
+				this.startY = touchY
+				this.direction = "none"
+			},
+
+			touchEnd(e, index) {
+				if (this.currentIndex !== index) return
+
+				// 只有确实进行了水平滑动才处理
+				if (this.isSliding) {
+					// 根据滑动距离决定是显示还是隐藏删除按钮
+					if (this.offsetX < -40) {
+						// 超过一半，完全显示删除按钮
+						this.offsetX = -80
+					} else {
+						// 未超过一半，恢复原位
+						this.offsetX = 0
+						this.currentIndex = -1
+					}
+					this.direction = "vertical"
+					this.isSliding = false
+				}
+
+			},
+
+			handleDelete(details, index) {
+				console.log(index)
+				this.items.splice(index, 1)
+				this.offsetX = 0
+				this.currentIndex = -1
+				on_deleteTestDetailsDB(details.id)
+			},
+
 		}
 	}
 </script>
@@ -61,10 +170,12 @@
 		background-color: $uni-bg-color-hover;
 	}
 
-	.list-item {
-		padding: 20px;
+	.list-item-area {
 		background-color: white;
-		border-bottom: 0.5px solid $uni-text-color-disable;
+	}
+
+	.list-item {
+		border-bottom: 1px solid $uni-text-color-disable;
 	}
 
 	.last-child {
@@ -85,6 +196,15 @@
 	}
 
 	.test-fall {
-		color: darkred;
+		color: firebrick;
+	}
+
+	.delete-btn {
+		width: 80px;
+		height: 100%;
+		background-color: firebrick;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 </style>

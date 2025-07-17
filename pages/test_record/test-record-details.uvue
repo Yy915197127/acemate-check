@@ -93,17 +93,15 @@
 </template>
 
 <script lang="uts">
-	import TestDetailsM from '@/models/TestDetailsM'
-
 	export default {
 		data() {
 			return {
-				testDetails: TestDetailsM
+				testDetails: Object
 			};
 		},
 		onLoad(options) {
 			if (options.details) {
-				this.testDetails = JSON.parse(decodeURIComponent(options.details));
+				this.testDetails = JSON.parseObject(options.details);
 				uni.setNavigationBarTitle({
 					title: this.testDetails.name
 				})
@@ -149,6 +147,6 @@
 	}
 
 	.test-fall {
-		color: darkred;
+		color: firebrick;
 	}
 </style>
