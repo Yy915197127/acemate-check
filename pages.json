@@ -85,7 +85,7 @@
 			//测试详情
 			"path": "pages/test_record/test-record-details",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationStyle": "custom"
 			}
 		},
 		{

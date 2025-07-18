@@ -1,3 +1,4 @@
+import DCloudUTSFoundation
 import FMDB
 import Foundation
 
@@ -37,14 +38,14 @@ class DeviceModel: Codable {
             let jsonString = String(data: data, encoding: .utf8) ?? ""
             return jsonString
         } catch {
-            print("序列化失败: \(error.localizedDescription)")
+            console.log("序列化失败: \(error.localizedDescription)")
             return ""
         }
     }
 
     static func decode(from jsonString: String) -> DeviceModel? {
         guard let data = jsonString.data(using: .utf8) else {
-            print("字符串无法转为 Data")
+            console.log("字符串无法转为 Data")
             return nil
         }
         do {
@@ -52,7 +53,7 @@ class DeviceModel: Codable {
             let model = try decoder.decode(DeviceModel.self, from: data)
             return model
         } catch {
-            print("反序列化失败: \(error.localizedDescription)")
+            console.log("反序列化失败: \(error.localizedDescription)")
             return nil
         }
     }

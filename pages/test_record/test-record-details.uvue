@@ -1,13 +1,23 @@
 <template>
-	<scroll-view class="page">
+	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
+		<template v-slot:right>
+			<button size="mini" @click="addSnapshot">导出</button>
+		</template>
+	</uni-navbar-lite>
+
+	<scroll-view class="page" id="snapshot-content">
 		<view class="list-view">
 			<text class="title">蓝牙</text>
 			<view class="space-view">
-				<text>信号强度</text>
+				<text>设备名称:</text>
+				<text>{{testDetails.name}}</text>
+			</view>
+			<view class="space-view">
+				<text>信号强度:</text>
 				<text>{{testDetails.rssi}}</text>
 			</view>
 			<view class="space-view">
-				<text>收发功能</text>
+				<text>收发功能:</text>
 				<text
 					:class="testDetails.sAndr ? 'test-succeed' : 'test-fall'">{{testDetails.sAndr ? '正常' : '异常'}}</text>
 			</view>
@@ -16,12 +26,12 @@
 		<view class="list-view">
 			<text class="title">电机</text>
 			<view class="space-view">
-				<text>行走电机</text>
+				<text>行走电机:</text>
 				<text
 					:class="testDetails.wheel ? 'test-succeed' : 'test-fall'">{{testDetails.wheel ? '正常' : '异常'}}</text>
 			</view>
 			<view class="space-view">
-				<text>发球电机</text>
+				<text>发球电机:</text>
 				<text :class="testDetails.shot ? 'test-succeed' : 'test-fall'">{{testDetails.shot ? '正常' : '异常'}}</text>
 			</view>
 		</view>
@@ -29,17 +39,17 @@
 		<view class="list-view">
 			<text class="title">舵机</text>
 			<view class="space-view">
-				<text>转盘舵机</text>
+				<text>转盘舵机:</text>
 				<text
 					:class="testDetails.feeder_rotate ? 'test-succeed' : 'test-fall'">{{testDetails.feeder_rotate ? '正常' : '异常'}}</text>
 			</view>
 			<view class="space-view">
-				<text>舱门舵机</text>
+				<text>舱门舵机:</text>
 				<text
 					:class="testDetails.door_latch ? 'test-succeed' : 'test-fall'">{{testDetails.door_latch ? '正常' : '异常'}}</text>
 			</view>
 			<view class="space-view">
-				<text>俯仰舵机</text>
+				<text>俯仰舵机:</text>
 				<text
 					:class="testDetails.launcher_pitch ? 'test-succeed' : 'test-fall'">{{testDetails.launcher_pitch ? '正常' : '异常'}}</text>
 			</view>
@@ -48,12 +58,12 @@
 		<view class="list-view">
 			<text class="title">IMU</text>
 			<view class="space-view">
-				<text>重力加速度</text>
+				<text>重力加速度:</text>
 				<text
-					:class="testDetails.highG ? 'test-succeed' : 'test-fall'">{{testDetails.highG ? '正常' : testDetails.HighG_remark}}</text>
+					:class="testDetails.highG ? 'test-succeed' : 'test-fall'">{{testDetails.highG ? '正常' : testDetails.HighG_remark.length != 0 ? testDetails.HighG_remark : "无数据"}}</text>
 			</view>
 			<view class="space-view">
-				<text>陀螺仪</text>
+				<text>陀螺仪:</text>
 				<text
 					:class="testDetails.gyroscope ? 'test-succeed' : 'test-fall'">{{testDetails.gyroscope ? '正常' : '异常'}}</text>
 			</view>
@@ -62,7 +72,7 @@
 		<view class="list-view">
 			<text class="title">压力传感器</text>
 			<view class="space-view">
-				<text>网球检测</text>
+				<text>网球检测:</text>
 				<text
 					:class="testDetails.pressure ? 'test-succeed' : 'test-fall'">{{testDetails.pressure ? '正常' : '异常'}}</text>
 			</view>
@@ -71,7 +81,7 @@
 		<view class="list-view">
 			<text class="title">摄像头</text>
 			<view class="space-view">
-				<text>网球识别</text>
+				<text>网球识别:</text>
 				<text
 					:class="testDetails.camera ? 'test-succeed' : 'test-fall'">{{testDetails.camera ? '正常' : '异常'}}</text>
 			</view>
@@ -80,13 +90,17 @@
 		<view class="list-view">
 			<text class="title">WiFi热点</text>
 			<view class="space-view">
-				<text>WiFi名称</text>
+				<text>WiFi名称:</text>
 				<text>{{testDetails.wifi_name}}</text>
 			</view>
 			<view class="space-view">
-				<text>WiFi连接</text>
+				<text>WiFi连接:</text>
 				<text :class="testDetails.wifi ? 'test-succeed' : 'test-fall'">{{testDetails.wifi ? '正常' : '异常'}}</text>
 			</view>
+		</view>
+
+		<view class="createdTime">
+			<text>测试时间: {{testDetails.createdTime}}</text>
 		</view>
 
 	</scroll-view>
@@ -96,19 +110,62 @@
 	export default {
 		data() {
 			return {
-				testDetails: Object
+				title: "测试详情",
+				testDetails: Object,
+				snapImagePath: ""
 			};
 		},
 		onLoad(options) {
 			if (options.details) {
 				this.testDetails = JSON.parseObject(options.details);
-				uni.setNavigationBarTitle({
-					title: this.testDetails.name
-				})
 			}
 		},
 		methods: {
+			addSnapshot() {
 
+				uni.showLoading({
+					title: "",
+					mask: true
+				})
+
+				const view = uni.getElementById('snapshot-content')!
+				view.takeSnapshot({
+					success: (res) => {
+						console.log(res.tempFilePath)
+						this.snapImagePath = res.tempFilePath
+						this.saveToAlbum()
+					},
+					fail: (res) => {
+						console.log(res)
+						uni.hideLoading();
+						uni.showToast({
+							icon: 'error',
+							title: '导出失败'
+						})
+					}
+				})
+			},
+
+			saveToAlbum() {
+				uni.saveImageToPhotosAlbum({
+					filePath: this.snapImagePath,
+					success() {
+						uni.hideLoading();
+						uni.showToast({
+							position: "center",
+							icon: "none",
+							title: "导出成功，请到手机相册查看"
+						})
+					},
+					fail(e) {
+						uni.hideLoading();
+						uni.showModal({
+							content: "导出失败，errCode：" + e.errCode + "，errMsg：" + e.errMsg + "，errSubject：" + e.errSubject,
+							showCancel: false
+						});
+					}
+				})
+			}
 		}
 	}
 </script>
@@ -117,13 +174,13 @@
 	.page {
 		flex: 1;
 		background-color: $uni-bg-color-hover;
-		padding-bottom: env(safe-area-inset-bottom);
+		// padding-bottom: env(safe-area-inset-bottom);
 	}
 
 	.list-view {
 		padding: 20px;
 		background-color: white;
-		margin-top: 15px;
+		margin-bottom: 15px;
 	}
 
 	.space-view {
@@ -148,5 +205,12 @@
 
 	.test-fall {
 		color: firebrick;
+	}
+
+	.createdTime {
+		flex-direction: row;
+		justify-content: flex-end;
+		margin-bottom: 10px;
+		padding: 0 20px;
 	}
 </style>

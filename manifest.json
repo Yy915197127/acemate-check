@@ -61,7 +61,9 @@
 	},
 	"app-ios": {
 		"distribute": {
-			"modules": {},
+			"modules": {
+				"uni-media": {}
+			},
 			"icons": {
 				"appstore": "static/icon.png"
 			},

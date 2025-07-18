@@ -14,9 +14,16 @@ export function on_fetchTestDetailsPageDB(page : number, pageSize : number) : Ar
 }
 
 // 根据aceid全等查询
-export function on_fetchTestDetailsDB(aceid : string) : TestDetailsM {
+export function on_fetchTestDetailsDB(aceid : string) : object {
 	const mojson = DatabaseManager.shared.fetchTestDetailsDB(aceid = aceid) ?? ""
-	return JSON.parseObject<TestDetailsM>(mojson) ?? new TestDetailsM()
+
+	console.log(mojson)
+
+	let mm = JSON.parse(mojson)
+	console.log(mm)
+
+	return mm
+	// 	return JSON.parseObject<TestDetailsM>(mojson) ?? new TestDetailsM()
 }
 
 // 插入
@@ -25,8 +32,10 @@ export function on_insertTestDetailsDB(aceID : string, name : string) {
 }
 
 // 更新（根据aceid）
-export function on_updateTestDetailsDB(aceid : string, model : TestDetailsM) {
-	DatabaseManager.shared.UTS_updateTestDetailsDB(aceid = aceid, deviceJson = JSON.stringify(model) ?? "")
+export function on_updateTestDetailsDB(aceid : string, model : object) {
+	const moj = JSON.stringify(model) ?? ''
+	console.log(moj)
+	DatabaseManager.shared.UTS_updateTestDetailsDB(aceid = aceid, deviceJson = moj)
 }
 
 // 删除（根据id）

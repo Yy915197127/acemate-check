@@ -3,10 +3,12 @@
 <plist version="1.0">
 	<dict>
 		<key>NSBluetoothAlwaysUsageDescription</key>
-		<string>验收设备需开启蓝牙功能</string>
+		<string>检验设备需开启蓝牙功能</string>
 		<key>NSBluetoothPeripheralUsageDescription</key>
-		<string>验收设备需开启蓝牙功能</string>
+		<string>检验设备需开启蓝牙功能</string>
 		<key>NSLocalNetworkUsageDescription</key>
-		<string>验收设备需开启本地网络功能</string>
+		<string>检验设备WiFi需开启本地网络功能</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>导出检验设备记录需开启添加相册功能</string>
 	</dict>
 </plist>

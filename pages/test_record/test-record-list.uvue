@@ -10,11 +10,17 @@
 				<view class="list-item" :style="{width:`${windowWidth}px`, padding: '10px 20px' } "
 					@click="testRecordDetails(details, index)">
 					<view class="space-view">
-						<text style="font-size: 18;">设备: {{details.name}}</text>
-						<text style="font-size: 16;"
-							:class="details.isSucceed ? 'test-succeed' : 'test-fall'">{{details.isSucceed ? '测试通过' : '测试异常'}}</text>
+						<view class="left">
+							<text style="font-size: 18;">设备: {{details.name}}</text>
+							<text style="font-size: 13; color: gray; margin-top: 10px;">测试时间:
+								{{details.createdTime}}</text>
+						</view>
+						<view class="right">
+							<text style="font-size: 16;"
+								:class="details.isSucceed ? 'test-succeed' : 'test-fall'">{{details.isSucceed ? '测试通过' : '测试异常'}}</text>
+						</view>
 					</view>
-					<text style="font-size: 13; color: gray; margin-top: 10px;">测试时间: {{details.createdTime}}</text>
+
 				</view>
 
 				<!-- 删除按钮 -->

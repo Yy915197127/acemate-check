@@ -54,7 +54,7 @@ class DatabaseManager {
     }
 
     // UTS插入
-    func UTS_insertTestDetailsDB(_ aceID: String, _ name: String, ) {
+    func UTS_insertTestDetailsDB(_ aceID: String, _ name: String) {
         let mo = DeviceModel(aceid: aceID, name: name)
         insertTestDetailsDB(mo)
     }
@@ -136,6 +136,7 @@ class DatabaseManager {
 
     // 根据aceid全等查询
     func fetchTestDetailsDB(aceid: String) -> String? {
+        console.log("根据aceid全等查询\(aceid)")
         var device: DeviceModel?
         let querySQL = "SELECT * FROM test_details WHERE aceid = ? LIMIT 1"
 
@@ -151,12 +152,15 @@ class DatabaseManager {
 
     // 更新（根据aceid）
     func UTS_updateTestDetailsDB(aceid: String, deviceJson: String) {
+        console.log("更新（根据aceid）\(aceid)")
+        console.log(deviceJson)
         guard let mo = DeviceModel.decode(from: deviceJson) else { return }
         updateTestDetailsDB(aceid: aceid, device: mo)
     }
 
     // 更新（根据aceid）
     func updateTestDetailsDB(aceid: String, device: DeviceModel) {
+        console.log(device)
         let updateSQL = """
             UPDATE test_details SET
                 name = ?,

@@ -71,6 +71,7 @@
 
 			//创建测试记录数据
 			this.aceid = 'ace_' + Date.now()
+			console.log(this.aceid)
 			on_insertTestDetailsDB(this.aceid, this.title)
 
 		},
@@ -83,11 +84,15 @@
 					uni.hideLoading();
 					clearTimeout(this.timeout)
 
+					console.log(this.aceid)
+
 					//先取再更新
 					let model = on_fetchTestDetailsDB(this.aceid)
+					console.log(model)
 					if (model) {
 						model.rssi = this.rssi
 						model.sAndr = true
+						console.log(model)
 						on_updateTestDetailsDB(this.aceid, model)
 					}
 				})

@@ -1,9 +1,0 @@
-import {
-	HWScanOption,
-	HWScanResult,
-	HWScanResultCallBack,
-} from '../interface.uts'
-
-export function scan(options : HWScanOption | null, complete : HWScanResultCallBack) {
-	
-}
