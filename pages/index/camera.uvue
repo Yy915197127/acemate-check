@@ -26,7 +26,8 @@
 
 <script>
 	import { onSendCommand } from '@/uni_modules/ace-bluetooth';
-	import { on_updateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
+	import { on_UTSupdateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
+	import TDModel from '@/models/TDModel.uts'
 	export default {
 		data() {
 			return {
@@ -65,10 +66,10 @@
 							confirmText: '正常',
 							success: (result) => {
 								//先取再更新
-								let model = on_fetchTestDetailsDB(this.aceid)
+								let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
 								if (model) {
 									model.camera = result.confirm
-									on_updateTestDetailsDB(this.aceid, model)
+									on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
 								}
 							}
 						})

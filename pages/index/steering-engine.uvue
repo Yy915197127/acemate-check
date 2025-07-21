@@ -58,7 +58,8 @@
 <script>
 	import { onSendCommand } from '@/uni_modules/ace-bluetooth';
 	import { onPopupViewController } from '@/uni_modules/ace-revise-popup'
-	import { on_updateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
+	import { on_UTSupdateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
+	import TDModel from '@/models/TDModel.uts'
 	export default {
 		data() {
 			return {
@@ -90,12 +91,12 @@
 			uni.$on('result-dialog', (res : UTSJSONObject) => {
 
 				//先取再更新
-				let model = on_fetchTestDetailsDB(this.aceid)
+				let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
 				if (model) {
 					model.feeder_rotate = res.feeder_rotate === '1'
 					model.door_latch = res.door_latch === '1'
 					model.launcher_pitch = res.launcher_pitch === '1'
-					on_updateTestDetailsDB(this.aceid, model)
+					on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
 				}
 
 				setTimeout(() => {

@@ -28,7 +28,8 @@
 
 <script lang="uts">
 	import { onSendCommand, onConnectToWifi } from '@/uni_modules/ace-bluetooth';
-	import { on_updateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
+	import { on_UTSupdateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
+	import TDModel from '@/models/TDModel.uts'
 	export default {
 		data() {
 			return {
@@ -48,14 +49,6 @@
 		onLoad(query) {
 			this.title = query.title
 			this.aceid = query.aceid
-
-			// 防止开启热点后断联, 直接写入测试数据
-			// let model = on_fetchTestDetailsDB(this.aceid)
-			// if (model) {
-			// 	model.wifi_name = "Acemate_096"
-			// 	model.wifi = true
-			// 	on_updateTestDetailsDB(this.aceid, model)
-			// }
 		},
 
 		methods: {
@@ -82,11 +75,11 @@
 							this.status = status
 
 							//先取再更新
-							let model = on_fetchTestDetailsDB(this.aceid)
+							let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
 							if (model) {
 								model.wifi_name = this.wifiname
 								model.wifi = status
-								on_updateTestDetailsDB(this.aceid, model)
+								on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
 							}
 
 							uni.hideLoading();

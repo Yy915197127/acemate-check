@@ -54,7 +54,8 @@
 
 <script>
 	import { onSendCommand, } from '@/uni_modules/ace-bluetooth';
-	import { on_updateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
+	import { on_UTSupdateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
+	import TDModel from '@/models/TDModel.uts'
 	export default {
 		data() {
 			return {
@@ -155,11 +156,11 @@
 						this.HighGTestResultText = this.highGTestResult ? this.$t('imu.Normal') : abnormalAx + abnormalAy + abnormalAz + "数据异常"
 
 						//先取再更新
-						let model = on_fetchTestDetailsDB(this.aceid)
+						let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
 						if (model) {
 							model.highG = this.highGTestResult
 							model.HighG_remark = this.highGTestResult ? '' : this.HighGTestResultText
-							on_updateTestDetailsDB(this.aceid, model)
+							on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
 						}
 					}
 				}, 1000)
@@ -186,10 +187,10 @@
 									this.gyroscopeTestResultText = this.gyroscopeTestResult ? this.$t('imu.Normal') : this.$t('imu.Abnormal')
 
 									//先取再更新
-									let model = on_fetchTestDetailsDB(this.aceid)
+									let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
 									if (model) {
 										model.gyroscope = result.confirm
-										on_updateTestDetailsDB(this.aceid, model)
+										on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
 									}
 								}
 							})

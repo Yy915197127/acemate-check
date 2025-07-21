@@ -1,0 +1,62 @@
+
+export default class TDModel {
+	id ?: number               //键
+	aceid ?: string            //设备存储ID
+	name ?: string			   //测试设备蓝牙名
+
+	createdAt ?: number  	   //测试开始时间戳
+	createdTime ?: string	   //测试开始时间
+
+	rssi ?: number			   //信号强度
+	sAndr ?: boolean		   //收发功能
+
+	wheel ?: boolean	       //行走电机
+
+	shot ?: boolean			   //发球电机
+
+	feeder_rotate ?: boolean   //转盘舵机
+	door_latch ?: boolean	   //舱门舵机
+	launcher_pitch ?: boolean  //俯仰舵机
+
+	highG ?: boolean		   //重力加速度
+	HighG_remark ?: string	   //测试异常说明
+	gyroscope ?: boolean	   //陀螺仪
+
+	pressure ?: boolean		   //压力传感器
+
+	camera ?: boolean		   //摄像头
+
+	wifi ?: boolean		 	   //WiFi热点
+	wifi_name ?: string 	   //WiFi名
+	isSucceed ?: boolean	   //整体测试状态
+
+	// 构造函数
+	constructor(data ?: any) {
+		if (data) {
+			Object.assign(this, data)
+		}
+	}
+
+	// constructor(id : number, aceid : string, name : string, createdAt : number, createdTime : string, rssi : number, sAndr : boolean, wheel : boolean, shot : boolean, feeder_rotate : boolean, door_latch : boolean, launcher_pitch : boolean, highG : boolean, HighG_remark : string, gyroscope : boolean, pressure : boolean, camera : boolean, wifi : boolean, wifi_name : string, isSucceed : boolean) {
+	// 	this.id = id;
+	// 	this.aceid = aceid;
+	// 	this.name = name;
+	// 	this.createdAt = createdAt;
+	// 	this.createdTime = createdTime;
+	// 	this.rssi = rssi;
+	// 	this.sAndr = sAndr;
+	// 	this.wheel = wheel;
+	// 	this.shot = shot;
+	// 	this.feeder_rotate = feeder_rotate;
+	// 	this.door_latch = door_latch;
+	// 	this.launcher_pitch = launcher_pitch;
+	// 	this.highG = highG;
+	// 	this.HighG_remark = HighG_remark;
+	// 	this.gyroscope = gyroscope;
+	// 	this.pressure = pressure;
+	// 	this.camera = camera;
+	// 	this.wifi = wifi;
+	// 	this.wifi_name = wifi_name;
+	// 	this.isSucceed = isSucceed;
+	// }
+}

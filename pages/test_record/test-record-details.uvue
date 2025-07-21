@@ -107,27 +107,26 @@
 </template>
 
 <script lang="uts">
+	import TDModel from '@/models/TDModel.uts'
 	export default {
 		data() {
 			return {
 				title: "测试详情",
-				testDetails: Object,
+				testDetails: TDModel,
 				snapImagePath: ""
 			};
 		},
 		onLoad(options) {
 			if (options.details) {
-				this.testDetails = JSON.parseObject(options.details);
+				this.testDetails = new TDModel(JSON.parse(options.details));
 			}
 		},
 		methods: {
 			addSnapshot() {
-
 				uni.showLoading({
 					title: "",
 					mask: true
 				})
-
 				const view = uni.getElementById('snapshot-content')!
 				view.takeSnapshot({
 					success: (res) => {
@@ -158,6 +157,7 @@
 						})
 					},
 					fail(e) {
+						console.log(e)
 						uni.hideLoading();
 						uni.showModal({
 							content: "导出失败，errCode：" + e.errCode + "，errMsg：" + e.errMsg + "，errSubject：" + e.errSubject,

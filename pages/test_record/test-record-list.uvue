@@ -36,11 +36,11 @@
 
 <script>
 	import { on_fetchTestDetailsPageDB, on_deleteTestDetailsDB } from '@/uni_modules/ace-test-details'
-
+	import TDModel from '@/models/TDModel.uts'
 	export default {
 		data() {
 			return {
-				items: [] as TestDetailsM[],
+				items: [] as TDModel[],
 				page: 1,
 				pageSize: 20,
 				isLoadMore: true,
@@ -65,7 +65,7 @@
 				}
 				const Details = on_fetchTestDetailsPageDB(this.page, this.pageSize)
 				if (Details.length > 0) {
-					this.items.push(...Details.map(item => JSON.parseObject<TestDetailsM>(item)))
+					this.items.push(...Details.map(item => new TDModel(JSON.parse(item))))
 				}
 				if (Details.length == this.pageSize) {
 					//允许加载更多

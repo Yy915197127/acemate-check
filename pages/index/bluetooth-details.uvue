@@ -39,7 +39,8 @@
 
 <script>
 	import { onConnectReadRSSIBut, onSendCommand } from '@/uni_modules/ace-bluetooth';
-	import { on_insertTestDetailsDB, on_updateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
+	import { on_insertTestDetailsDB, on_UTSupdateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
+	import TDModel from '@/models/TDModel.uts'
 
 	export default {
 		data() {
@@ -87,13 +88,13 @@
 					console.log(this.aceid)
 
 					//先取再更新
-					let model = on_fetchTestDetailsDB(this.aceid)
+					let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
 					console.log(model)
 					if (model) {
 						model.rssi = this.rssi
 						model.sAndr = true
 						console.log(model)
-						on_updateTestDetailsDB(this.aceid, model)
+						on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
 					}
 				})
 				uni.showLoading({
