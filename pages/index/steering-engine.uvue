@@ -1,7 +1,8 @@
 <template>
 	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
 		<template v-slot:right>
-			<button size="mini" style="width: 70px; padding: 0;" @click="quit">{{$t('global.ExitTest')}}</button>
+			<button v-show="isShow" size="mini" style="width: 70px; padding: 0;"
+				@click="quit">{{$t('global.ExitTest')}}</button>
 		</template>
 	</uni-navbar-lite>
 	<scroll-view class="page">
@@ -20,7 +21,7 @@
 			</view>
 		</view>
 
-		<view style="background-color: #ffffff; padding: 20px; margin-top: 30px;">
+		<view style="background-color: #ffffff; padding: 20px; margin-top: 20px;">
 			<text class="title">{{cabinDoorTitle}}</text>
 			<view class="space-view">
 				<button class="cabinDoor-btn" size="mini"
@@ -35,7 +36,7 @@
 			</view>
 		</view>
 
-		<view style="background-color: #ffffff; padding: 20px; margin-top: 30px;">
+		<view style="background-color: #ffffff; padding: 20px; margin-top: 20px;">
 			<text class="title">{{pitchingTitle}}</text>
 			<view class="space-view">
 				<text class="remark-text">{{$t('steeringEngine.ServeElevationAngle')}}</text>
@@ -49,7 +50,7 @@
 					@click="pitchingRevise">{{pitchingOffset}}°{{$t('steeringEngine.Calibrate')}}</button>
 			</view>
 		</view>
-		<view style="padding: 30px 20px;">
+		<view style="padding: 20px 20px;" v-show="isShow">
 			<button style="color: #ffffff; background-color: #000000;" @click="next">{{$t('global.NextStep')}}</button>
 		</view>
 	</scroll-view>
@@ -65,6 +66,7 @@
 			return {
 				title: "蓝牙" as string | null,
 				aceid: '',
+				isShow: true,
 				turntableTitle: this.$t('steeringEngine.TurntableServo'),
 				cabinDoorTitle: this.$t('steeringEngine.HatchServo'),
 				pitchingTitle: this.$t('steeringEngine.PitchServo'),
@@ -78,6 +80,7 @@
 
 		onLoad(query) {
 			this.title = query.title
+			this.isShow = query.page != 'unit'
 			this.aceid = query.aceid
 
 			//读取校正数据
@@ -92,7 +95,7 @@
 
 				//先取再更新
 				let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
-				if (model) {
+				if (Object.keys(model).length != 0) {
 					model.feeder_rotate = res.feeder_rotate === '1'
 					model.door_latch = res.door_latch === '1'
 					model.launcher_pitch = res.launcher_pitch === '1'
@@ -191,10 +194,6 @@
 				uni.openDialogPage({
 					url: "/pages/dialog-page/result-dialog"
 				})
-
-				// uni.navigateTo({
-				// 	url: `/pages/index/pressure-sensor?title=${this.title}&aceid=${this.aceid}`
-				// })
 			},
 			quit() {
 				//退出工厂模式

@@ -11,7 +11,7 @@ export function on_fetchTestDetailsPageDB(page : number, pageSize : number) : Ar
 
 // 根据aceid全等查询
 export function on_fetchTestDetailsDB(aceid : string) : object {
-	const mojson = DatabaseManager.shared.fetchTestDetailsDB(aceid = aceid) ?? ""
+	const mojson : string = DatabaseManager.shared.fetchTestDetailsDB(aceid = aceid) ?? ''
 	return JSON.parse(mojson)
 }
 

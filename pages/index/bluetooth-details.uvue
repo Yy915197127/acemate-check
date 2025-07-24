@@ -14,7 +14,7 @@
 			<text style="font-size: 13; color: gray; margin-top: 15px;">{{rssiRemark}}</text>
 		</view>
 
-		<view style="background-color: #ffffff; padding: 20px; margin-top: 30px;">
+		<view style="background-color: #ffffff; padding: 20px; margin-top: 20px;">
 			<text class="title">{{receiveSendDataTitle}}</text>
 			<view class="space-view send-data-view">
 				<text>{{sendDataTitle}}</text>
@@ -29,7 +29,7 @@
 				style="font-size: 13; color: gray; margin-top: 15px;">{{status ? receiveSucceedRemark : receiveDataRemark}}</text>
 		</view>
 
-		<view style="padding: 30px 20px;">
+		<view style="padding: 20px 20px;">
 			<button style="color: #ffffff; background-color: #000000;" v-show="status"
 				@click="next()">{{$t('global.NextStep')}}</button>
 		</view>
@@ -62,19 +62,27 @@
 		},
 		onLoad(query) {
 			this.title = query.title
+			//创建测试记录数据
+			this.aceid = 'ace_' + Date.now()
+			console.log(this.aceid)
+			on_insertTestDetailsDB(this.aceid, this.title)
+		},
 
+		onShow() {
 			//获取蓝牙信号强度
 			this.interval = setInterval(() => {
 				onConnectReadRSSIBut((rssi) => {
 					this.rssi = rssi
 				})
 			}, 1000);
+		},
 
-			//创建测试记录数据
-			this.aceid = 'ace_' + Date.now()
-			console.log(this.aceid)
-			on_insertTestDetailsDB(this.aceid, this.title)
+		onHide() {
+			clearInterval(this.interval);
+		},
 
+		onUnload() {
+			clearInterval(this.interval);
 		},
 
 		methods: {
@@ -85,12 +93,10 @@
 					uni.hideLoading();
 					clearTimeout(this.timeout)
 
-					console.log(this.aceid)
-
 					//先取再更新
 					let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
 					console.log(model)
-					if (model) {
+					if (Object.keys(model).length != 0) {
 						model.rssi = this.rssi
 						model.sAndr = true
 						console.log(model)
@@ -111,7 +117,6 @@
 				}, 15000);
 			},
 			next() {
-				clearInterval(this.interval);
 				uni.navigateTo({
 					url: `/pages/index/wheel-motor?title=${this.title}&aceid=${this.aceid}`
 				})
@@ -119,8 +124,6 @@
 			quit() {
 				//退出工厂模式
 				//onSendCommand("", "stop", "");
-
-				clearInterval(this.interval);
 				uni.navigateBack({
 					delta: 100,
 					animationType: "slide-out-bottom"

@@ -24,7 +24,10 @@
 				</radio-group>
 			</view>
 			<text class="remark-text" v-show="isShow">请选择正常或异常！</text>
-			<button class="save-btn" @click="save">确定</button>
+			<view class="space-view">
+				<button class="cancel-btn" @click="cancel">取消</button>
+				<button class="save-btn" @click="save">确定</button>
+			</view>
 		</view>
 	</view>
 </template>
@@ -50,6 +53,9 @@
 			},
 			launcher_pitchChange(e : UniradioGroupChangeEvent) {
 				this.launcher_pitch = e.detail.value
+			},
+			cancel() {
+				uni.closeDialogPage()
 			},
 			save() {
 				if (this.feeder_rotate == -1 || this.door_latch == -1 || this.launcher_pitch == -1) {
@@ -87,6 +93,7 @@
 		color: black;
 		font-size: 18;
 		font-weight: bold;
+		margin-bottom: 10px;
 	}
 
 	.remark-text {
@@ -107,9 +114,17 @@
 		margin-top: 15px;
 	}
 
+	.cancel-btn {
+		background-color: white;
+		color: black;
+		border-width: 1px;
+		border-color: black;
+		margin-top: 10px;
+	}
+
 	.save-btn {
-		margin-top: 20px;
 		background-color: black;
 		color: white;
+		margin-top: 10px;
 	}
 </style>

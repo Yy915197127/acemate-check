@@ -181,7 +181,9 @@
 	}
 
 	.list-item {
-		border-bottom: 1px solid $uni-text-color-disable;
+		box-sizing: border-box;
+		border-bottom: 0.5px solid $uni-text-color-disable;
+		margin-bottom: 0.5px;
 	}
 
 	.last-child {

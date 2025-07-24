@@ -1,22 +1,132 @@
 <template>
-	<view>
-		
-	</view>
+	<uni-navbar-lite title="单元测试" :is-back="false" :nc-color="'#f1f1f1'">
+		<template v-slot:right>
+			<view class="right" @click="connect">
+				<view class="status-view" :style="{backgroundColor: globalBluetoothState == 1 ?'#90E174':'#F96969'}">
+				</view>
+				<text style="font-size: 13;">{{globalBluetoothState == 1 ? "已连接" : "未连接"}}</text>
+			</view>
+		</template>
+	</uni-navbar-lite>
+
+	<list-view class="page">
+		<list-item class="list-view" v-for="(name, index) in units" :key="index" @click="go(index)">
+			<text>{{name}}</text>
+			<image src="/static/gogogo.png" style="width: 22px;" mode="widthFix"></image>
+		</list-item>
+	</list-view>
 </template>
 
 <script>
+	import { state } from '@/store/index.uts'
+	import { onDisconnectPeripheral, onSendCommand } from '@/uni_modules/ace-bluetooth'
 	export default {
 		data() {
 			return {
-				
+				bluetoothName: '',
+				isStart: false,
+				units: ['行走电机', '发球电机', 'IMU', '舵机', '压力传感器', '摄像头', 'WiFi热点'],
+				pages: ['/pages/index/wheel-motor', '/pages/index/serve-machine-motor', '/pages/index/imu', '/pages/index/steering-engine', '/pages/index/pressure-sensor', '/pages/index/camera', '/pages/index/wifi']
 			}
 		},
+
+		computed: {
+			globalBluetoothState() : number {
+				return state.bluetoothState
+			}
+		},
+
+		onLoad() {
+			uni.$on('unit', (res) => {
+				this.bluetoothName = res
+				//开启工厂模式
+				onSendCommand("", "start", "", (res) => {
+					console.log(res)
+				})
+			})
+		},
+
+		onUnload() {
+			uni.$off('unit')
+		},
+
 		methods: {
-			
+			connect() {
+				if (state.bluetoothState == 1) {
+					uni.showModal({
+						title: '是否断开蓝牙连接',
+						cancelText: '取消',
+						confirmText: '断开',
+						success: (result) => {
+							if (result.confirm) {
+								onDisconnectPeripheral()
+							}
+						},
+					})
+				} else {
+					uni.navigateTo({
+						url: '/pages/index/bluetooth-list?page=unit',
+						animationType: 'slide-in-bottom'
+					})
+				}
+			},
+
+			go(index) {
+				if (this.globalBluetoothState == 1) {
+					if (this.isStart) {
+						uni.navigateTo({
+							url: this.pages[index] + '?page=unit&title=' + this.bluetoothName,
+						})
+					} else {
+						uni.showToast({
+							title: '工厂模式未开启，请断开连接后重试，或联系管理员',
+							icon: 'none'
+						})
+					}
+				} else {
+					uni.showToast({
+						title: '请先连接设备',
+						icon: 'none'
+					})
+				}
+			}
 		}
 	}
 </script>
 
-<style>
+<style lang="scss">
+	.right {
+		height: 24px;
+		background-color: #E8EAEC;
+		border-radius: 12px;
+		align-items: center;
+		flex-direction: row;
+		padding: 0 10px;
+	}
 
+	.status-view {
+		width: 10px;
+		height: 10px;
+		border-radius: 5px;
+		margin-right: 6px;
+	}
+
+	.page {
+		flex: 1;
+		background-color: $uni-bg-color-hover;
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.list-view {
+		padding: 20px;
+		height: 60px;
+		/* 水平居中 */
+		align-items: center;
+		/* 横向排列 */
+		flex-direction: row;
+		/* 两端布局 */
+		justify-content: space-between;
+		background-color: white;
+		border-bottom: 0.5px solid $uni-text-color-disable;
+	}
 </style>

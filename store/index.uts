@@ -1,0 +1,14 @@
+//定义一个大写的State类型
+export type State = {
+	bluetoothState : number
+}
+
+// 实例化为state
+export const state = reactive({
+	bluetoothState: 0
+} as State)
+
+// 定义修改属性值的方法
+export const setBluetoothState = (num : number) => {
+	state.bluetoothState = num
+}

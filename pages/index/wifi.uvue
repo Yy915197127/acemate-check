@@ -1,7 +1,8 @@
 <template>
 	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
 		<template v-slot:right>
-			<button size="mini" style="width: 70px; padding: 0;" @click="quit">{{$t('global.ExitTest')}}</button>
+			<button v-show="isShow" size="mini" style="width: 70px; padding: 0;"
+				@click="quit">{{$t('global.ExitTest')}}</button>
 		</template>
 	</uni-navbar-lite>
 	<scroll-view class="page">
@@ -20,7 +21,7 @@
 					@click="wifiButtonAction">{{wifiButton}}</button>
 			</view>
 		</view>
-		<view style="padding: 30px 20px;">
+		<view style="padding: 20px 20px;" v-show="isShow">
 			<button style="color: #ffffff; background-color: #000000;" @click="quit">{{completeTest}}</button>
 		</view>
 	</scroll-view>
@@ -35,6 +36,7 @@
 			return {
 				title: "蓝牙" as string | null,
 				aceid: '',
+				isShow: true,
 				wifiname: '' as string,
 				status: false,
 				isShowButton: true,
@@ -48,6 +50,7 @@
 
 		onLoad(query) {
 			this.title = query.title
+			this.isShow = query.page != 'unit'
 			this.aceid = query.aceid
 		},
 
@@ -76,7 +79,7 @@
 
 							//先取再更新
 							let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
-							if (model) {
+							if (Object.keys(model).length != 0) {
 								model.wifi_name = this.wifiname
 								model.wifi = status
 								on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))

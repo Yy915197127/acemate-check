@@ -1,7 +1,8 @@
 <template>
 	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
 		<template v-slot:right>
-			<button size="mini" style="width: 70px; padding: 0;" @click="quit">{{$t('global.ExitTest')}}</button>
+			<button v-show="isShow" size="mini" style="width: 70px; padding: 0;"
+				@click="quit">{{$t('global.ExitTest')}}</button>
 		</template>
 	</uni-navbar-lite>
 	<view class="page">
@@ -24,11 +25,11 @@
 
 			<text class="remark-text">(1-10代表1000-10000转，请用测速计进行测试)</text>
 			<view class="button-view">
-				<button class="btn" @click="confirm">{{$t('serveMachineMotor.Confirm')}}</button>
+				<button :class="isTest ? 'btn' : 'long-btn-g'" @click="confirm">{{isTest ? '开始测试' : '停止测试'}}</button>
 			</view>
 		</view>
 
-		<view style="padding: 30px 20px;">
+		<view style="padding: 20px 20px;" v-show="isShow">
 			<button style="color: #ffffff; background-color: #000000;" @click="next">{{$t('global.NextStep')}}</button>
 		</view>
 
@@ -44,15 +45,22 @@
 			return {
 				title: "蓝牙" as string | null,
 				aceid: '',
+				isShow: true,
 				serveMachineMotorTitle: this.$t('serveMachineMotor.ServingMotor'),
 				up_speed: 5,
-				down_speed: 5
+				down_speed: 5,
+				isTest: true
 			}
 		},
 
 		onLoad(query) {
 			this.title = query.title
+			this.isShow = query.page != 'unit'
 			this.aceid = query.aceid
+		},
+
+		onHide() {
+			onSendCommand("shot_test", "stop", "");
 		},
 
 		onUnload() {
@@ -69,31 +77,36 @@
 			},
 
 			confirm() {
-				onSendCommand("shot_test", "start", {
-					"up_speed": this.up_speed,
-					"down_speed": this.down_speed
-				});
+				this.isTest = !this.isTest
+				if (this.isTest) {
+					onSendCommand("shot_test", "stop", "");
+					if (!this.isShow) {
+						return
+					}
+					uni.showModal({
+						title: '发球电机是否正常',
+						cancelText: '异常',
+						confirmText: '正常',
+						success: (result) => {
+							//先取再更新
+							let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
+							if (Object.keys(model).length != 0) {
+								model.shot = result.confirm
+								on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
+							}
+						}
+					})
+				} else {
+					onSendCommand("shot_test", "start", {
+						"up_speed": this.up_speed,
+						"down_speed": this.down_speed
+					});
+				}
 			},
 
 			next() {
-				onSendCommand("shot_test", "stop", "");
-				uni.showModal({
-					title: '发球电机是否正常',
-					cancelText: '异常',
-					confirmText: '正常',
-					success: (result) => {
-						//先取再更新
-						let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
-						if (model) {
-							model.shot = result.confirm
-							on_UTSupdateTestDetailsDB(this.aceid, model)
-						}
-						setTimeout(() => {
-							uni.navigateTo({
-								url: `/pages/index/steering-engine?title=${this.title}&aceid=${this.aceid}`
-							})
-						}, 500)
-					}
+				uni.navigateTo({
+					url: `/pages/index/steering-engine?title=${this.title}&aceid=${this.aceid}`
 				})
 			},
 			quit() {
@@ -144,8 +157,14 @@
 	}
 
 	.btn {
-		// //width: 80px;
+		color: #000;
 		border-color: black;
+		border-width: 1px;
+	}
+
+	.long-btn-g {
+		color: grey;
+		border-color: grey;
 		border-width: 1px;
 	}
 </style>

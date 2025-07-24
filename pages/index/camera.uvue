@@ -1,7 +1,8 @@
 <template>
 	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
 		<template v-slot:right>
-			<button size="mini" style="width: 70px; padding: 0;" @click="quit">{{$t('global.ExitTest')}}</button>
+			<button v-show="isShow" size="mini" style="width: 70px; padding: 0;"
+				@click="quit">{{$t('global.ExitTest')}}</button>
 		</template>
 	</uni-navbar-lite>
 	<scroll-view class="page">
@@ -15,10 +16,10 @@
 			</view>
 			<text class="remark-text">{{cameraRemark}}</text>
 			<view class="long-btn-view">
-				<button class="long-btn" @click="cameraButtonAction">{{isCamera ? "开始检测" : "停止检测"}}</button>
+				<button class="long-btn" @click="cameraButtonAction">{{isCamera ? "开始测试" : "停止检测"}}</button>
 			</view>
 		</view>
-		<view style="padding: 30px 20px;">
+		<view style="padding: 20px 20px;" v-show="isShow">
 			<button style="color: #ffffff; background-color: #000000;" @click="next">{{$t('global.NextStep')}}</button>
 		</view>
 	</scroll-view>
@@ -33,6 +34,7 @@
 			return {
 				title: "蓝牙" as string | null,
 				aceid: '',
+				isShow: true,
 				height: 0 as number,
 				depth: 0 as number,
 				lr: 0 as number,
@@ -46,7 +48,16 @@
 
 		onLoad(query) {
 			this.title = query.title
+			this.isShow = query.page != 'unit'
 			this.aceid = query.aceid
+		},
+
+		onHide() {
+			onSendCommand("camera_test", "stop", "")
+		},
+
+		onUnload() {
+			onSendCommand("camera_test", "stop", "")
 		},
 
 		methods: {
@@ -60,6 +71,9 @@
 						this.depth = data["z"] ?? 0
 						this.lr = data["x"] ?? 0
 					} else {
+						if (!this.isShow) {
+							return
+						}
 						uni.showModal({
 							title: '摄像头功能是否正常',
 							cancelText: '异常',
@@ -67,7 +81,7 @@
 							success: (result) => {
 								//先取再更新
 								let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
-								if (model) {
+								if (Object.keys(model).length != 0) {
 									model.camera = result.confirm
 									on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
 								}

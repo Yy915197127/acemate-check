@@ -1,7 +1,8 @@
 <template>
 	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
 		<template v-slot:right>
-			<button size="mini" style="width: 70px; padding: 0;" @click="quit">{{$t('global.ExitTest')}}</button>
+			<button v-show="isShow" size="mini" style="width: 70px; padding: 0;"
+				@click="quit">{{$t('global.ExitTest')}}</button>
 		</template>
 	</uni-navbar-lite>
 	<scroll-view class="page">
@@ -19,7 +20,7 @@
 				<button class="long-btn" @click="psButtonAction">{{isTesting ? psButton2 : psButton1}}</button>
 			</view>
 		</view>
-		<view style="padding: 30px 20px;">
+		<view style="padding: 20px 20px;" v-show="isShow">
 			<button style="color: #ffffff; background-color: #000000;" @click="next">{{$t('global.NextStep')}}</button>
 		</view>
 	</scroll-view>
@@ -34,6 +35,7 @@
 			return {
 				title: "蓝牙" as string | null,
 				aceid: '',
+				isShow: true,
 				ps: 0 as number,
 				status: false,
 				isTesting: false,
@@ -47,39 +49,48 @@
 
 		onLoad(query) {
 			this.title = query.title
+			this.isShow = query.page != 'unit'
 			this.aceid = query.aceid
-			this.interval = setInterval(() => {
-				onSendCommand("pressure_test", "read", "", (res) => {
-					if (res["command"] == "pressure_test") {
-						this.ps = res["data"]["pressure"] ?? 0
-						this.status = this.ps > 200
-						if (this.ps > 200) {
-							//先取再更新
-							let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
-							if (model) {
-								model.pressure = true
-								on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
-							}
-						}
-					}
-				})
-
-			}, 500);
 		},
 
+		onHide() {
+			clearInterval(this.interval)
+			onSendCommand("pressure_test", "stop", "")
+		},
+
+		onUnload() {
+			clearInterval(this.interval)
+			onSendCommand("pressure_test", "stop", "")
+		},
 		methods: {
 			psButtonAction() {
 				this.isTesting = !this.isTesting
 				if (this.isTesting) {
 					//开启网球检测
 					onSendCommand("pressure_test", "tennis_test", "")
+					this.interval = setInterval(() => {
+						onSendCommand("pressure_test", "read", "", (res) => {
+							if (res["command"] == "pressure_test") {
+								this.ps = res["data"]["pressure"] ?? 0
+								this.status = this.ps > 200
+								if (this.ps > 200) {
+									//先取再更新
+									let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
+									if (Object.keys(model).length != 0) {
+										model.pressure = true
+										on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
+									}
+								}
+							}
+						})
+
+					}, 500);
 				} else {
 					onSendCommand("pressure_test", "stop", "")
+					clearInterval(this.interval)
 				}
 			},
 			next() {
-				clearInterval(this.interval)
-				onSendCommand("pressure_test", "stop", "")
 				uni.navigateTo({
 					url: `/pages/index/camera?title=${this.title}&aceid=${this.aceid}`
 				})

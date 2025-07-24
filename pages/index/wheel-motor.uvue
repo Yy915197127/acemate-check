@@ -1,7 +1,8 @@
 <template>
 	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
 		<template v-slot:right>
-			<button size="mini" style="width: 70px; padding: 0;" @click="quit">{{$t('global.ExitTest')}}</button>
+			<button v-show="isShow" size="mini" style="width: 70px; padding: 0;"
+				@click="quit">{{$t('global.ExitTest')}}</button>
 		</template>
 	</uni-navbar-lite>
 	<view class="page">
@@ -36,7 +37,7 @@
 			</view>
 		</view>
 
-		<view style="padding: 30px 20px;">
+		<view style="padding: 20px 20px;" v-show="isShow">
 			<button style="color: #ffffff; background-color: #000000;"
 				@click="next()">{{$t('global.NextStep')}}</button>
 		</view>
@@ -54,6 +55,7 @@
 			return {
 				title: "蓝牙" as string | null,
 				aceid: '',
+				isShow: true,
 				wheelMotorTitle: this.$t('wheelMotor.DriveMotor'),
 				speed: 5,
 				acceleration: 5,
@@ -67,6 +69,7 @@
 
 		onLoad(query) {
 			this.title = query.title
+			this.isShow = query.page != 'unit'
 			this.aceid = query.aceid
 		},
 
@@ -92,6 +95,11 @@
 			touchend(res) {
 				clearInterval(this.interval);
 				onSendCommand("wheel_test", "stop", "");
+
+				if (!this.isShow) {
+					return
+				}
+
 				uni.showModal({
 					title: res + '是否正常',
 					cancelText: '异常',
@@ -117,7 +125,7 @@
 						if (this.isUp && this.isRight && this.isDown && this.isLeft) {
 							//先取再更新
 							let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
-							if (model) {
+							if (Object.keys(model).length != 0) {
 								model.wheel = true
 								on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
 							}
@@ -191,8 +199,8 @@
 
 	.container {
 		position: relative;
-		width: 300px;
-		height: 200px;
+		width: 200px;
+		height: 146px;
 	}
 
 	.btn {

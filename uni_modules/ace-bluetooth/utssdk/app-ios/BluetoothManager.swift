@@ -266,7 +266,6 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         peripheral.delegate = self
         peripheral.discoverServices([serviceUUID])
         onConnectionChange?(.connected)
-        onConnectionChangeBack?()
         bluetoothState = .connected
         UserDefaults.standard.set(peripheral.identifier.uuidString, forKey: "savedPeripheralUUID")
         reconnectAttempts = 0
@@ -282,6 +281,8 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         onConnectionChange?(.disconnected)
         bluetoothState = .disconnected
         isConnect = false
+
+        onReconnectBlockUTS?(0)
 
         //装配测试不用发送心跳
         // // 停止心跳定时器
@@ -320,7 +321,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             } else {
                 console.log("已达到最大重试次数 (\(maxRetries))，不再尝试重新连接")
                 targetPeripheral = nil
-                onReconnectBlockUTS?(0)
+                onReconnectBlockUTS?(-2)
             }
         } else {
             // 用户主动断开连接，重置标志位
@@ -386,6 +387,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 console.log("订阅状态特征通知失败：\(error.localizedDescription)")
             } else {
                 console.log(characteristic.isNotifying ? "已订阅状态特征通知" : "已停止状态特征通知订阅")
+                onConnectionChangeBack?()
                 onReconnectBlockUTS?(1)
             }
         }

@@ -1,7 +1,8 @@
 <template>
 	<uni-navbar-lite :title="title" :is-back="true" :nc-color="'#f1f1f1'">
 		<template v-slot:right>
-			<button size="mini" style="width: 70px; padding: 0;" @click="quit">{{$t('global.ExitTest')}}</button>
+			<button v-show="isShow" size="mini" style="width: 70px; padding: 0;"
+				@click="quit">{{$t('global.ExitTest')}}</button>
 		</template>
 	</uni-navbar-lite>
 	<scroll-view class="page">
@@ -15,14 +16,14 @@
 			</view>
 			<text class="remark-text">{{HighGButtonRemark}}</text>
 			<view class="long-btn-view">
-				<button class="long-btn" @click="highGButtonAction">{{HighGButton}}</button>
+				<button class="long-btn" style="width: 100px;" @click="highGButtonAction">{{HighGButton}}</button>
 				<text class="remark-text"
 					:class="HighGTestResultText?.includes('...') ? '' : (highGTestResult ? 'high-G-test-succeed' : 'high-G-test-fall')"
 					v-show="HighGTestResultText?.length != 0">{{HighGTestResultText}}</text>
 			</view>
 		</view>
 
-		<view style="background-color: #ffffff; padding: 20px; margin-top: 30px;">
+		<view style="background-color: #ffffff; padding: 20px; margin-top: 20px;">
 			<text class="title">{{gyroscopeTitle}}</text>
 			<text class="remark-text">{{gyroscopeRemark}}</text>
 			<view class="space-view">
@@ -31,22 +32,18 @@
 			</view>
 			<text class="remark-text">{{gyroscopeButtonRemark}}</text>
 			<view class="long-btn-view">
-				<!-- <button :class="isShowGyroscopeButton ? 'long-btn' : 'long-btn-g'"
-					@click="gyroscopeButtonAction">{{gyroscopeButton}}</button> -->
-
 				<view class="space-view">
 					<button :class="isShowGyroscopeButton ? 'long-btn' : 'long-btn-g'"
-						@click="gyroscopeButtonAction('left')">向左旋转测试</button>
+						@click="gyroscopeButtonAction('left')">向左旋转</button>
 					<button :class="isShowGyroscopeButton ? 'long-btn' : 'long-btn-g'"
-						@click="gyroscopeButtonAction('right')">向右旋转测试</button>
+						@click="gyroscopeButtonAction('right')">向右旋转</button>
 				</view>
-
 				<text class="remark-text"
 					:class="gyroscopeTestResultText?.includes($t('imu.AutoDetecting')) ? '' : (gyroscopeTestResult ? 'high-G-test-succeed' : 'high-G-test-fall')"
 					v-show="gyroscopeTestResultText?.length != 0">{{gyroscopeTestResultText}}</text>
 			</view>
 		</view>
-		<view style="padding: 30px 20px;">
+		<view style="padding: 20px 20px;" v-show="isShow">
 			<button style="color: #ffffff; background-color: #000000;" @click="next">{{$t('global.NextStep')}}</button>
 		</view>
 	</scroll-view>
@@ -61,6 +58,7 @@
 			return {
 				title: "蓝牙" as string | null,
 				aceid: '',
+				isShow: true,
 				ax: 0 as number,
 				ay: 0 as number,
 				az: 0 as number,
@@ -72,7 +70,6 @@
 				HighGButtonRemark: this.$t('imu.AccelerometerRemark2'),
 				HighGTitle: this.$t('imu.Accelerometer'),
 				HighGRemark: this.$t('imu.AccelerometerRemark1'),
-
 
 				yaw: 0 as number,
 				rotationAngle: 0 as number,
@@ -88,6 +85,7 @@
 
 		onLoad(query) {
 			this.title = query.title
+			this.isShow = query.page != 'unit'
 			this.aceid = query.aceid
 		},
 
@@ -157,7 +155,7 @@
 
 						//先取再更新
 						let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
-						if (model) {
+						if (Object.keys(model).length != 0) {
 							model.highG = this.highGTestResult
 							model.HighG_remark = this.highGTestResult ? '' : this.HighGTestResultText
 							on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
@@ -178,6 +176,9 @@
 							let data = res["data"]
 							this.rotationAngle = data["actual_angle"]
 							this.isShowGyroscopeButton = true
+							if (!this.isShow) {
+								return
+							}
 							uni.showModal({
 								title: '旋转角度是否正常',
 								cancelText: '异常',
@@ -188,7 +189,7 @@
 
 									//先取再更新
 									let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
-									if (model) {
+									if (Object.keys(model).length != 0) {
 										model.gyroscope = result.confirm
 										on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
 									}
@@ -201,7 +202,6 @@
 
 			next() {
 				uni.navigateTo({
-					// url: `/pages/index/pressure-sensor?title=${this.title}&aceid=${this.aceid}`
 					url: `/pages/index/serve-machine-motor?title=${this.title}&aceid=${this.aceid}`
 				})
 			},

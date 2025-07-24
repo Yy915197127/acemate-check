@@ -6,6 +6,7 @@
 	</uni-navbar-lite>
 
 	<view class="content">
+		<image style="width: 240px;" src="/static/logo.png" mode="widthFix"></image>
 		<button id="testButton" class="testButton" @click="button_click">{{$t('global.beginTesting')}}</button>
 	</view>
 </template>
@@ -33,7 +34,7 @@
 		methods: {
 			button_click() {
 				uni.navigateTo({
-					url: '/pages/index/bluetooth-list'
+					url: '/pages/index/bluetooth-list?page=index'
 				})
 			},
 			testRecord() {
@@ -47,8 +48,8 @@
 
 <style>
 	.content {
+		flex: 1;
 		display: flex;
-		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 	}
@@ -56,9 +57,7 @@
 	.testButton {
 		color: #ffffff;
 		background-color: #000000;
-		width: 50%;
-		margin-top: 50%;
-		margin-left: auto;
-		margin-right: auto;
+		width: 300px;
+		margin-top: 40px;
 	}
 </style>

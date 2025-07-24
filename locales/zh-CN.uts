@@ -5,7 +5,7 @@ export default {
 		ExitTest: '退出测试',
 		NextStep: '下一步',
 		Test: '测试',
-		StartDetection: '开始检测',
+		StartDetection: '开始测试',
 	},
 
 	//bluetooth-list
@@ -100,7 +100,7 @@ export default {
 		Height: '高度: ',
 		Depth: '深度: ',
 		LeftRight: '左右: ',
-		StartTest: '点击开始检测后，请将网球放在机器正前方5m，高度1m以上的位置，实时判断网球位置是否准确'
+		StartTest: '点击开始测试后，请将网球放在机器正前方5m，高度1m以上的位置，实时判断网球位置是否准确'
 	},
 
 	//WiFi

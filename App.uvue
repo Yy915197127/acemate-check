@@ -1,6 +1,6 @@
 <script lang="uts">
 	import { onReconnectBlock } from '@/uni_modules/ace-bluetooth';
-
+	import { setBluetoothState } from '@/store/index.uts'
 	let firstBackTime = 0
 	export default {
 		onLaunch: function () {
@@ -41,17 +41,23 @@
 				setTimeout(() => {
 					let reconnectStatus = 1
 					onReconnectBlock((res) => {
+						// 0:设备蓝牙断开(所有情况)
+						//-1:设备非用户主动断开，尝试重新连接
+						//-2:重连失败
+						// 1:已订阅状态特征通知
 						console.log("全局监听蓝牙状态:" + res)
+						setBluetoothState(res)
 						if (reconnectStatus != res) {
-							reconnectStatus = res
 							switch (res) {
 								case -1:
+									reconnectStatus = res
 									uni.showLoading({
 										title: "蓝牙已断开，正在尝试重连...",
 										mask: true
 									})
 									break;
-								case 0:
+								case -2:
+									reconnectStatus = res
 									uni.hideLoading();
 									uni.showToast({
 										title: "重新连接失败，请手动连接",
@@ -59,6 +65,7 @@
 									})
 									break;
 								case 1:
+									reconnectStatus = res
 									uni.hideLoading();
 									uni.showToast({
 										title: "重新连接成功"
@@ -69,9 +76,8 @@
 							}
 						}
 					})
-				}, 2000)
+				}, 1000)
 			},
-
 		}
 	}
 </script>

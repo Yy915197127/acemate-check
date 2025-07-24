@@ -1,5 +1,5 @@
 <template>
-	<view :style="{ backgroundColor: ncColor }" class="uni-navbar">
+	<view :style="{ backgroundColor: ncColor }">
 		<view class="uni-navbar-inner" :style="navbarStyle">
 			<view class="left-content" @click="back" v-show="isBack">
 				<text class="uni-icons">{{unicode}}</text>
@@ -86,11 +86,6 @@
 		font-size: 22px;
 		font-style: normal;
 		color: #333;
-	}
-
-	.uni-navbar {
-		/* border: 1px #eee solid; */
-		/* background-color: aquamarine; */
 	}
 
 	.uni-navbar-inner {

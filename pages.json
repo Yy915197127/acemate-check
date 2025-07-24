@@ -91,7 +91,7 @@
 		{
 			"path": "pages/unit/unit",
 			"style": {
-				"navigationBarTitleText": "单元测试"
+				"navigationStyle": "custom"
 			}
 		}
 	],
@@ -103,16 +103,22 @@
 	},
 	"tabBar": {
 		"color": "#a3a7ad",
-		"fontSize": "16px",
+		"fontSize": "11px",
+		"iconWidth": "21px",
+		"spacing": "5px",
 		"selectedColor": "#000000",
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [{
 				"pagePath": "pages/index/index",
+				"iconPath": "/static/index.png",
+				"selectedIconPath": "/static/index_s.png",
 				"text": "全局测试"
 			},
 			{
 				"pagePath": "pages/unit/unit",
+				"iconPath": "/static/unit.png",
+				"selectedIconPath": "/static/unit_s.png",
 				"text": "单元测试"
 			}
 		]
