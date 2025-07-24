@@ -42,6 +42,7 @@
 				//开启工厂模式
 				onSendCommand("", "start", "", (res) => {
 					console.log(res)
+					this.isStart = true
 				})
 			})
 		},

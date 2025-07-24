@@ -199,8 +199,8 @@
 
 	.container {
 		position: relative;
-		width: 200px;
-		height: 146px;
+		width: 260px;
+		height: 206px;
 	}
 
 	.btn {

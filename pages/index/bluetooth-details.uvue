@@ -25,6 +25,10 @@
 				<text>{{receiveDataTitle}}</text>
 				<view :class="status ? 'on-status-view' : 'status-view'"></view>
 			</view>
+			<view class="space-view send-data-view">
+				<text>版本号</text>
+				<text>{{version}}</text>
+			</view>
 			<text
 				style="font-size: 13; color: gray; margin-top: 15px;">{{status ? receiveSucceedRemark : receiveDataRemark}}</text>
 		</view>
@@ -57,7 +61,8 @@
 				interval: 0,
 				rssi: 0,
 				status: false,
-				timeout: 0
+				timeout: 0,
+				version: ''
 			}
 		},
 		onLoad(query) {
@@ -89,6 +94,9 @@
 			send() {
 				//开启工厂模式,并测试收发功能
 				onSendCommand("", "start", "", (res) => {
+					console.log(res)
+					let data = res["data"]
+					this.version = data["version"] ?? ""
 					this.status = true
 					uni.hideLoading();
 					clearTimeout(this.timeout)
@@ -160,17 +168,17 @@
 
 	.status-view {
 		margin-right: 15px;
-		width: 30px;
-		height: 30px;
+		width: 20px;
+		height: 20px;
+		border-radius: 10px;
 		background-color: #dedede;
-		border-radius: 15px;
 	}
 
 	.on-status-view {
 		margin-right: 15px;
-		width: 30px;
-		height: 30px;
+		width: 20px;
+		height: 20px;
+		border-radius: 10px;
 		background-color: $uni-color-primary;
-		border-radius: 15px;
 	}
 </style>
