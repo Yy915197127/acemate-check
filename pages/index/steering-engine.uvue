@@ -9,10 +9,12 @@
 		<view style="background-color: #ffffff; padding: 20px;">
 			<text class="title">{{turntableTitle}}</text>
 			<view class="space-view">
-				<button class="btn" size="mini" @click="turntableBut(turntable[0])">0°</button>
-				<button class="btn" size="mini" @click="turntableBut(turntable[1])">90°</button>
-				<button class="btn" size="mini" @click="turntableBut(turntable[2])">180°</button>
-				<button class="btn" size="mini" @click="turntableBut(turntable[3])">270°</button>
+				<button class="btn" size="mini" v-for="(name, index) in turntable" :key="index"
+					@click="turntableBut(name)">{{name}}°</button>
+				<!-- <button class="btn" size="mini" @click="turntableBut(turntable[0])">{{turntable[0]+"°"}}</button>
+				<button class="btn" size="mini" @click="turntableBut(turntable[1])">{{turntable[1]+"°"}}</button>
+				<button class="btn" size="mini" @click="turntableBut(turntable[2])">{{turntable[2]+"°"}}</button>
+				<button class="btn" size="mini" @click="turntableBut(turntable[3])">{{turntable[3]+"°"}}</button> -->
 			</view>
 			<view class="long-btn-view">
 				<text class="remark-text">{{$t('steeringEngine.Offset')+turntableOffset}}°</text>
@@ -42,7 +44,7 @@
 				<text class="remark-text">{{$t('steeringEngine.ServeElevationAngle')}}</text>
 				<text class="">{{angle}}°</text>
 			</view>
-			<slider :min="0" :max="180" :step="10" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
+			<slider :min="22" :max="157" :step="1" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
 				:value="angle" @changing="angleSliderChangeing" @change="angleSliderChange" />
 			<view class="long-btn-view">
 				<text class="remark-text">{{$t('steeringEngine.Offset')+pitchingOffset}}°</text>
@@ -70,11 +72,11 @@
 				turntableTitle: this.$t('steeringEngine.TurntableServo'),
 				cabinDoorTitle: this.$t('steeringEngine.HatchServo'),
 				pitchingTitle: this.$t('steeringEngine.PitchServo'),
-				turntable: [0, 90, 180, 270],
+				turntable: [20, 110, 200, 290],
 				turntableOffset: 0,
 				cabinDoorOffset: 0,
 				pitchingOffset: 0,
-				angle: 90
+				angle: 22
 			}
 		},
 

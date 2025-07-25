@@ -60,7 +60,7 @@ export default {
 		CloseHatch: '关舱门',
 		OpenHatch: '开舱门',
 		HatchAngleCalibration: '关舱门角度校正',
-		ServeElevationAngle: '发球仰角(0：最高，180：最低)',
+		ServeElevationAngle: '发球仰角(22：最高，157：最低)',
 		Observe: '观察舵机当前位置，如若未居中请调整偏移角度，使舵机位置居中',
 		Cancel: '取消',
 		Save: '保存'
