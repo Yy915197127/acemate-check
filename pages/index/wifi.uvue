@@ -150,14 +150,12 @@
 	}
 
 	.long-btn {
-		width: 220px;
 		color: #000;
 		border-color: black;
 		border-width: 1px;
 	}
 
 	.long-btn-g {
-		width: 220px;
 		color: grey;
 		border-color: grey;
 		border-width: 1px;

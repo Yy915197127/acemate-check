@@ -13,15 +13,15 @@
 				<text class="remark-text">{{$t('wheelMotor.Speed')}}</text>
 				<text class="">{{speed}}</text>
 			</view>
-			<slider :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
-				:value="speed" @changing="speedSliderChangeing" />
+			<slider style="margin: 0 5px;" :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174"
+				foreColor="#f1f1f1" :value="speed" @changing="speedSliderChangeing" />
 
 			<view class="space-view">
 				<text class="remark-text">{{$t('wheelMotor.Acceleration')}}</text>
 				<text class="">{{acceleration}}</text>
 			</view>
-			<slider :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174" foreColor="#f1f1f1"
-				:value="acceleration" @changing="accelerationSliderChangeing" />
+			<slider style="margin: 0 5px;" :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174"
+				foreColor="#f1f1f1" :value="acceleration" @changing="accelerationSliderChangeing" />
 
 			<view class="container-view">
 				<view class="container">

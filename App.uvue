@@ -1,5 +1,5 @@
 <script lang="uts">
-	import { onReconnectBlock } from '@/uni_modules/ace-bluetooth';
+	import { onReconnectBlock, onDisconnectPeripheral } from '@/uni_modules/ace-bluetooth';
 	import { setBluetoothState } from '@/store/index.uts'
 	let firstBackTime = 0
 	export default {
@@ -40,35 +40,50 @@
 			onReconnect() {
 				setTimeout(() => {
 					let reconnectStatus = 1
-					onReconnectBlock((res) => {
+					let timeout = 0
+					onReconnectBlock((bluetoothName, status) => {
 						// 0:设备蓝牙断开(所有情况)
 						//-1:设备非用户主动断开，尝试重新连接
 						//-2:重连失败
 						// 1:已订阅状态特征通知
-						console.log("全局监听蓝牙状态:" + res)
-						setBluetoothState(res)
-						if (reconnectStatus != res) {
-							switch (res) {
+						console.log("全局监听蓝牙 " + bluetoothName + " 状态: " + status)
+						setBluetoothState(status)
+						if (reconnectStatus != status) {
+							switch (status) {
 								case -1:
-									reconnectStatus = res
+									reconnectStatus = -1
 									uni.showLoading({
-										title: "蓝牙已断开，正在尝试重连...",
+										title: bluetoothName + "已断开，正在重连...",
 										mask: true
 									})
+
+									this.timeout = setTimeout(() => {
+										clearTimeout(this.timeout)
+										reconnectStatus = 1
+										uni.hideLoading();
+										onDisconnectPeripheral()
+										uni.showToast({
+											title: '重连失败，请检查设备状态',
+											icon: "error"
+										})
+									}, 20000);
+
 									break;
 								case -2:
-									reconnectStatus = res
+									reconnectStatus = 1
 									uni.hideLoading();
+									clearTimeout(this.timeout)
 									uni.showToast({
-										title: "重新连接失败，请手动连接",
+										title: "重连失败，请检查设备状态",
 										icon: "error"
 									})
 									break;
 								case 1:
-									reconnectStatus = res
+									reconnectStatus = 1
 									uni.hideLoading();
+									clearTimeout(this.timeout)
 									uni.showToast({
-										title: "重新连接成功"
+										title: bluetoothName + "已连接",
 									})
 									break;
 								default:

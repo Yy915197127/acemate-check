@@ -9,28 +9,32 @@
 		<view style="background-color: #ffffff; padding: 20px;">
 			<text class="title">{{turntableTitle}}</text>
 			<view class="space-view">
-				<button class="btn" v-for="(name, index) in turntable" :key="index"
+				<button class="btn" size="mini" v-for="(name, index) in turntable" :key="index"
 					@click="turntableBut(name)">{{name}}°</button>
+				<!-- <button class="btn" size="mini" @click="turntableBut(turntable[0])">{{turntable[0]+"°"}}</button>
+				<button class="btn" size="mini" @click="turntableBut(turntable[1])">{{turntable[1]+"°"}}</button>
+				<button class="btn" size="mini" @click="turntableBut(turntable[2])">{{turntable[2]+"°"}}</button>
+				<button class="btn" size="mini" @click="turntableBut(turntable[3])">{{turntable[3]+"°"}}</button> -->
 			</view>
 			<view class="long-btn-view">
 				<text class="remark-text">{{$t('steeringEngine.Offset')+turntableOffset}}°</text>
-				<button style="width: 50px; padding: 0; margin-left: 10px;" class="btn" size="mini"
-					@click="turntableRevise">{{$t('steeringEngine.Calibrate')}}</button>
+				<button class="long-btn"
+					@click="turntableRevise">{{turntableOffset}}°{{$t('steeringEngine.Calibrate')}}</button>
 			</view>
 		</view>
 
 		<view style="background-color: #ffffff; padding: 20px; margin-top: 20px;">
 			<text class="title">{{cabinDoorTitle}}</text>
 			<view class="space-view">
-				<button style="padding: 0;" class="btn"
+				<button class="cabinDoor-btn" size="mini"
 					@click="cabinDoorClose">{{$t('steeringEngine.CloseHatch')}}</button>
-				<button style="padding: 0;" class="btn"
+				<button class="cabinDoor-btn" size="mini"
 					@click="cabinDoorOpen">{{$t('steeringEngine.OpenHatch')}}</button>
 			</view>
 			<view class="long-btn-view">
 				<text class="remark-text">{{$t('steeringEngine.Offset')+cabinDoorOffset}}°</text>
-				<button style="width: 50px; padding: 0; margin-left: 10px;" class="btn" size="mini"
-					@click="cabinDoorRevise">{{$t('steeringEngine.Calibrate')}}</button>
+				<button class="long-btn"
+					@click="cabinDoorRevise">{{$t('steeringEngine.HatchAngleCalibration')}}</button>
 			</view>
 		</view>
 
@@ -43,14 +47,10 @@
 			<slider style="margin: 0 5px;" :min="22" :max="157" :step="1" :block-size="25"
 				activeBackgroundColor="#90E174" foreColor="#f1f1f1" :value="angle" @changing="angleSliderChangeing"
 				@change="angleSliderChange" />
-
-			<view class="long-btn-view">
-				<button class="long-btn" @click="pitchingStart">开始测试</button>
-			</view>
 			<view class="long-btn-view">
 				<text class="remark-text">{{$t('steeringEngine.Offset')+pitchingOffset}}°</text>
-				<button style="width: 50px; padding: 0; margin-left: 10px;" class="btn" size="mini"
-					@click="pitchingRevise">{{$t('steeringEngine.Calibrate')}}</button>
+				<button class="long-btn"
+					@click="pitchingRevise">{{pitchingOffset}}°{{$t('steeringEngine.Calibrate')}}</button>
 			</view>
 		</view>
 		<view style="padding: 20px 20px;" v-show="isShow">
@@ -182,26 +182,17 @@
 
 			},
 
-			// angleSliderChange(e : UniSliderChangeEvent) {
-			// 	console.log("俯仰角度发生变化：" + e.detail.value);
-			// 	onSendCommand("servo_test", "set_angle", {
-			// 		"servo_type": "launcher_pitch",
-			// 		"angle_deg": e.detail.value
-			// 	});
-			// },
+			angleSliderChange(e : UniSliderChangeEvent) {
+				console.log("俯仰角度发生变化：" + e.detail.value);
+				onSendCommand("servo_test", "set_angle", {
+					"servo_type": "launcher_pitch",
+					"angle_deg": e.detail.value
+				});
+			},
 			angleSliderChangeing(e : UniSliderChangeEvent) {
 				console.log("俯仰角度持续发生变化：" + e.detail.value);
 				this.angle = e.detail.value
 			},
-
-			pitchingStart() {
-				console.log("俯仰角度开始测试：" + this.angle);
-				onSendCommand("servo_test", "set_angle", {
-					"servo_type": "launcher_pitch",
-					"angle_deg": this.angle
-				});
-			},
-
 			next() {
 				uni.openDialogPage({
 					url: "/pages/dialog-page/result-dialog"
@@ -243,7 +234,7 @@
 	}
 
 	.btn {
-		width: 75px;
+		width: 70px;
 		border-color: black;
 		border-width: 1px;
 	}
@@ -251,8 +242,6 @@
 	.long-btn-view {
 		align-items: center;
 		justify-content: center;
-		/* 横向排列 */
-		flex-direction: row;
 		margin-top: 15px;
 	}
 
@@ -263,6 +252,13 @@
 	}
 
 	.long-btn {
+		margin-top: 15px;
+		border-color: black;
+		border-width: 1px;
+	}
+
+	.cabinDoor-btn {
+		width: 90px;
 		border-color: black;
 		border-width: 1px;
 	}

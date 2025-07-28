@@ -150,7 +150,6 @@
 	}
 
 	.long-btn {
-		width: 220px;
 		border-color: black;
 		border-width: 1px;
 	}

@@ -81,7 +81,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     var onProcessReceivedDataBlock: (([String: Any]) -> Void)?
 
     // 重新连接回调给UTS
-    var onReconnectBlockUTS: ((NSNumber) -> Void)?
+    var onReconnectBlockUTS: ((String?, NSNumber) -> Void)?
 
     //信号强度回调
     var connectDeviceReadRSSIBlock: ((NSNumber) -> Void)?
@@ -229,7 +229,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 self.peripheralDic.updateValue(peripheral, forKey: localName)
                 onPeripheralDiscovered?(localName)
             } else {
-                // console.log("设备 \(localName) 已存在于列表中，跳过添加")
+                // console.log("设备 \(localName) 已存在于列表中，跳过添����")
             }
 
         }
@@ -282,7 +282,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         bluetoothState = .disconnected
         isConnect = false
 
-        onReconnectBlockUTS?(0)
+        onReconnectBlockUTS?(peripheral.name, 0)
 
         //装配测试不用发送心跳
         // // 停止心跳定时器
@@ -294,7 +294,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             if reconnectAttempts < maxRetries {
                 reconnectAttempts += 1
                 console.log("非用户主动断开，尝试重新连接，当前尝试次数: \(reconnectAttempts)/\(maxRetries)")
-                onReconnectBlockUTS?(-1)
+                onReconnectBlockUTS?(peripheral.name, -1)
 
                 // 延迟一段时间后尝试重新连接
                 DispatchQueue.main.asyncAfter(deadline: .now() + retryIntervalSeconds) {
@@ -321,7 +321,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             } else {
                 console.log("已达到最大重试次数 (\(maxRetries))，不再尝试重新连接")
                 targetPeripheral = nil
-                onReconnectBlockUTS?(-2)
+                onReconnectBlockUTS?(peripheral.name, -2)
             }
         } else {
             // 用户主动断开连接，重置标志位
@@ -388,7 +388,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             } else {
                 console.log(characteristic.isNotifying ? "已订阅状态特征通知" : "已停止状态特征通知订阅")
                 onConnectionChangeBack?()
-                onReconnectBlockUTS?(1)
+                onReconnectBlockUTS?(peripheral.name, 1)
             }
         }
     }
@@ -775,7 +775,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         //                            console.log("上传完成，开始升级")
         //                            // 3. 切换到“正在升级”阶段，90 秒模拟进度
         //
-        //                            // 真正触发升级指令
+        //                            // 真正触���升级指令
         //                            OtaManager.shared.triggerUpdate { result in
         //                                switch result {
         //                                case .success:

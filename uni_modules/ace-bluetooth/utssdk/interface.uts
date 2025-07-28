@@ -56,4 +56,4 @@ export type ConnectionStateBack = () => void;
 export type ProcessReceivedBlock = (res : Map<string, any>) => void;
 
 /* 蓝牙断开连接重连状态回调 */
-export type ReconnectBlock = (res : number) => void;
+export type ReconnectBlock = (bluetoothName ?: string, status ?: number) => void;
