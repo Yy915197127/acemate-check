@@ -19,6 +19,7 @@ class DeviceModel: Codable {
     var HighG_remark: String
     var gyroscope: Bool
     var pressure: Bool
+    var snapshot: Bool
     var camera: Bool
     var wifi: Bool
     var wifi_name: String
@@ -74,6 +75,7 @@ class DeviceModel: Codable {
         HighG_remark: String = "",
         gyroscope: Bool = false,
         pressure: Bool = false,
+        snapshot: Bool = false,
         camera: Bool = false,
         wifi: Bool = false,
         wifi_name: String = ""
@@ -94,12 +96,14 @@ class DeviceModel: Codable {
         self.HighG_remark = HighG_remark
         self.gyroscope = gyroscope
         self.pressure = pressure
+        self.snapshot = snapshot
         self.camera = camera
         self.wifi = wifi
         self.wifi_name = wifi_name
         self.isSucceed =
             self.sAndr && self.wheel && self.shot && self.feeder_rotate && self.door_latch
-            && self.launcher_pitch && self.highG && self.gyroscope && self.pressure && self.camera
+            && self.launcher_pitch && self.highG && self.gyroscope && self.pressure && self.snapshot
+            && self.camera
             && self.wifi
     }
 
@@ -121,12 +125,14 @@ class DeviceModel: Codable {
         self.HighG_remark = resultSet.string(forColumn: "HighG_remark") ?? ""
         self.gyroscope = resultSet.bool(forColumn: "gyroscope")
         self.pressure = resultSet.bool(forColumn: "pressure")
+        self.snapshot = resultSet.bool(forColumn: "snapshot")
         self.camera = resultSet.bool(forColumn: "camera")
         self.wifi = resultSet.bool(forColumn: "wifi")
         self.wifi_name = resultSet.string(forColumn: "wifi_name") ?? ""
         self.isSucceed =
             self.sAndr && self.wheel && self.shot && self.feeder_rotate && self.door_latch
-            && self.launcher_pitch && self.highG && self.gyroscope && self.pressure && self.camera
+            && self.launcher_pitch && self.highG && self.gyroscope && self.pressure && self.snapshot
+            && self.camera
             && self.wifi
     }
 }

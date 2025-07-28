@@ -43,9 +43,9 @@
 			<slider style="margin: 0 5px;" :min="22" :max="157" :step="1" :block-size="25"
 				activeBackgroundColor="#90E174" foreColor="#f1f1f1" :value="angle" @changing="angleSliderChangeing"
 				@change="angleSliderChange" />
-
-			<view class="long-btn-view">
-				<button class="long-btn" @click="pitchingStart">开始测试</button>
+			<view class="space-view">
+				<button style="padding: 0; width: 140px;" class="btn" @click="pitchingHighest">最高角度测试</button>
+				<button style="padding: 0; width: 140px;" class="btn" @click="pitchingLowest">最低角度测试</button>
 			</view>
 			<view class="long-btn-view">
 				<text class="remark-text">{{$t('steeringEngine.Offset')+pitchingOffset}}°</text>
@@ -182,23 +182,29 @@
 
 			},
 
-			// angleSliderChange(e : UniSliderChangeEvent) {
-			// 	console.log("俯仰角度发生变化：" + e.detail.value);
-			// 	onSendCommand("servo_test", "set_angle", {
-			// 		"servo_type": "launcher_pitch",
-			// 		"angle_deg": e.detail.value
-			// 	});
-			// },
+			angleSliderChange(e : UniSliderChangeEvent) {
+				console.log("俯仰角度发生变化：" + e.detail.value);
+				onSendCommand("servo_test", "set_angle", {
+					"servo_type": "launcher_pitch",
+					"angle_deg": e.detail.value
+				});
+			},
 			angleSliderChangeing(e : UniSliderChangeEvent) {
 				console.log("俯仰角度持续发生变化：" + e.detail.value);
 				this.angle = e.detail.value
 			},
 
-			pitchingStart() {
-				console.log("俯仰角度开始测试：" + this.angle);
+			pitchingHighest() {
 				onSendCommand("servo_test", "set_angle", {
 					"servo_type": "launcher_pitch",
-					"angle_deg": this.angle
+					"angle_deg": 22
+				});
+			},
+
+			pitchingLowest() {
+				onSendCommand("servo_test", "set_angle", {
+					"servo_type": "launcher_pitch",
+					"angle_deg": 157
 				});
 			},
 

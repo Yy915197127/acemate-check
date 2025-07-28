@@ -38,7 +38,7 @@
 				height: 0 as number,
 				depth: 0 as number,
 				lr: 0 as number,
-				cameraTitle: this.$t('camera.Camera'),
+				cameraTitle: '摄像头网球识别',
 				tennisRemark: this.$t('camera.Coordinates'),
 				cameraRemark: this.$t('camera.StartTest'),
 				cameraButton: this.$t('global.StartDetection'),

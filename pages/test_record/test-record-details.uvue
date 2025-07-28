@@ -81,6 +81,11 @@
 		<view class="list-view">
 			<text class="title">摄像头</text>
 			<view class="space-view">
+				<text>图像检测:</text>
+				<text
+					:class="testDetails.snapshot ? 'test-succeed' : 'test-fall'">{{testDetails.snapshot ? '正常' : '异常'}}</text>
+			</view>
+			<view class="space-view">
 				<text>网球识别:</text>
 				<text
 					:class="testDetails.camera ? 'test-succeed' : 'test-fall'">{{testDetails.camera ? '正常' : '异常'}}</text>
@@ -152,21 +157,32 @@
 			saveToAlbum() {
 				uni.saveImageToPhotosAlbum({
 					filePath: this.snapImagePath,
-					success() {
+					success: (e : SaveImageToPhotosAlbumSuccess) => {
 						uni.hideLoading();
 						uni.showToast({
 							position: "center",
 							icon: "none",
 							title: "导出成功，请到手机相册查看"
 						})
+
+						//删除截屏缓存文件
+						const fileManager = uni.getFileSystemManager()
+						fileManager.unlink({
+							filePath: this.snapImagePath
+						})
 					},
-					fail(e) {
-						console.log(e)
+					fail: (e : IUniError) => {
 						uni.hideLoading();
 						uni.showModal({
 							content: "导出失败，errCode：" + e.errCode + "，errMsg：" + e.errMsg + "，errSubject：" + e.errSubject,
 							showCancel: false
 						});
+
+						//删除截屏缓存文件
+						const fileManager = uni.getFileSystemManager()
+						fileManager.unlink({
+							filePath: this.snapImagePath
+						})
 					}
 				})
 			}
@@ -214,7 +230,7 @@
 	.createdTime {
 		flex-direction: row;
 		justify-content: flex-end;
-		margin-bottom: 10px;
+		margin-bottom: 15px;
 		padding: 0 20px;
 	}
 </style>

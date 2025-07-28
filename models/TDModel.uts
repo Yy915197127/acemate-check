@@ -24,7 +24,8 @@ export default class TDModel {
 
 	pressure ?: boolean		   //压力传感器
 
-	camera ?: boolean		   //摄像头
+	snapshot ?: boolean		   //摄像头图像识别
+	camera ?: boolean		   //摄像头网球检测
 
 	wifi ?: boolean		 	   //WiFi热点
 	wifi_name ?: string 	   //WiFi名

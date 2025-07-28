@@ -25,8 +25,8 @@
 			return {
 				bluetoothName: '',
 				isStart: false,
-				units: ['行走电机', '发球电机', 'IMU', '舵机', '压力传感器', '摄像头', 'WiFi热点'],
-				pages: ['/pages/index/wheel-motor', '/pages/index/serve-machine-motor', '/pages/index/imu', '/pages/index/steering-engine', '/pages/index/pressure-sensor', '/pages/index/camera', '/pages/index/wifi']
+				units: ['行走电机', '发球电机', 'IMU', '舵机', '压力传感器', '摄像头图像检测', '摄像头网球检测', 'WiFi热点'],
+				pages: ['/pages/index/wheel-motor', '/pages/index/serve-machine-motor', '/pages/index/imu', '/pages/index/steering-engine', '/pages/index/pressure-sensor', '/pages/index/camera-snapshot', '/pages/index/camera', '/pages/index/wifi']
 			}
 		},
 

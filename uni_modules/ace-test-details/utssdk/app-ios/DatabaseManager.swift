@@ -38,6 +38,7 @@ class DatabaseManager {
                 HighG_remark TEXT,
                 gyroscope INTEGER,
                 pressure INTEGER,
+                snapshot INTEGER,
                 camera INTEGER,
                 wifi INTEGER,
                 wifi_name TEXT
@@ -65,8 +66,8 @@ class DatabaseManager {
             INSERT INTO test_details (
                 aceid, name, createdAt, rssi, sAndr, wheel, shot, feeder_rotate,
                 door_latch, launcher_pitch, highG, HighG_remark,
-                gyroscope, pressure, camera, wifi, wifi_name
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                gyroscope, pressure, snapshot, camera, wifi, wifi_name
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
             """
 
         databaseQueue?.inDatabase { db in
@@ -87,6 +88,7 @@ class DatabaseManager {
                     device.HighG_remark,
                     device.gyroscope ? 1 : 0,
                     device.pressure ? 1 : 0,
+                    device.snapshot ? 1 : 0,
                     device.camera ? 1 : 0,
                     device.wifi ? 1 : 0,
                     device.wifi_name,
@@ -175,6 +177,7 @@ class DatabaseManager {
                 HighG_remark = ?,
                 gyroscope = ?,
                 pressure = ?,
+                snapshot = ?,
                 camera = ?,
                 wifi = ?, 
                 wifi_name = ?
@@ -197,6 +200,7 @@ class DatabaseManager {
                     device.HighG_remark,
                     device.gyroscope ? 1 : 0,
                     device.pressure ? 1 : 0,
+                    device.snapshot ? 1 : 0,
                     device.camera ? 1 : 0,
                     device.wifi ? 1 : 0,
                     device.wifi_name,

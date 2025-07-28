@@ -7,18 +7,10 @@
 	</uni-navbar-lite>
 	<scroll-view class="page">
 		<view style="background-color: #ffffff; padding: 20px;">
-			<text class="title">{{psTitle}}</text>
-			<view class="space-view">
-				<text>{{$t('pressureSensor.PressureValue') + ps}}</text>
-				<view class="status-view">
-					<view class="status" :style="{ backgroundColor: status ? 'green' : 'darkred'}"></view>
-					<text>{{status?$t('pressureSensor.BallPresent'):$t('pressureSensor.NoBall')}}</text>
-				</view>
-			</view>
-			<text class="remark-text">{{psRemark}}</text>
 			<view class="long-btn-view">
-				<button class="long-btn" @click="psButtonAction">{{isTesting ? psButton2 : psButton1}}</button>
+				<button class="long-btn" @click="cameraButtonAction">开始测试</button>
 			</view>
+			<text style="margin-top: 15px;">{{log}}</text>
 		</view>
 		<view style="padding: 20px 20px;" v-show="isShow">
 			<button style="color: #ffffff; background-color: #000000;" @click="next">{{$t('global.NextStep')}}</button>
@@ -36,14 +28,8 @@
 				title: "蓝牙" as string | null,
 				aceid: '',
 				isShow: true,
-				ps: 0 as number,
-				status: false,
-				isTesting: false,
-				psTitle: this.$t('pressureSensor.PressureSensor'),
-				psRemark: this.$t('pressureSensor.StartTest'),
-				psButton1: this.$t('global.StartDetection'),
-				psButton2: this.$t('pressureSensor.StopDetection'),
-				interval: 0,
+				cameraTitle: '摄像头图像检测',
+				log: ""
 			}
 		},
 
@@ -54,45 +40,30 @@
 		},
 
 		onHide() {
-			clearInterval(this.interval)
-			onSendCommand("pressure_test", "stop", "")
+
 		},
 
 		onUnload() {
-			clearInterval(this.interval)
-			onSendCommand("pressure_test", "stop", "")
-		},
-		methods: {
-			psButtonAction() {
-				this.isTesting = !this.isTesting
-				if (this.isTesting) {
-					//开启网球检测
-					onSendCommand("pressure_test", "tennis_test", "")
-					this.interval = setInterval(() => {
-						onSendCommand("pressure_test", "read", "", (res) => {
-							if (res["command"] == "pressure_test") {
-								this.ps = res["data"]["pressure"] ?? 0
-								this.status = this.ps > 200
-								if (this.ps > 200) {
-									//先取再更新
-									let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
-									if (Object.keys(model).length != 0) {
-										model.pressure = true
-										on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
-									}
-								}
-							}
-						})
 
-					}, 500);
-				} else {
-					onSendCommand("pressure_test", "stop", "")
-					clearInterval(this.interval)
-				}
+		},
+
+		methods: {
+			cameraButtonAction() {
+				onSendCommand("camera_snapshot", "snapshot", { "quality": 50 }, (res) => {
+					console.log(res)
+					this.log = JSON.stringify(res)
+
+					//先取再更新
+					let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
+					if (Object.keys(model).length != 0) {
+						model.snapshot = true
+						on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
+					}
+				})
 			},
 			next() {
 				uni.navigateTo({
-					url: `/pages/index/camera-snapshot?title=${this.title}&aceid=${this.aceid}`
+					url: `/pages/index/camera?title=${this.title}&aceid=${this.aceid}`
 				})
 			},
 			quit() {
@@ -152,19 +123,5 @@
 	.long-btn {
 		border-color: black;
 		border-width: 1px;
-	}
-
-	.status-view {
-		/* 水平居中 */
-		align-items: center;
-		/* 横向排列 */
-		flex-direction: row;
-	}
-
-	.status {
-		width: 20px;
-		height: 20px;
-		border-radius: 10px;
-		margin-right: 8px;
 	}
 </style>
