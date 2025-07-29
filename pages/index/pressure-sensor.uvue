@@ -94,7 +94,7 @@
 			},
 			next() {
 				uni.navigateTo({
-					url: `/pages/index/camera-snapshot?title=${this.title}&aceid=${this.aceid}`
+					url: `/pages/index/camera?title=${this.title}&aceid=${this.aceid}`
 				})
 			},
 			quit() {

@@ -8,23 +8,22 @@
 	<scroll-view class="page">
 		<view style="background-color: #ffffff; padding: 20px;">
 			<text class="title">{{cameraTitle}}</text>
-
-			<view class="image-view">
-				<text>左:</text>
-				<view :style="{'width': (windowWidth - 40), 'height':(windowWidth - 40)/1.5}" class="image">
-					<image style="width: 100%; height: 100%;" :src="left_image" mode="aspectFit"
-						@click="previewImage(0)"></image>
+			<view class="space-view">
+				<view>
+					<text>左</text>
+					<view :style="{'width': imageView_w, 'height':imageView_w/1.5}" class="image">
+						<image :style="{'width': image_w}" :src="imageList[0]" mode="widthFix" @click="previewImage(0)">
+						</image>
+					</view>
+				</view>
+				<view>
+					<text>右</text>
+					<view :style="{'width': imageView_w, 'height':imageView_w/1.5}" class="image">
+						<image :style="{'width': image_w}" :src="imageList[1]" mode="widthFix" @click="previewImage(1)">
+						</image>
+					</view>
 				</view>
 			</view>
-
-			<view class="image-view">
-				<text>右:</text>
-				<view :style="{'width': (windowWidth - 40), 'height':(windowWidth - 40)/1.5}" class="image">
-					<image style="width: 100%; height: 100%;" :src="right_image" mode="aspectFit"
-						@click="previewImage(1)"></image>
-				</view>
-			</view>
-
 			<text class="remark-text">{{cameraRemark}}</text>
 			<view class="long-btn-view">
 				<button class="long-btn" @click="cameraButtonAction">开始测试</button>
@@ -41,18 +40,28 @@
 	import { on_UTSupdateTestDetailsDB, on_fetchTestDetailsDB } from '@/uni_modules/ace-test-details'
 	import TDModel from '@/models/TDModel.uts'
 
+	import imageData from '@/image.json'
+
 	export default {
 		data() {
 			return {
 				title: "蓝牙" as string | null,
 				aceid: '',
 				isShow: true,
-				windowWidth: uni.getWindowInfo().windowWidth,
 				cameraTitle: '摄像头图像检测',
 				cameraRemark: '点击开始测试后，会接收设备左右摄像头拍摄的图像',
 				timeout: 0,
-				left_image: '',
-				right_image: ''
+				imageList: ['/static/image.png', '/static/image.png', '']
+			}
+		},
+
+		computed: {
+			imageView_w() : number {
+				return (uni.getWindowInfo().windowWidth - 50) / 2
+			},
+
+			image_w() : string {
+				return this.imageList.length == 2 ? '100%' : '30%'
 			}
 		},
 
@@ -68,6 +77,7 @@
 					title: '正在获取图像...',
 					mask: true
 				})
+				this.imageList = ['/static/image.png', '/static/image.png', '']
 
 				onSendCommand("camera_snapshot", "snapshot", { "quality": 50 }, (res) => {
 					uni.hideLoading();
@@ -81,9 +91,7 @@
 
 					if (status == "success") {
 						const data = res['data']
-						this.left_image = 'data:image/png;base64,' + data['left_image']
-						this.right_image = 'data:image/png;base64,' + data['right_image']
-
+						this.imageList = ['data:image/png;base64,' + data['left_image'], 'data:image/png;base64,' + data['right_image']]
 						//先取再更新
 						if (this.isShow) {
 							let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
@@ -111,41 +119,32 @@
 			},
 
 			previewImage(index : number) {
-				const imageList = [index == 0 ? this.left_image : this.right_image]
+				if (this.imageList.length != 2) {
+					return
+				}
 				uni.previewImage({
-					urls: imageList,
+					urls: this.imageList,
+					current: index,
 					indicator: "none",
+					indicator: "number",
+					loop: true,
 					longPressActions: ({
 						itemList: ["保存相册"],
 						success: (e : LongPressActionsSuccessResult) => {
-							this.saveBase64ToAlbum(imageList[e.index])
+							this.saveBase64ToAlbum(this.imageList[e.index])
 						}
 					} as LongPressActionsOptions)
 				})
 			},
 
 			saveBase64ToAlbum(base64Data) {
-				// 1. 确保base64数据格式正确
-				if (!base64Data.startsWith('data:image/')) {
-					return reject(new Error('无效的Base64图片格式'));
-				}
-				// 2. 提取图片类型和纯base64数据
-				const matches = base64Data.match(/^data:image\/(\w+);base64,(.+)$/);
-				if (!matches || matches.length < 3) {
-					return reject(new Error('Base64格式解析失败'));
-				}
-
-				const fileType = matches[1]; // png/jpeg等
-				const pureBase64 = matches[2];
-
-				// 3. 生成临时文件路径
-				const filePath = `${uni.env.USER_DATA_PATH}/temp_${Date.now()}.${fileType}`;
-
-				// 4. 写入文件（关键修正部分）
+				// 生成临时文件路径
+				const filePath = `${uni.env.USER_DATA_PATH}/temp_${Date.now()}.png`;
+				// 写入文件
 				uni.getFileSystemManager().writeFile({
 					filePath: filePath,
-					data: pureBase64,  // 直接使用纯base64数据
-					encoding: 'base64',  // 明确指定base64编码
+					data: base64Data.split('data:image/png;base64,').join(''),
+					encoding: 'base64',
 					success: (e) => {
 						uni.saveImageToPhotosAlbum({
 							filePath: filePath,
@@ -243,13 +242,11 @@
 		border-width: 1px;
 	}
 
-	.image-view {
-		margin-top: 15px;
-	}
-
 	.image {
 		margin-top: 10px;
+		align-items: center;
+		justify-content: center;
 		background-color: #f1f1f1;
-		border-radius: 5px;
+		border-radius: 10px;
 	}
 </style>

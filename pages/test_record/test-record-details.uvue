@@ -96,7 +96,8 @@
 			<text class="title">WiFi热点</text>
 			<view class="space-view">
 				<text>WiFi名称:</text>
-				<text>{{testDetails.wifi_name}}</text>
+				<text
+					:class="testDetails.wifi_name.length == 0 ? 'test-fall' : ''">{{testDetails.wifi_name.length != 0 ? testDetails.wifi_name : '无数据'}}</text>
 			</view>
 			<view class="space-view">
 				<text>WiFi连接:</text>

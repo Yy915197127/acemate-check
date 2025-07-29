@@ -6,7 +6,32 @@
 		</template>
 	</uni-navbar-lite>
 	<scroll-view class="page">
+
 		<view style="background-color: #ffffff; padding: 20px;">
+			<text class="title">{{cameraSnapshotTitle}}</text>
+			<view class="space-view">
+				<view>
+					<text>左</text>
+					<view :style="{'width': imageView_w, 'height':imageView_w/1.5}" class="image">
+						<image :style="{'width': image_w}" :src="imageList[0]" mode="widthFix" @click="previewImage(0)">
+						</image>
+					</view>
+				</view>
+				<view>
+					<text>右</text>
+					<view :style="{'width': imageView_w, 'height':imageView_w/1.5}" class="image">
+						<image :style="{'width': image_w}" :src="imageList[1]" mode="widthFix" @click="previewImage(1)">
+						</image>
+					</view>
+				</view>
+			</view>
+			<text class="remark-text">{{cameraSnapshotRemark}}</text>
+			<view class="long-btn-view">
+				<button class="long-btn" @click="cameraSnapshotButtonAction">开始测试</button>
+			</view>
+		</view>
+
+		<view style="background-color: #ffffff; padding: 20px; margin-top: 20px;">
 			<text class="title">{{cameraTitle}}</text>
 			<text class="remark-text">{{tennisRemark}}</text>
 			<view class="space-view">
@@ -38,13 +63,28 @@
 				height: 0 as number,
 				depth: 0 as number,
 				lr: 0 as number,
-				cameraTitle: '摄像头网球识别',
+				cameraTitle: '网球识别',
 				tennisRemark: this.$t('camera.Coordinates'),
 				cameraRemark: this.$t('camera.StartTest'),
 				cameraButton: this.$t('global.StartDetection'),
-				isCamera: true
+				isCamera: true,
+				cameraSnapshotTitle: '图像检测',
+				cameraSnapshotRemark: '点击开始测试后，会接收设备左右摄像头拍摄的图像',
+				timeout: 0,
+				imageList: ['/static/image.png', '/static/image.png', '']
 			}
 		},
+
+		computed: {
+			imageView_w() : number {
+				return (uni.getWindowInfo().windowWidth - 50) / 2
+			},
+
+			image_w() : string {
+				return this.imageList.length == 2 ? '100%' : '30%'
+			}
+		},
+
 
 		onLoad(query) {
 			this.title = query.title
@@ -61,6 +101,118 @@
 		},
 
 		methods: {
+			cameraSnapshotButtonAction() {
+				uni.showLoading({
+					title: '正在获取图像...',
+					mask: true
+				})
+				this.imageList = ['/static/image.png', '/static/image.png', '']
+
+				onSendCommand("camera_snapshot", "snapshot", { "quality": 50 }, (res) => {
+					uni.hideLoading();
+					clearTimeout(this.timeout)
+					const status = res['status']
+					const type = res['type']
+
+					if (type != "factory_test") {
+						return
+					}
+					if (status == "success") {
+						const data = res['data']
+						this.imageList = ['data:image/png;base64,' + data['left_image'], 'data:image/png;base64,' + data['right_image']]
+					} else {
+						uni.showToast({
+							title: '获取图像失败，errMsg：' + res['error'],
+							icon: "none"
+						})
+					}
+
+					//先取再更新
+					if (this.isShow) {
+						let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
+						if (Object.keys(model).length != 0) {
+							model.snapshot = status == "success"
+							on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
+						}
+					}
+				})
+
+				this.timeout = setTimeout(() => {
+					clearTimeout(this.timeout)
+					uni.hideLoading();
+					uni.showToast({
+						title: '获取图像失败，请重试',
+						icon: "none"
+					})
+				}, 20000);
+			},
+
+			previewImage(index : number) {
+				if (this.imageList.length != 2) {
+					return
+				}
+				uni.previewImage({
+					urls: this.imageList,
+					current: index,
+					indicator: "none",
+					indicator: "number",
+					loop: true,
+					longPressActions: ({
+						itemList: ["保存相册"],
+						success: (e : LongPressActionsSuccessResult) => {
+							this.saveBase64ToAlbum(this.imageList[e.index])
+						}
+					} as LongPressActionsOptions)
+				})
+			},
+
+			saveBase64ToAlbum(base64Data) {
+				// 生成临时文件路径
+				const filePath = `${uni.env.USER_DATA_PATH}/temp_${Date.now()}.png`;
+				// 写入文件
+				uni.getFileSystemManager().writeFile({
+					filePath: filePath,
+					data: base64Data.split('data:image/png;base64,').join(''),
+					encoding: 'base64',
+					success: (e) => {
+						uni.saveImageToPhotosAlbum({
+							filePath: filePath,
+							success: (e : SaveImageToPhotosAlbumSuccess) => {
+								uni.hideLoading();
+								uni.showToast({
+									position: "center",
+									icon: "none",
+									title: "保存成功，请到手机相册查看"
+								})
+
+								//删除缓存文件
+								const fileManager = uni.getFileSystemManager()
+								fileManager.unlink({
+									filePath: filePath
+								})
+							},
+							fail: (e : IUniError) => {
+								uni.hideLoading();
+								uni.showModal({
+									content: "导出失败，errCode：" + e.errCode + "，errMsg：" + e.errMsg + "，errSubject：" + e.errSubject,
+									showCancel: false
+								});
+
+								//删除缓存文件
+								const fileManager = uni.getFileSystemManager()
+								fileManager.unlink({
+									filePath: filePath
+								})
+							}
+						})
+
+					},
+					fail: (err) => {
+						console.error('写入临时文件失败:', err);
+					}
+				});
+			},
+
 			cameraButtonAction() {
 				this.isCamera = !this.isCamera
 				onSendCommand("camera_test", this.isCamera ? "stop" : "tennis_test", "", (res) => {
@@ -155,5 +307,13 @@
 	.long-btn {
 		border-color: black;
 		border-width: 1px;
+	}
+
+	.image {
+		margin-top: 10px;
+		align-items: center;
+		justify-content: center;
+		background-color: #f1f1f1;
+		border-radius: 10px;
 	}
 </style>

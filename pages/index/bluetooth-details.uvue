@@ -102,15 +102,13 @@
 					clearTimeout(this.timeout)
 
 					//先取再更新
-					if (this.isShow) {
-						let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
+					let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
+					console.log(model)
+					if (Object.keys(model).length != 0) {
+						model.rssi = this.rssi
+						model.sAndr = true
 						console.log(model)
-						if (Object.keys(model).length != 0) {
-							model.rssi = this.rssi
-							model.sAndr = true
-							console.log(model)
-							on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
-						}
+						on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
 					}
 				})
 				uni.showLoading({

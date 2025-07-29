@@ -1,8 +1,5 @@
 <template>
-	<uni-navbar-lite title="测试记录" :is-back="true" :nc-color="'#f1f1f1'">
-		<template v-slot:right>
-		</template>
-	</uni-navbar-lite>
+	<uni-navbar-lite title="测试记录" :is-back="true" :nc-color="'#f1f1f1'"></uni-navbar-lite>
 	<list-view :enable-back-to-top="true" class="page" :direction="direction" @scrolltolower="scrolltolower"
 		:lower-threshold="300" @scroll="scroll">
 		<list-item v-for="(details, index) in items" :key="index">
@@ -14,19 +11,17 @@
 				<view class="list-item" :style="{width:`${windowWidth}px`, padding: '10px 20px' } "
 					@click="testRecordDetails(details, index)">
 					<view class="space-view">
-						<view class="left">
+						<view>
 							<text style="font-size: 18;">设备: {{details.name}}</text>
 							<text style="font-size: 13; color: gray; margin-top: 10px;">测试时间:
 								{{details.createdTime}}</text>
 						</view>
-						<view class="right">
+						<view>
 							<text style="font-size: 16;"
 								:class="details.isSucceed ? 'test-succeed' : 'test-fall'">{{details.isSucceed ? '测试通过' : '测试异常'}}</text>
 						</view>
 					</view>
-
 				</view>
-
 				<!-- 删除按钮 -->
 				<view class="delete-btn" @click="handleDelete(details, index)">
 					<text style="color: white;">删除</text>
@@ -54,7 +49,7 @@
 				startY: 0,
 				offsetX: 0,
 				isSlid: false,
-				slidingDirection: null as null | 'horizontal' | 'vertical', // 用这个替代 isSliding
+				slidingDirection: null as null | 'horizontal' | 'vertical',
 				currentIndex: -1
 			};
 		},
@@ -172,7 +167,6 @@
 			},
 
 			handleDelete(details, index) {
-				console.log(index)
 				this.items.splice(index, 1)
 				this.offsetX = 0
 				this.currentIndex = -1

@@ -60,13 +60,13 @@
 				"navigationStyle": "custom"
 			}
 		},
-		{
-			//摄像头快照
-			"path": "pages/index/camera-snapshot",
-			"style": {
-				"navigationStyle": "custom"
-			}
-		},
+		// {
+		// 	//摄像头快照
+		// 	"path": "pages/index/camera-snapshot",
+		// 	"style": {
+		// 		"navigationStyle": "custom"
+		// 	}
+		// },
 		{
 			//摄像头
 			"path": "pages/index/camera",
