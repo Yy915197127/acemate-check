@@ -9,6 +9,6 @@
 		<key>NSLocalNetworkUsageDescription</key>
 		<string>检验设备WiFi需开启本地网络功能</string>
 		<key>NSPhotoLibraryAddUsageDescription</key>
-		<string>导出检验设备记录需开启添加相册功能</string>
+		<string>检验设备需开启添加相册功能</string>
 	</dict>
 </plist>

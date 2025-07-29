@@ -78,11 +78,13 @@
 							this.status = status
 
 							//先取再更新
-							let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
-							if (Object.keys(model).length != 0) {
-								model.wifi_name = this.wifiname
-								model.wifi = status
-								on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
+							if (this.isShow) {
+								let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
+								if (Object.keys(model).length != 0) {
+									model.wifi_name = this.wifiname
+									model.wifi = status
+									on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
+								}
 							}
 
 							uni.hideLoading();
@@ -97,7 +99,7 @@
 
 			quit() {
 				//退出工厂模式
-				//onSendCommand("", "stop", "");
+				onSendCommand("", "stop", "");
 				uni.navigateBack({
 					delta: 100,
 					animationType: "slide-out-bottom"

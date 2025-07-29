@@ -85,7 +85,7 @@
 			//全局测试记录列表
 			"path": "pages/test_record/test-record-list",
 			"style": {
-				"navigationBarTitleText": "测试记录"
+				"navigationStyle": "custom"
 			}
 		},
 		{

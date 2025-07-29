@@ -1,4 +1,8 @@
 <template>
+	<uni-navbar-lite title="测试记录" :is-back="true" :nc-color="'#f1f1f1'">
+		<template v-slot:right>
+		</template>
+	</uni-navbar-lite>
 	<list-view :enable-back-to-top="true" class="page" :direction="direction" @scrolltolower="scrolltolower"
 		:lower-threshold="300" @scroll="scroll">
 		<list-item v-for="(details, index) in items" :key="index">
@@ -49,8 +53,9 @@
 				startX: 0,
 				startY: 0,
 				offsetX: 0,
-				isSliding: false,
-				currentIndex: -1,
+				isSlid: false,
+				slidingDirection: null as null | 'horizontal' | 'vertical', // 用这个替代 isSliding
+				currentIndex: -1
 			};
 		},
 
@@ -98,64 +103,72 @@
 			},
 
 			touchStart(e, index) {
-				if (this.offsetX != 0 && this.currentIndex != index) {
+				if (this.currentIndex !== -1 && this.currentIndex !== index) {
 					this.offsetX = 0
 					this.currentIndex = -1
 				}
+
 				this.currentIndex = index
 				this.startX = e.touches[0].clientX
 				this.startY = e.touches[0].clientY
+				this.slidingDirection = null
+				this.isSlid = this.startX > 50//防止右滑返回手势冲突
 			},
-
 			touchMove(e, index) {
-				if (this.currentIndex !== index) return
+				if (this.currentIndex !== index || !this.isSlid) return
 
 				const touchX = e.touches[0].clientX
 				const touchY = e.touches[0].clientY
 				const deltaX = touchX - this.startX
 				const deltaY = touchY - this.startY
 
-				// 判断是否是水平滑动（防止上下滑动误触）
-				if (!this.isSliding) {
-					// 如果垂直滑动距离大于水平滑动距离，则不处理
-					if (Math.abs(deltaY) > Math.abs(deltaX)) {
+				if (this.slidingDirection === null) {
+					const threshold = 10
+
+					if (Math.abs(deltaX) > threshold || Math.abs(deltaY) > threshold) {
+						if (Math.abs(deltaX) > Math.abs(deltaY)) {
+							this.slidingDirection = 'horizontal'
+							this.direction = 'none'
+						} else {
+							this.slidingDirection = 'vertical'
+							this.direction = 'vertical'
+							if (this.offsetX !== 0) {
+								this.offsetX = 0
+								this.currentIndex = -1
+							}
+							return
+						}
+					} else {
 						return
 					}
-					this.isSliding = true
 				}
 
-				// 限制左右滑动范围
-				if (deltaX > 0) {
-					// 向右滑动，最多回到原位
-					this.offsetX = Math.min(0, this.offsetX + deltaX)
-				} else {
-					// 向左滑动，最多滑动80px（删除按钮宽度）
-					this.offsetX = Math.max(-80, this.offsetX + deltaX)
-				}
+				if (this.slidingDirection === 'horizontal') {
+					e.preventDefault()
 
-				this.startX = touchX
-				this.startY = touchY
-				this.direction = "none"
+					let newOffsetX = this.offsetX + deltaX * 0.5
+					newOffsetX = Math.max(-80, Math.min(0, newOffsetX))
+
+					this.offsetX = newOffsetX
+					this.startX = touchX
+					this.startY = touchY
+				}
 			},
 
 			touchEnd(e, index) {
 				if (this.currentIndex !== index) return
 
-				// 只有确实进行了水平滑动才处理
-				if (this.isSliding) {
-					// 根据滑动距离决定是显示还是隐藏删除按钮
+				if (this.slidingDirection === 'horizontal') {
 					if (this.offsetX < -40) {
-						// 超过一半，完全显示删除按钮
 						this.offsetX = -80
 					} else {
-						// 未超过一半，恢复原位
 						this.offsetX = 0
 						this.currentIndex = -1
 					}
-					this.direction = "vertical"
-					this.isSliding = false
 				}
 
+				this.direction = "vertical"
+				this.slidingDirection = null
 			},
 
 			handleDelete(details, index) {
@@ -166,7 +179,7 @@
 				on_deleteTestDetailsDB(details.id)
 			},
 
-		}
+		},
 	}
 </script>
 

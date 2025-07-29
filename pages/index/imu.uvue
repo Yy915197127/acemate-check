@@ -154,11 +154,13 @@
 						this.HighGTestResultText = this.highGTestResult ? this.$t('imu.Normal') : abnormalAx + abnormalAy + abnormalAz + "数据异常"
 
 						//先取再更新
-						let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
-						if (Object.keys(model).length != 0) {
-							model.highG = this.highGTestResult
-							model.HighG_remark = this.highGTestResult ? '' : this.HighGTestResultText
-							on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
+						if (this.isShow) {
+							let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
+							if (Object.keys(model).length != 0) {
+								model.highG = this.highGTestResult
+								model.HighG_remark = this.highGTestResult ? '' : this.HighGTestResultText
+								on_UTSupdateTestDetailsDB(this.aceid, JSON.stringify(model))
+							}
 						}
 					}
 				}, 1000)
@@ -207,7 +209,7 @@
 			},
 			quit() {
 				//退出工厂模式
-				//onSendCommand("", "stop", "");
+				onSendCommand("", "stop", "");
 				uni.navigateBack({
 					delta: 100,
 					animationType: "slide-out-bottom"
