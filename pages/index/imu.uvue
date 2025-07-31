@@ -6,7 +6,7 @@
 		</template>
 	</uni-navbar-lite>
 	<scroll-view class="page">
-		<view style="background-color: #ffffff; padding: 20px;">
+		<view class="module-view">
 			<text class="title">{{HighGTitle}}</text>
 			<text class="remark-text">{{HighGRemark}}</text>
 			<view class="space-view">
@@ -23,7 +23,7 @@
 			</view>
 		</view>
 
-		<view style="background-color: #ffffff; padding: 20px; margin-top: 20px;">
+		<view class="module-view" style="margin-top: 20px;">
 			<text class="title">{{gyroscopeTitle}}</text>
 			<text class="remark-text">{{gyroscopeRemark}}</text>
 			<view class="space-view">
@@ -224,6 +224,12 @@
 		flex: 1;
 		background-color: $uni-bg-color-hover;
 		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.module-view {
+		background-color: #ffffff;
+		padding: 20px;
+		width: 100%;
 	}
 
 	.title {

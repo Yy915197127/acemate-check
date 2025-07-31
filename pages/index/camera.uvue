@@ -7,7 +7,7 @@
 	</uni-navbar-lite>
 	<scroll-view class="page">
 
-		<view style="background-color: #ffffff; padding: 20px;">
+		<view class="module-view">
 			<text class="title">{{cameraSnapshotTitle}}</text>
 			<view class="space-view">
 				<view>
@@ -31,7 +31,7 @@
 			</view>
 		</view>
 
-		<view style="background-color: #ffffff; padding: 20px; margin-top: 20px;">
+		<view class="module-view" style="margin-top: 20px;">
 			<text class="title">{{cameraTitle}}</text>
 			<text class="remark-text">{{tennisRemark}}</text>
 			<view class="space-view">
@@ -109,6 +109,12 @@
 				this.imageList = ['/static/image.png', '/static/image.png', '']
 
 				onSendCommand("camera_snapshot", "snapshot", { "quality": 50 }, (res) => {
+					console.log(res)
+
+					if (res['command'] === 'camera_test') {
+						return
+					}
+
 					uni.hideLoading();
 					clearTimeout(this.timeout)
 					const status = res['status']
@@ -267,6 +273,12 @@
 		flex: 1;
 		background-color: $uni-bg-color-hover;
 		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.module-view {
+		background-color: #ffffff;
+		padding: 20px;
+		width: 100%;
 	}
 
 	.title {

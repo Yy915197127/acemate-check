@@ -1,0 +1,77 @@
+import { UISlider, UIControl, UIColor, UIImpactFeedbackGenerator } from "UIKit"
+import { CGFloat } from 'CoreFoundation'
+import { Float } from 'Swift'
+import { Selector } from 'ObjectiveC';
+
+export class NativeSlider {
+
+	element : UniNativeViewElement;
+	slider : UISlider | null;
+	lastNotifiedStep : number = -1;
+
+	constructor(element : UniNativeViewElement) {
+		// 接收组件传递过来的UniNativeViewElement
+		this.element = element;
+		super.init()
+		this.bindView();
+	}
+
+	// element 绑定原生view
+	bindView() {
+		// 初始化原生 UISlider
+		this.slider = new UISlider()
+		this.slider!.minimumTrackTintColor = new UIColor(red = new CGFloat(144 / 255.0), green = new CGFloat(225 / 255.0), blue = new CGFloat(116 / 255.0), alpha = 1.0)
+		// 构建方法选择器
+		const method1 = new Selector("sliderValueChanged:")
+		slider?.addTarget(this, action = method1, for = UIControl.Event.valueChanged)
+
+		const method2 = new Selector("sliderTouchUpInside:")
+		slider?.addTarget(this, action = method2, for = UIControl.Event.touchUpInside)
+		// UniNativeViewElement 绑定原生 view
+		this.element.bindIOSView(this.slider!);
+	}
+
+	updateValue(min : Float, max : Float, value : Float) {
+		this.slider!.minimumValue = min
+		this.slider!.maximumValue = max
+		this.slider!.value = value
+	}
+
+	/**
+	 * 滑块拖动回调方法
+	 * 在 swift 中，所有target-action (例如按钮的点击事件，NotificationCenter 的通知事件等)对应的 action 函数前面都要使用 @objc 进行标记。
+	 */
+	@objc sliderValueChanged(sender : UISlider) {
+		this.setSliderMV(sender)
+		//构建自定义 UniNativeViewEvent 对象
+		let event = new UniNativeViewEvent("sliderValueChanged", { "value": sender.value })
+		//触发自定义事件
+		this.element.dispatchEvent(event)
+	}
+
+	@objc sliderTouchUpInside(sender : UISlider) {
+		//构建自定义 UniNativeViewEvent 对象
+		let event = new UniNativeViewEvent("sliderTouchUpInside", { "value": sender.value })
+		//触发自定义事件
+		this.element.dispatchEvent(event)
+	}
+
+	setSliderMV(sender : UISlider) {
+		let rounded = Math.round(Number.from(sender.value));
+		sender.value = new Float(rounded)
+		if (rounded != this.lastNotifiedStep) {
+			if (UTSiOS.available("iOS 13.0, *")) {
+				// 触觉反馈
+				let generator = new UIImpactFeedbackGenerator(style = UIImpactFeedbackGenerator.FeedbackStyle.rigid)
+				generator.impactOccurred()
+				generator.prepare()
+				this.lastNotifiedStep = rounded
+			}
+		}
+	}
+
+	destroy() {
+		// 释放 UTS 实例对象，避免内存泄露
+		UTSiOS.destroyInstance(this)
+	}
+}

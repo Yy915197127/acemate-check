@@ -6,7 +6,7 @@
 		</template>
 	</uni-navbar-lite>
 	<scroll-view class="page">
-		<view style="background-color: #ffffff; padding: 20px;">
+		<view class="module-view">
 			<text class="title">{{turntableTitle}}</text>
 			<view class="space-view">
 				<button class="btn" v-for="(name, index) in turntable" :key="index"
@@ -19,7 +19,7 @@
 			</view>
 		</view>
 
-		<view style="background-color: #ffffff; padding: 20px; margin-top: 20px;">
+		<view class="module-view" style="margin-top: 20px;">
 			<text class="title">{{cabinDoorTitle}}</text>
 			<view class="space-view">
 				<button style="padding: 0;" class="btn"
@@ -34,7 +34,7 @@
 			</view>
 		</view>
 
-		<view style="background-color: #ffffff; padding: 20px; margin-top: 20px;">
+		<view class="module-view" style="margin-top: 20px;">
 			<text class="title">{{pitchingTitle}}</text>
 			<view class="space-view">
 				<text class="remark-text">{{$t('steeringEngine.ServeElevationAngle')}}</text>
@@ -95,7 +95,6 @@
 			});
 
 			uni.$on('result-dialog', (res : UTSJSONObject) => {
-
 				//先取再更新
 				if (this.isShow) {
 					let model = new TDModel(on_fetchTestDetailsDB(this.aceid))
@@ -211,7 +210,8 @@
 
 			next() {
 				uni.openDialogPage({
-					url: "/pages/dialog-page/result-dialog"
+					url: "/pages/dialog-page/result-dialog",
+					animationType: "fade-in"
 				})
 			},
 			quit() {
@@ -231,6 +231,12 @@
 		flex: 1;
 		background-color: $uni-bg-color-hover;
 		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.module-view {
+		background-color: #ffffff;
+		padding: 20px;
+		width: 100%;
 	}
 
 	.title {

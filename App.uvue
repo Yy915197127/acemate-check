@@ -58,7 +58,6 @@
 									})
 
 									this.timeout = setTimeout(() => {
-										clearTimeout(this.timeout)
 										reconnectStatus = 1
 										uni.hideLoading();
 										onDisconnectPeripheral()

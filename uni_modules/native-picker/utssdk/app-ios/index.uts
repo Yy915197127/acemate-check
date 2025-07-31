@@ -1,0 +1,62 @@
+import { UIPickerView, UIPickerViewDataSource, UIPickerViewDelegate } from "UIKit"
+import { CGFloat } from 'CoreFoundation'
+import { Int } from 'Swift'
+export class NativePicker implements UIPickerViewDataSource, UIPickerViewDelegate {
+	element : UniNativeViewElement;
+	picker : UIPickerView | null;
+	// 数据模型
+	data : Array<string> = [];
+
+	constructor(element : UniNativeViewElement) {
+		// 接收组件传递过来的UniNativeViewElement
+		this.element = element;
+		super.init();
+		this.bindView();
+	}
+
+	// element 绑定原生view
+	bindView() {
+		// 初始化原生 UIPickerView
+		this.picker = new UIPickerView()
+		this.picker!.dataSource = this
+		this.picker!.delegate = this
+		// UniNativeViewElement 绑定原生 view
+		this.element.bindIOSView(this.picker!);
+	}
+
+	updateProps(data : Array<string>, row : Int) {
+		this.data = data
+		this.picker!.reloadAllComponents()
+		this.picker!.selectRow(row, inComponent = 0, animated = false)
+	}
+
+	destroy() {
+		// 释放 UTS 实例对象，避免内存泄露
+		UTSiOS.destroyInstance(this)
+	}
+
+	numberOfComponents(@argumentLabel("in") pickerView : UIPickerView) : Int {
+		return 1
+	}
+
+	pickerView(param1 : UIPickerView, @argumentLabel("numberOfRowsInComponent") component : Int) : Int {
+		return this.data.length
+	}
+
+	pickerView(param1 : UIPickerView, @argumentLabel("rowHeightForComponent") component : Int) : CGFloat {
+		return new CGFloat(50)
+	}
+
+	pickerView(param1 : UIPickerView, @argumentLabel("titleForRow") row : Int, @argumentLabel("forComponent") component : Int) : string {
+		return this.data[row]
+	}
+
+	pickerView(param1 : UIPickerView, @argumentLabel("didSelectRow") row : Int, @argumentLabel("inComponent") component : Int) : void {
+		//构建自定义 UniNativeViewEvent 对象
+		let event = new UniNativeViewEvent("didSelectRow", { "row": row })
+		//触发自定义事件
+		this.element.dispatchEvent(event)
+	}
+
+
+}

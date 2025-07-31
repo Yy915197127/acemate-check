@@ -6,7 +6,7 @@
 		</template>
 	</uni-navbar-lite>
 	<scroll-view class="page">
-		<view style="background-color: #ffffff; padding: 20px;">
+		<view class="module-view">
 			<text class="title">{{cameraTitle}}</text>
 			<view class="space-view">
 				<view>
@@ -206,6 +206,12 @@
 		flex: 1;
 		background-color: $uni-bg-color-hover;
 		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.module-view {
+		background-color: #ffffff;
+		padding: 20px;
+		width: 100%;
 	}
 
 	.title {

@@ -6,7 +6,7 @@
 	</uni-navbar-lite>
 
 	<view class="page">
-		<view style="background-color: #ffffff; padding: 20px;">
+		<view class="module-view">
 			<view class="space-view">
 				<text class="title">{{rssiTitle}}</text>
 				<text>{{rssi}}db</text>
@@ -14,7 +14,7 @@
 			<text style="font-size: 13; color: gray; margin-top: 15px;">{{rssiRemark}}</text>
 		</view>
 
-		<view style="background-color: #ffffff; padding: 20px; margin-top: 20px;">
+		<view class="module-view" style="margin-top: 20px;">
 			<text class="title">{{receiveSendDataTitle}}</text>
 			<view class="space-view send-data-view">
 				<text>{{sendDataTitle}}</text>
@@ -145,6 +145,12 @@
 	.page {
 		flex: 1;
 		background-color: $uni-bg-color-hover;
+	}
+
+	.module-view {
+		background-color: #ffffff;
+		padding: 20px;
+		width: 100%;
 	}
 
 	.title {

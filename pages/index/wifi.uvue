@@ -6,7 +6,7 @@
 		</template>
 	</uni-navbar-lite>
 	<scroll-view class="page">
-		<view style="background-color: #ffffff; padding: 20px;">
+		<view class="module-view">
 			<text class="title">{{wifiTitle}}</text>
 			<view class="space-view">
 				<text>{{$t('WiFi.WiFiName')+wifiname}}</text>
@@ -114,6 +114,12 @@
 		flex: 1;
 		background-color: $uni-bg-color-hover;
 		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.module-view {
+		background-color: #ffffff;
+		padding: 20px;
+		width: 100%;
 	}
 
 	.title {

@@ -38,7 +38,8 @@
 					"xxxhdpi": ""
 				}
 			}
-		}
+		},
+		"defaultAppTheme": "light"
 	},
 	"web": {
 		"router": {

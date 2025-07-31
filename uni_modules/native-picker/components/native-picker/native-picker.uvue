@@ -1,0 +1,43 @@
+<template>
+	<native-view style="height: 100%; width: 100%;" @init="onviewinit" @didSelectRow="change"></native-view>
+</template>
+<script setup lang="uts">
+	//引入 Nativepicker 原生对象
+	import { NativePicker } from "@/uni_modules/native-picker";
+	let picker : NativePicker | null = null
+
+	//声明属性
+	const props = defineProps<{
+		data : Array<string>,
+		row : Int
+	}>()
+
+	//监听属性变化
+	watchEffect(() => {
+		picker?.updateProps(props.data, props.row)
+	})
+
+	//声明事件
+	const emit = defineEmits<{
+		(e : "change", event : UniNativeViewEvent) : void
+	}>()
+
+	//native-view初始化时触发此方法
+	function onviewinit(e : UniNativeViewInitEvent) {
+		picker = new NativePicker(e.detail.element);
+		picker?.updateProps(props.data, props.row)
+	}
+
+	function change(e : UniNativeViewEvent) {
+		emit("change", e)
+	}
+
+	function onUnmounted() {
+		// iOS平台需要主动释放 uts 实例
+		picker?.destroy()
+	}
+</script>
+
+<style>
+
+</style>

@@ -1,0 +1,51 @@
+<template>
+	<native-view style="height: 100px; width: 100%;" @init="onviewinit" @sliderValueChanged="changing"
+		@sliderTouchUpInside="change"></native-view>
+</template>
+<script setup lang="uts">
+	//引入 NativeSlider 原生对象
+	import { NativeSlider } from "@/uni_modules/native-slider";
+	let slider : NativeSlider | null = null
+
+	//声明属性
+	const props = defineProps<{
+		min : Float,
+		max : Float,
+		value : Float
+	}>()
+
+	//声明事件
+	const emit = defineEmits<{
+		(e : "change", event : UniNativeViewEvent) : void,
+		(e : "changing", event : UniNativeViewEvent) : void
+	}>()
+
+	//监听属性变化
+	watchEffect(() => {
+		slider?.updateValue(props.min, props.max, props.value)
+	})
+
+	//native-view初始化时触发此方法
+	function onviewinit(e : UniNativeViewInitEvent) {
+		//获取UniNativeViewElement 传递给NativeSlider对象
+		slider = new NativeSlider(e.detail.element);
+		slider?.updateValue(props.min, props.max, props.value)
+	}
+
+	function changing(e : UniNativeViewEvent) {
+		emit("changing", e)
+	}
+
+	function change(e : UniNativeViewEvent) {
+		emit("change", e)
+	}
+
+	function onUnmounted() {
+		// iOS平台需要主动释放 uts 实例
+		slider?.destroy()
+	}
+</script>
+
+<style>
+
+</style>

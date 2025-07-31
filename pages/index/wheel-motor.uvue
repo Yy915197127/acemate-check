@@ -6,7 +6,7 @@
 		</template>
 	</uni-navbar-lite>
 	<view class="page">
-		<view style="background-color: #ffffff; padding: 20px;">
+		<view class="module-view">
 			<text class="title">{{wheelMotorTitle}}</text>
 
 			<view class="space-view">
@@ -168,6 +168,12 @@
 	.page {
 		flex: 1;
 		background-color: $uni-bg-color-hover;
+	}
+
+	.module-view {
+		background-color: #ffffff;
+		padding: 20px;
+		width: 100%;
 	}
 
 	.title {
