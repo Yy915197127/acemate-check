@@ -1,0 +1,108 @@
+<template>
+	<view id="dialog1" class="dialog-container">
+		<view class="dialog-content">
+			<text class="title">{{title}}</text>
+			<text class="remark-text">{{remarkText}}</text>
+			<native-picker style="height: 150px; width: 100%;" :data="pickerData" :row="row"
+				@change="pickerChange"></native-picker>
+			<view class="space-view">
+				<button class="cancel-btn" @click="cancel">取消</button>
+				<button class="save-btn" @click="save">确定</button>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+	const dataArr = Array.from({ length: 41 }, (_, i) => 20 - i)
+	export default {
+		data() {
+			return {
+				title: '',
+				remarkText: '观察舵机当前位置，如若未居中请调整偏移角度，使舵机位置居中',
+				offsetInfo: UTSJSONObject,
+				pickerData: dataArr.map(num => num.toString() + '°'),
+				row: 0,
+				offset: 0
+			};
+		},
+
+		onLoad(query) {
+			this.offsetInfo = JSON.parse(query.obj)
+			this.title = this.offsetInfo.title
+			this.row = dataArr.indexOf(this.offsetInfo.offset)
+		},
+
+		methods: {
+			pickerChange(e) {
+				this.offsetInfo.offset = dataArr[e.detail.row]
+			},
+			cancel() {
+				uni.closeDialogPage()
+			},
+			save() {
+				uni.$emit('offset-dialog', this.offsetInfo)
+				uni.closeDialogPage()
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.dialog-container {
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.3);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.dialog-content {
+		width: 300px;
+		padding: 20px;
+		background-color: #fff;
+		border-radius: 20px;
+		display: flex;
+		align-items: center;
+	}
+
+	.title {
+		color: black;
+		font-size: 18;
+		font-weight: bold;
+	}
+
+	.remark-text {
+		font-size: 13;
+		line-height: 1.4;
+		color: gray;
+		margin-top: 15px;
+	}
+
+	.space-view {
+		width: 100%;
+		/* 水平居中 */
+		align-items: center;
+		/* 横向排列 */
+		flex-direction: row;
+		/* 两端布局 */
+		justify-content: space-between;
+	}
+
+	.cancel-btn {
+		width: 110px;
+		background-color: white;
+		color: black;
+		border-width: 1px;
+		border-color: black;
+		margin-top: 10px;
+	}
+
+	.save-btn {
+		width: 110px;
+		background-color: black;
+		color: white;
+		margin-top: 10px;
+	}
+</style>

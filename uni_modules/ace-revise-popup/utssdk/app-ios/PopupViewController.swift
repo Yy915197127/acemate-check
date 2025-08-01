@@ -87,7 +87,6 @@ class PopupViewController: UIViewController, UIPickerViewDataSource, UIPickerVie
         pickerView.dataSource = self
         pickerView.delegate = self
         titleLabel.text = reviseInfo.title
-        // row = 30 - Int(truncating: reviseInfo.offset)
         if let index = data.firstIndex(of: Int(reviseInfo.offset)) {
             row = index
         }

@@ -83,7 +83,7 @@
 						title: '连接超时！',
 						icon: 'error'
 					})
-				}, 20000);
+				}, 15000);
 
 				onConnectDevice(name, (status) => {
 					uni.hideLoading();

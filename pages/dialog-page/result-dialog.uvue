@@ -2,23 +2,23 @@
 	<view id="dialog1" class="dialog-container">
 		<view class="dialog-content">
 			<text class="title">{{title}}</text>
-			<view class="space-view">
+			<view class="module-view">
 				<text>转盘舵机: </text>
-				<radio-group @change="feeder_rotateChange" style="flex-direction: row;">
+				<radio-group @change="feeder_rotateChange" style="flex-direction: row; margin-left: 10px;">
 					<radio value="1" activeBackgroundColor="#90E174" style="margin-right: 10px">正常</radio>
 					<radio value="0" activeBackgroundColor="#dd524d">异常</radio>
 				</radio-group>
 			</view>
-			<view class="space-view">
+			<view class="module-view">
 				<text>舱门舵机: </text>
-				<radio-group @change="door_latchChange" style="flex-direction: row;">
+				<radio-group @change="door_latchChange" style="flex-direction: row; margin-left: 10px;">
 					<radio value="1" activeBackgroundColor="#90E174" style="margin-right: 10px">正常</radio>
 					<radio value="0" activeBackgroundColor="#dd524d">异常</radio>
 				</radio-group>
 			</view>
-			<view class="space-view">
+			<view class="module-view">
 				<text>俯仰舵机: </text>
-				<radio-group @change="launcher_pitchChange" style="flex-direction: row;">
+				<radio-group @change="launcher_pitchChange" style="flex-direction: row; margin-left: 10px;">
 					<radio value="1" activeBackgroundColor="#90E174" style="margin-right: 10px">正常</radio>
 					<radio value="0" activeBackgroundColor="#dd524d">异常</radio>
 				</radio-group>
@@ -81,10 +81,10 @@
 	}
 
 	.dialog-content {
-		width: 80%;
+		width: 300px;
 		padding: 20px;
 		background-color: #fff;
-		border-radius: 6px;
+		border-radius: 20px;
 		display: flex;
 		align-items: center;
 	}
@@ -103,8 +103,16 @@
 		margin-top: 15px;
 	}
 
+	.module-view {
+		/* 水平居中 */
+		align-items: center;
+		/* 横向排列 */
+		flex-direction: row;
+		margin-top: 15px;
+	}
+
 	.space-view {
-		width: 80%;
+		width: 100%;
 		/* 水平居中 */
 		align-items: center;
 		/* 横向排列 */
@@ -115,6 +123,7 @@
 	}
 
 	.cancel-btn {
+		width: 110px;
 		background-color: white;
 		color: black;
 		border-width: 1px;
@@ -123,6 +132,7 @@
 	}
 
 	.save-btn {
+		width: 110px;
 		background-color: black;
 		color: white;
 		margin-top: 10px;

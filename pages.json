@@ -1,5 +1,12 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		// {
+		// 	//舵机
+		// 	"path": "pages/index/steering-engine",
+		// 	"style": {
+		// 		"navigationStyle": "custom"
+		// 	}
+		// },
 		{
 			"path": "pages/index/index",
 			"style": {
@@ -47,11 +54,12 @@
 			}
 		},
 		{
+			//舵机偏移量校正弹窗
+			"path": "pages/dialog-page/offset-dialog"
+		},
+		{
 			//舵机测试结果弹窗
-			"path": "pages/dialog-page/result-dialog",
-			"style": {
-				"navigationBarTitleText": ""
-			}
+			"path": "pages/dialog-page/result-dialog"
 		},
 		{
 			//压力传感器
