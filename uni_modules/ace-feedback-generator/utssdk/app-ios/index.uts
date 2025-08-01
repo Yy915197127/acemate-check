@@ -1,0 +1,15 @@
+import { UIImpactFeedbackGenerator } from "UIKit"
+
+export class FeedbackGenerator {
+	private generator : UIImpactFeedbackGenerator
+
+	constructor() {
+		// 触觉反馈
+		this.generator = new UIImpactFeedbackGenerator(style = UIImpactFeedbackGenerator.FeedbackStyle.medium)
+	}
+
+	start() {
+		this.generator.impactOccurred()
+		this.generator.prepare()
+	}
+}

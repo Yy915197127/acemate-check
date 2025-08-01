@@ -8,49 +8,58 @@
 	<scroll-view class="page">
 		<view class="module-view">
 			<text class="title">{{turntableTitle}}</text>
-			<view class="space-view">
-				<button class="btn" v-for="(name, index) in turntable" :key="index"
-					@click="turntableBut(name)">{{name}}°</button>
-			</view>
-			<view class="long-btn-view">
-				<text class="remark-text">{{$t('steeringEngine.Offset')+turntableOffset}}°</text>
-				<button style="width: 50px; padding: 0; margin-left: 10px;" class="btn" size="mini"
-					@click="turntableRevise">{{$t('steeringEngine.Calibrate')}}</button>
+			<view style="padding: 0 5px;">
+				<view class="space-view">
+					<button class="btn" v-for="(name, index) in turntable" :key="index"
+						@click="turntableBut(name)">{{name}}°</button>
+				</view>
+				<view class="long-btn-view">
+					<text class="remark-text">{{$t('steeringEngine.Offset')+turntableOffset}}°</text>
+					<button style="width: 50px; padding: 0; margin-left: 10px;" class="btn" size="mini"
+						@click="turntableRevise">{{$t('steeringEngine.Calibrate')}}</button>
+				</view>
 			</view>
 		</view>
 
 		<view class="module-view" style="margin-top: 20px;">
 			<text class="title">{{cabinDoorTitle}}</text>
-			<view class="space-view">
-				<button style="padding: 0;" class="btn"
-					@click="cabinDoorClose">{{$t('steeringEngine.CloseHatch')}}</button>
-				<button style="padding: 0;" class="btn"
-					@click="cabinDoorOpen">{{$t('steeringEngine.OpenHatch')}}</button>
-			</view>
-			<view class="long-btn-view">
-				<text class="remark-text">{{$t('steeringEngine.Offset')+cabinDoorOffset}}°</text>
-				<button style="width: 50px; padding: 0; margin-left: 10px;" class="btn" size="mini"
-					@click="cabinDoorRevise">{{$t('steeringEngine.Calibrate')}}</button>
+			<view style="padding: 0 5px;">
+				<view class="space-view">
+					<button style="padding: 0;" class="btn"
+						@click="cabinDoorClose">{{$t('steeringEngine.CloseHatch')}}</button>
+					<button style="padding: 0;" class="btn"
+						@click="cabinDoorOpen">{{$t('steeringEngine.OpenHatch')}}</button>
+				</view>
+				<view class="long-btn-view">
+					<text class="remark-text">{{$t('steeringEngine.Offset')+cabinDoorOffset}}°</text>
+					<button style="width: 50px; padding: 0; margin-left: 10px;" class="btn" size="mini"
+						@click="cabinDoorRevise">{{$t('steeringEngine.Calibrate')}}</button>
+				</view>
 			</view>
 		</view>
 
 		<view class="module-view" style="margin-top: 20px;">
 			<text class="title">{{pitchingTitle}}</text>
-			<view class="space-view">
-				<text class="remark-text">{{$t('steeringEngine.ServeElevationAngle')}}</text>
-				<text class="">{{angle}}°</text>
-			</view>
-			<slider style="margin: 0 5px;" :min="22" :max="157" :step="1" :block-size="25"
-				activeBackgroundColor="#90E174" foreColor="#f1f1f1" :value="angle" @changing="angleSliderChangeing"
-				@change="angleSliderChange" />
-			<view class="space-view">
-				<button style="padding: 0; width: 140px;" class="btn" @click="pitchingHighest">最高角度测试</button>
-				<button style="padding: 0; width: 140px;" class="btn" @click="pitchingLowest">最低角度测试</button>
-			</view>
-			<view class="long-btn-view">
-				<text class="remark-text">{{$t('steeringEngine.Offset')+pitchingOffset}}°</text>
-				<button style="width: 50px; padding: 0; margin-left: 10px;" class="btn" size="mini"
-					@click="pitchingRevise">{{$t('steeringEngine.Calibrate')}}</button>
+			<view style="padding: 0 5px;">
+				<view class="space-view">
+					<text class="remark-text">{{$t('steeringEngine.ServeElevationAngle')}}</text>
+					<text class="">{{angle}}°</text>
+				</view>
+				<!-- <slider style="margin: 0 5px;" :min="22" :max="157" :step="1" :block-size="25"
+					activeBackgroundColor="#90E174" foreColor="#f1f1f1" :value="angle" @changing="angleSliderChangeing"
+					@change="angleSliderChange" /> -->
+
+				<native-slider style="overflow: visible;" :min="22" :max="157" :value="angle"
+					@changing="angleSliderChangeing" @change="angleSliderChange"></native-slider>
+				<view class="space-view">
+					<button style="padding: 0; width: 140px;" class="btn" @click="pitchingHighest">最高角度测试</button>
+					<button style="padding: 0; width: 140px;" class="btn" @click="pitchingLowest">最低角度测试</button>
+				</view>
+				<view class="long-btn-view">
+					<text class="remark-text">{{$t('steeringEngine.Offset')+pitchingOffset}}°</text>
+					<button style="width: 50px; padding: 0; margin-left: 10px;" class="btn" size="mini"
+						@click="pitchingRevise">{{$t('steeringEngine.Calibrate')}}</button>
+				</view>
 			</view>
 		</view>
 		<view style="padding: 20px 20px;" v-show="isShow">

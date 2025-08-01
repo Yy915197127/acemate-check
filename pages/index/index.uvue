@@ -9,10 +9,6 @@
 		<image style="width: 240px;" src="/static/logo.png" mode="widthFix"></image>
 		<button id="testButton" class="testButton" @click="button_click">{{$t('global.beginTesting')}}</button>
 
-		<!-- 		<native-picker style="height: 200px;" :data="data" :row="row" @change="didSelectPickerRow"></native-picker>
-
-		<native-slider :min="1" :max="20" :value="4" @change="change" @changing="changing"></native-slider> -->
-
 	</view>
 </template>
 
@@ -21,9 +17,7 @@
 	export default {
 		data() {
 			return {
-				title: "" as string,
-				data: Array.from({ length: 41 }, (_, i) => `${20 - i}°`),
-				row: 0
+				title: "" as string
 			}
 		},
 
@@ -34,28 +28,15 @@
 
 		onLoad() {
 			this.title = this.$t('global.globalTest')
-
-			this.row = this.data.indexOf('-15°')
 		},
 
 		methods: {
-			// didSelectPickerRow(res) {
-			// 	console.log(res.detail.row)
-			// },
-
-			// changing() {
-
-			// },
-
-			// change(res) {
-			// 	console.log(res.detail.value)
-			// },
-
 			button_click() {
 				uni.navigateTo({
 					url: '/pages/index/bluetooth-list?page=index'
 				})
 			},
+
 			testRecord() {
 				uni.navigateTo({
 					url: '/pages/test_record/test-record-list'

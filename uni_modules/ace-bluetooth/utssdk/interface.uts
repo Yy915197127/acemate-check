@@ -49,8 +49,8 @@ export type MyApiSync = (paramA : boolean) => MyApiResult
 /* 扫描蓝牙列表回调 */
 export type BluetoothCallback = (res : Array<string>) => void;
 
-/* 设备连接成功回调 */
-export type ConnectionStateBack = () => void;
+/* 设备连接状态回调(只回调一次) */
+export type ConnectionStateBack = (status ?: boolean) => void;
 
 /* 接收设备数据回调  */
 export type ProcessReceivedBlock = (res : Map<string, any>) => void;

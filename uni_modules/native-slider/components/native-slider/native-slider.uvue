@@ -1,5 +1,5 @@
 <template>
-	<native-view style="height: 100px; width: 100%;" @init="onviewinit" @sliderValueChanged="changing"
+	<native-view style="height: 40px;" @init="onviewinit" @sliderValueChanged="changing"
 		@sliderTouchUpInside="change"></native-view>
 </template>
 <script setup lang="uts">

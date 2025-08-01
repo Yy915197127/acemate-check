@@ -8,24 +8,32 @@
 	<view class="page">
 		<view class="module-view">
 			<text class="title">{{serveMachineMotorTitle}}</text>
+			<view style="padding: 0 5px;">
+				<view class="space-view">
+					<text class="remark-text">上电机</text>
+					<text class="">{{up_speed}}</text>
+				</view>
+				<!-- <slider :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174"
+					foreColor="#f1f1f1" :value="up_speed" @changing="up_speedSliderChangeing" /> -->
 
-			<view class="space-view">
-				<text class="remark-text">上电机</text>
-				<text class="">{{up_speed}}</text>
-			</view>
-			<slider style="margin: 0 5px;" :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174"
-				foreColor="#f1f1f1" :value="up_speed" @changing="up_speedSliderChangeing" />
+				<native-slider style="overflow: visible;" :min="1" :max="10" :value="up_speed"
+					@changing="up_speedSliderChangeing"></native-slider>
 
-			<view class="space-view">
-				<text class="remark-text">下电机</text>
-				<text class="">{{down_speed}}</text>
-			</view>
-			<slider style="margin: 0 5px;" :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174"
-				foreColor="#f1f1f1" :value="down_speed" @changing="down_speedSliderChangeing" />
+				<view class="space-view">
+					<text class="remark-text">下电机</text>
+					<text class="">{{down_speed}}</text>
+				</view>
+				<!-- <slider :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174"
+					foreColor="#f1f1f1" :value="down_speed" @changing="down_speedSliderChangeing" /> -->
 
-			<text class="remark-text">(1-10代表1000-10000转，请用测速计进行测试)</text>
-			<view class="button-view">
-				<button :class="isTest ? 'btn' : 'long-btn-g'" @click="confirm">{{isTest ? '开始测试' : '停止测试'}}</button>
+				<native-slider style="overflow: visible;" :min="1" :max="10" :value="down_speed"
+					@changing="down_speedSliderChangeing"></native-slider>
+
+				<text class="remark-text" style="margin-top: 15px;">(1-10代表1000-10000转，请用测速计进行测试)</text>
+				<view class="button-view">
+					<button :class="isTest ? 'btn' : 'long-btn-g'"
+						@click="confirm">{{isTest ? '开始测试' : '停止测试'}}</button>
+				</view>
 			</view>
 		</view>
 

@@ -8,17 +8,19 @@
 	<scroll-view class="page">
 		<view class="module-view">
 			<text class="title">{{wifiTitle}}</text>
-			<view class="space-view">
-				<text>{{$t('WiFi.WiFiName')+wifiname}}</text>
-				<view class="status-view">
-					<view class="status" :style="{ backgroundColor: status ? 'green' : 'darkred'}"></view>
-					<text>{{status?$t('WiFi.Connected'):$t('WiFi.NotConnected')}}</text>
+			<view style="padding: 0 5px;">
+				<view class="space-view">
+					<text>{{$t('WiFi.WiFiName')+wifiname}}</text>
+					<view class="status-view">
+						<view class="status" :style="{ backgroundColor: status ? 'green' : 'darkred'}"></view>
+						<text>{{status?$t('WiFi.Connected'):$t('WiFi.NotConnected')}}</text>
+					</view>
 				</view>
-			</view>
-			<text class="remark-text">{{wifiRemark}}</text>
-			<view class="long-btn-view">
-				<button :class="isShowButton ? 'long-btn' : 'long-btn-g'"
-					@click="wifiButtonAction">{{wifiButton}}</button>
+				<text class="remark-text">{{wifiRemark}}</text>
+				<view class="long-btn-view">
+					<button :class="isShowButton ? 'long-btn' : 'long-btn-g'"
+						@click="wifiButtonAction">{{wifiButton}}</button>
+				</view>
 			</view>
 		</view>
 		<view style="padding: 20px 20px;" v-show="isShow">

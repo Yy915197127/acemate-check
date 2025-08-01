@@ -8,32 +8,40 @@
 	<view class="page">
 		<view class="module-view">
 			<text class="title">{{wheelMotorTitle}}</text>
-
-			<view class="space-view">
-				<text class="remark-text">{{$t('wheelMotor.Speed')}}</text>
-				<text class="">{{speed}}</text>
-			</view>
-			<slider style="margin: 0 5px;" :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174"
-				foreColor="#f1f1f1" :value="speed" @changing="speedSliderChangeing" />
-
-			<view class="space-view">
-				<text class="remark-text">{{$t('wheelMotor.Acceleration')}}</text>
-				<text class="">{{acceleration}}</text>
-			</view>
-			<slider style="margin: 0 5px;" :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174"
-				foreColor="#f1f1f1" :value="acceleration" @changing="accelerationSliderChangeing" />
-
-			<view class="container-view">
-				<view class="container">
-					<button class="btn top-btn" @touchstart="touchstartUp"
-						@touchend="touchend('前进')">{{$t('wheelMotor.Forward')}}</button>
-					<button class="btn right-btn" @touchstart="touchstartRight"
-						@touchend="touchend('右移')">{{$t('wheelMotor.MoveRight')}}</button>
-					<button class="btn bottom-btn" @touchstart="touchstartDown"
-						@touchend="touchend('后退')">{{$t('wheelMotor.Backward')}}</button>
-					<button class="btn left-btn" @touchstart="touchstartLeft"
-						@touchend="touchend('左移')">{{$t('wheelMotor.MoveLeft')}}</button>
+			<view style="padding: 0 5px;">
+				<view class="space-view">
+					<text class="remark-text">{{$t('wheelMotor.Speed')}}</text>
+					<text>{{speed}}</text>
 				</view>
+				<!-- <slider style="margin: 0 5px;" :min="1" :max="10" :step="1" :block-size="25"
+				activeBackgroundColor="#90E174" foreColor="#f1f1f1" :value="speed" @changing="speedSliderChangeing" /> -->
+
+				<native-slider style="overflow: visible;" :min="1" :max="10" :value="speed"
+					@changing="speedSliderChangeing"></native-slider>
+
+				<view class="space-view">
+					<text class="remark-text">{{$t('wheelMotor.Acceleration')}}</text>
+					<text>{{acceleration}}</text>
+				</view>
+				<!-- <slider style="margin: 0 5px;" :min="1" :max="10" :step="1" :block-size="25" activeBackgroundColor="#90E174"
+				foreColor="#f1f1f1" :value="acceleration" @changing="accelerationSliderChangeing" /> -->
+
+				<native-slider style="overflow: visible;" :min="1" :max="10" :value="acceleration"
+					@changing="accelerationSliderChangeing"></native-slider>
+
+				<view class="container-view">
+					<view class="container">
+						<button class="btn top-btn" @touchstart="touchstartUp"
+							@touchend="touchend('前进')">{{$t('wheelMotor.Forward')}}</button>
+						<button class="btn right-btn" @touchstart="touchstartRight"
+							@touchend="touchend('右移')">{{$t('wheelMotor.MoveRight')}}</button>
+						<button class="btn bottom-btn" @touchstart="touchstartDown"
+							@touchend="touchend('后退')">{{$t('wheelMotor.Backward')}}</button>
+						<button class="btn left-btn" @touchstart="touchstartLeft"
+							@touchend="touchend('左移')">{{$t('wheelMotor.MoveLeft')}}</button>
+					</view>
+				</view>
+
 			</view>
 		</view>
 
@@ -41,7 +49,6 @@
 			<button style="color: #ffffff; background-color: #000000;"
 				@click="next()">{{$t('global.NextStep')}}</button>
 		</view>
-
 
 	</view>
 </template>
@@ -63,7 +70,7 @@
 				isUp: false,
 				isRight: false,
 				isDown: false,
-				isLeft: false,
+				isLeft: false
 			}
 		},
 
@@ -74,10 +81,10 @@
 		},
 
 		methods: {
-			speedSliderChangeing(e : UniSliderChangeEvent) {
+			speedSliderChangeing(e) {
 				this.speed = e.detail.value
 			},
-			accelerationSliderChangeing(e : UniSliderChangeEvent) {
+			accelerationSliderChangeing(e) {
 				this.acceleration = e.detail.value
 			},
 			touchstartUp() {
@@ -137,14 +144,12 @@
 				})
 			},
 			setWheelMotor(direction : string) {
-				console.log(direction);
 				this.interval = setInterval(() => {
 					onSendCommand("wheel_test", "start", {
 						"direction": direction,
 						"speed": this.speed,
 						"acc": this.acceleration
 					});
-					console.log(Date.now());
 				}, 300);
 			},
 			next() {
@@ -189,7 +194,6 @@
 		flex-direction: row;
 		/* 两端布局 */
 		justify-content: space-between;
-		height: 40px;
 		margin-top: 15px;
 	}
 
@@ -207,13 +211,13 @@
 
 	.container {
 		position: relative;
-		width: 260px;
-		height: 206px;
+		width: 240px;
+		height: 196px;
 	}
 
 	.btn {
 		position: absolute;
-		//width: 80px;
+		width: 80px;
 		border-color: black;
 		border-width: 1px;
 	}

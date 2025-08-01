@@ -15,7 +15,7 @@
 </template>
 
 <script lang="uts">
-	import { onBluetoothManager, onConnectDevice, onStartScanning, onStopScanning } from '@/uni_modules/ace-bluetooth'
+	import { onBluetoothManager, onConnectDevice, onStartScanning, onStopScanning, onDisconnectPeripheral } from '@/uni_modules/ace-bluetooth'
 
 	export default {
 		data() {
@@ -75,16 +75,35 @@
 					title: this.$t('bluetoothList.Connecting') + name,
 					mask: true
 				})
-				onConnectDevice(name, () => {
+
+				let timeout = setTimeout(() => {
 					uni.hideLoading();
-					if (this.previousPage == 'index') {
-						uni.navigateTo({
-							url: `/pages/index/bluetooth-details?title=${name}`,
-							animationType: "slide-in-bottom"
-						})
+					onDisconnectPeripheral()
+					uni.showToast({
+						title: '连接超时！',
+						icon: 'error'
+					})
+				}, 20000);
+
+				onConnectDevice(name, (status) => {
+					uni.hideLoading();
+					clearTimeout(timeout)
+					if (status) {
+						if (this.previousPage == 'index') {
+							uni.navigateTo({
+								url: `/pages/index/bluetooth-details?title=${name}`,
+								animationType: "slide-in-bottom"
+							})
+						} else {
+							uni.$emit('unit', name)
+							uni.navigateBack()
+						}
 					} else {
-						uni.$emit('unit', name)
-						uni.navigateBack()
+						onDisconnectPeripheral()
+						uni.showToast({
+							title: '连接失败！',
+							icon: 'error'
+						})
 					}
 				})
 			}

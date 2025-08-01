@@ -8,6 +8,7 @@ export class NativeSlider {
 	element : UniNativeViewElement;
 	slider : UISlider | null;
 	lastNotifiedStep : number = -1;
+	generator : UIImpactFeedbackGenerator | null;
 
 	constructor(element : UniNativeViewElement) {
 		// 接收组件传递过来的UniNativeViewElement
@@ -27,8 +28,13 @@ export class NativeSlider {
 
 		const method2 = new Selector("sliderTouchUpInside:")
 		slider?.addTarget(this, action = method2, for = UIControl.Event.touchUpInside)
+
 		// UniNativeViewElement 绑定原生 view
 		this.element.bindIOSView(this.slider!);
+
+		if (UTSiOS.available("iOS 13.0, *")) {
+			this.generator = new UIImpactFeedbackGenerator(style = UIImpactFeedbackGenerator.FeedbackStyle.rigid)
+		}
 	}
 
 	updateValue(min : Float, max : Float, value : Float) {
@@ -60,13 +66,9 @@ export class NativeSlider {
 		let rounded = Math.round(Number.from(sender.value));
 		sender.value = new Float(rounded)
 		if (rounded != this.lastNotifiedStep) {
-			if (UTSiOS.available("iOS 13.0, *")) {
-				// 触觉反馈
-				let generator = new UIImpactFeedbackGenerator(style = UIImpactFeedbackGenerator.FeedbackStyle.rigid)
-				generator.impactOccurred()
-				generator.prepare()
-				this.lastNotifiedStep = rounded
-			}
+			this.generator!.impactOccurred()
+			this.generator!.prepare()
+			this.lastNotifiedStep = rounded
 		}
 	}
 

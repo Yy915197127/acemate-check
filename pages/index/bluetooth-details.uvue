@@ -11,26 +11,30 @@
 				<text class="title">{{rssiTitle}}</text>
 				<text>{{rssi}}db</text>
 			</view>
-			<text style="font-size: 13; color: gray; margin-top: 15px;">{{rssiRemark}}</text>
+			<view style="padding: 0 5px;">
+				<text class="remark-text" style="margin-top: 15;">{{rssiRemark}}</text>
+			</view>
 		</view>
 
 		<view class="module-view" style="margin-top: 20px;">
 			<text class="title">{{receiveSendDataTitle}}</text>
-			<view class="space-view send-data-view">
-				<text>{{sendDataTitle}}</text>
-				<button style="border-color: black; border-width: 1px;" size="mini"
-					@click="send()">{{$t('bluetoothDetails.Send')}}</button>
+			<view style="padding: 0 5px;">
+				<view class="space-view send-data-view">
+					<text>{{sendDataTitle}}</text>
+					<button style="border-color: black; border-width: 1px;" size="mini"
+						@click="send()">{{$t('bluetoothDetails.Send')}}</button>
+				</view>
+				<view class="space-view send-data-view">
+					<text>{{receiveDataTitle}}</text>
+					<view :class="status ? 'on-status-view' : 'status-view'"></view>
+				</view>
+				<view class="space-view send-data-view">
+					<text>版本号</text>
+					<text>{{version}}</text>
+				</view>
+				<text class="remark-text"
+					style="margin-top: 15;">{{status ? receiveSucceedRemark : receiveDataRemark}}</text>
 			</view>
-			<view class="space-view send-data-view">
-				<text>{{receiveDataTitle}}</text>
-				<view :class="status ? 'on-status-view' : 'status-view'"></view>
-			</view>
-			<view class="space-view send-data-view">
-				<text>版本号</text>
-				<text>{{version}}</text>
-			</view>
-			<text
-				style="font-size: 13; color: gray; margin-top: 15px;">{{status ? receiveSucceedRemark : receiveDataRemark}}</text>
 		</view>
 
 		<view style="padding: 20px 20px;">
@@ -166,6 +170,12 @@
 		flex-direction: row;
 		/* 两端布局 */
 		justify-content: space-between;
+	}
+
+	.remark-text {
+		font-size: 13;
+		line-height: 1.4;
+		color: gray;
 	}
 
 	.send-data-view {

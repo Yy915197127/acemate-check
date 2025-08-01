@@ -70,7 +70,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     var onConnectionChange: ((ConnectionState) -> Void)?
 
     /// 连接状态变化时的回调
-    var onConnectionChangeBack: (() -> Void)?
+    var onConnectionChangeBack: ((Bool) -> Void)?
 
     /// 开始连接时的回调
     var startConnectBlock: ((CBManagerState) -> Void)?
@@ -205,6 +205,8 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         _ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?
     ) {
         onConnectionChange?(.failed(error))
+        onConnectionChangeBack?(false)
+        console.log("连接失败", error)
     }
 
     /// 扫描到设备的回调
@@ -250,7 +252,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     }
 
     //连接制定名称的设备
-    func connectDeviceName(_ name: String, _ connectionChangeBlock: @escaping (() -> Void)) {
+    func connectDeviceName(_ name: String, _ connectionChangeBlock: @escaping ((Bool) -> Void)) {
         guard !peripheralDic.isEmpty else { return }
         onConnectionChangeBack = connectionChangeBlock
         targetPeripheral = peripheralDic[name]
@@ -387,7 +389,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 console.log("订阅状态特征通知失败：\(error.localizedDescription)")
             } else {
                 console.log(characteristic.isNotifying ? "已订阅状态特征通知" : "已停止状态特征通知订阅")
-                onConnectionChangeBack?()
+                onConnectionChangeBack?(true)
                 onReconnectBlockUTS?(peripheral.name, 1)
             }
         }
@@ -773,7 +775,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         //                        switch result {
         //                        case .success:
         //                            console.log("上传完成，开始升级")
-        //                            // 3. 切换到“正在升级”阶段，90 秒模拟进度
+        //                            // 3. 切����������“正在升级”阶段，90 秒模拟进度
         //
         //                            // 真正触���升级指令
         //                            OtaManager.shared.triggerUpdate { result in

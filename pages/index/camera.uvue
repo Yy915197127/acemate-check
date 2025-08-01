@@ -9,39 +9,45 @@
 
 		<view class="module-view">
 			<text class="title">{{cameraSnapshotTitle}}</text>
-			<view class="space-view">
-				<view>
-					<text>左</text>
-					<view :style="{'width': imageView_w, 'height':imageView_w/1.5}" class="image">
-						<image :style="{'width': image_w}" :src="imageList[0]" mode="widthFix" @click="previewImage(0)">
-						</image>
+			<view style="padding: 0 5px;">
+				<view class="space-view">
+					<view>
+						<text>左</text>
+						<view :style="{'width': imageView_w, 'height':imageView_w/1.5}" class="image">
+							<image :style="{'width': image_w}" :src="imageList[0]" mode="widthFix"
+								@click="previewImage(0)">
+							</image>
+						</view>
+					</view>
+					<view>
+						<text>右</text>
+						<view :style="{'width': imageView_w, 'height':imageView_w/1.5}" class="image">
+							<image :style="{'width': image_w}" :src="imageList[1]" mode="widthFix"
+								@click="previewImage(1)">
+							</image>
+						</view>
 					</view>
 				</view>
-				<view>
-					<text>右</text>
-					<view :style="{'width': imageView_w, 'height':imageView_w/1.5}" class="image">
-						<image :style="{'width': image_w}" :src="imageList[1]" mode="widthFix" @click="previewImage(1)">
-						</image>
-					</view>
+				<text class="remark-text">{{cameraSnapshotRemark}}</text>
+				<view class="long-btn-view">
+					<button class="long-btn" @click="cameraSnapshotButtonAction">开始测试</button>
 				</view>
-			</view>
-			<text class="remark-text">{{cameraSnapshotRemark}}</text>
-			<view class="long-btn-view">
-				<button class="long-btn" @click="cameraSnapshotButtonAction">开始测试</button>
 			</view>
 		</view>
 
 		<view class="module-view" style="margin-top: 20px;">
 			<text class="title">{{cameraTitle}}</text>
-			<text class="remark-text">{{tennisRemark}}</text>
-			<view class="space-view">
-				<text>{{$t('camera.Height')+height.toFixed(2)}}m</text>
-				<text>{{$t('camera.Depth')+depth.toFixed(2)}}m</text>
-				<text>{{$t('camera.LeftRight')+lr.toFixed(2)}}m</text>
-			</view>
-			<text class="remark-text">{{cameraRemark}}</text>
-			<view class="long-btn-view">
-				<button class="long-btn" @click="cameraButtonAction">{{isCamera ? "开始测试" : "停止检测"}}</button>
+			<view style="padding: 0 5px;">
+				<text class="remark-text">{{tennisRemark}}</text>
+				<view class="space-view">
+					<text>{{$t('camera.Height')+height.toFixed(2)}}m</text>
+					<text>{{$t('camera.Depth')+depth.toFixed(2)}}m</text>
+					<text>{{$t('camera.LeftRight')+lr.toFixed(2)}}m</text>
+				</view>
+				<text class="remark-text">{{cameraRemark}}</text>
+				<view class="long-btn-view">
+					<button class="long-btn" @click="cameraButtonAction">{{isCamera ? "开始测试" : "停止检测"}}</button>
+				</view>
 			</view>
 		</view>
 		<view style="padding: 20px 20px;" v-show="isShow">
@@ -77,7 +83,7 @@
 
 		computed: {
 			imageView_w() : number {
-				return (uni.getWindowInfo().windowWidth - 50) / 2
+				return (uni.getWindowInfo().windowWidth - 60) / 2
 			},
 
 			image_w() : string {
